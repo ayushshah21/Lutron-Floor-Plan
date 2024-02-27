@@ -28,4 +28,4 @@ A Miro-like multi-user application where users can upload floor plans (ceiling p
 - Documentation folder: https://drive.google.com/drive/folders/1IZNa4fFCGmNITipyYJfUingX30zaHY6D?usp=drive_link
 
 ## How to run application
-- TBD
+- Run npm install to start
