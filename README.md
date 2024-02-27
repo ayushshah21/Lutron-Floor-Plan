@@ -9,8 +9,8 @@ A Miro-like multi-user application where users can upload floor plans (ceiling p
 - Amelia Gankhuyag 
 
 ### **Tech Stack:** 
-- Front-End: TypeScript, React.js, Vite, Redux, KonvaJS,  
-- Back-End: NodeJS, Firebase, Firestore, NextJS, SocketIO
+- Front-End: Next.js, Konva.js, Socket.IO (Client-Side)  
+- Back-End: Firebase, Socket.IO (Server-Side)
 - Testing: Cypress, Jest
 
 ## Features
