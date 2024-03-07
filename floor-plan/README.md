@@ -7,6 +7,7 @@ If its the first time running the program run:
 npm install
 ```
 
+Then create a .env.local file and copy in credentials from slack
 
 
 First, run the development server:
