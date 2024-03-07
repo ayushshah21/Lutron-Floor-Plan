@@ -28,4 +28,6 @@ A Miro-like multi-user application where users can upload floor plans (ceiling p
 - Documentation folder: https://drive.google.com/drive/folders/1IZNa4fFCGmNITipyYJfUingX30zaHY6D?usp=drive_link
 
 ## How to run application
-- Run npm install to start
+- Create a .env.local file and add credentials in order for Next Auth to work
+- Run npm install to get dependencies
+- Run npm run dev to start application
