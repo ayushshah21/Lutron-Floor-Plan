@@ -1,21 +1,42 @@
-"use client";
+//"use client";
 import { signOut, useSession } from "next-auth/react";
-import styles from "./page.module.css";
+import styles from './MainPage.module.css';
 
 export default function Home() {
-  const session = useSession();
-  return (
-    <main className={styles.main}>
-      <div className={styles.loginBox}>
-        <p>
-          Floor plan editor page
-        </p>
-        <>
-          <div>{"Welcome back, " + session?.data?.user?.name}</div>
-          <button className={styles.button} onClick={() => signOut()}>Logout</button>
-        </>
-      </div>
-    </main>
-  );
+  const { data: session } = useSession();
+  
+  if (session) {
+    return (
+      <main className={styles.container}>
+        <header className={styles.header}>
+          <img src="/logo.png" alt="Company Logo" className={styles.logo} />
+          <input
+            type="search"
+            placeholder="Search floor plans"
+            className={styles.searchInput}
+          />
+        </header>
+        
+        <aside className={styles.sidebar}>
+          <button className={styles.newButton}>New</button>
+          <nav className={styles.nav}>
+            <a className={styles.navItem} href="/shared">Shared with me</a>
+            <a className={styles.navItem} href="/recent">Recent</a>
+            <a className={styles.navItem} href="/starred">Starred</a>
+          </nav>
+        </aside>
+        
+        <section className={styles.content}>
+          {/* Content and welcome message */}
+          <div className={styles.welcomeBox}>
+            Welcome back, {session.user.name}
+            <button className={styles.button} onClick={() => signOut()}>Logout</button>
+          </div>
+        </section>
+      </main>
+    );
+  } else {
+    // Redirect to login or show some message
+    return <div>Please log in to view this page.</div>;
+  }
 }
-

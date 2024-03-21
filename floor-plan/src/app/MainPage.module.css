@@ -1,0 +1,72 @@
+/* src/app/MainPage.module.css */
+.container {
+    display: grid;
+    grid-template-columns: 250px auto;
+    height: 100vh;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    height: 60px;
+    grid-column: 1 / -1; /* Header spans all columns */
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* Keep header above other content */
+  }
+  
+  .logo {
+    /* Add actual logo styles here */
+  }
+  
+  .searchInput {
+    /* Add actual search input styles here */
+  }
+  
+  .newButton {
+    /* Add actual 'New' button styles here */
+  }
+  
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding-top: 60px; /* Adjusted to push content below the header */
+  }
+  
+  .nav {
+    /* Add styles for the navigation menu */
+  }
+  
+  .navItem {
+    /* Add actual navigation item styles here */
+    margin: 1rem 0;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navItem:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .content {
+    /* Add styles for the main content area */
+  }
+  
+  .welcomeBox {
+    /* Add styles for the welcome box */
+  }
+  
+  .button {
+    /* Add styles for the logout button */
+  }
+  
+  /* Add responsive styles for smaller devices */
+  @media (max-width: 768px) {
+    /* ... */
+  }
+  
