@@ -5,10 +5,13 @@ import styles from './MainPage.module.css';
 
 export default function Home() {
   const { data: session, status } = useSession();
-  
-  // Wait until we know if we have a session or not before rendering
+
   if (status === "loading") {
     return <p>Loading...</p>;
+  }
+
+  if (!session) {
+    return <div>You must be logged in to view this page.</div>;
   }
 
   return (
