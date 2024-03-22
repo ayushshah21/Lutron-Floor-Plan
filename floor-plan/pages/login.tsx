@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import styles from "./LoginPage.module.css";
+import styles from '../src/styles/LoginPage.module.css';
 
 export default function Login() {
   return (
