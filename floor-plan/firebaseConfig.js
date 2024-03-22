@@ -12,9 +12,9 @@ const firebaseConfig = {
   storageBucket: "lutron-floor-plan.appspot.com",
   messagingSenderId: "808163386870",
   appId: "1:808163386870:web:e15dc6c2d7350d472e53d7",
-  measurementId: "G-VYC6QSGR25"
+  measurementId: "G-VYC6QSGR25",
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+export const app = initializeApp(firebaseConfig);
+export const analytics = getAnalytics(app);
