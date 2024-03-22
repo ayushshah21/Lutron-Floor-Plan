@@ -13,11 +13,11 @@
 .canvasBox {
   position: absolute;
   height: 560px;
-  width: 852px;
+  width: 900px;
   border-radius: 8px;
   background-color: #FFFFFF;
   margin: auto;
-  left: 50%;
+  left: 52%;
   top: 55%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -43,7 +43,6 @@
   min-width: 90px;
   padding: 8px 16px;
   width: 20%;
-  margin-top: 24px;
   border-radius: 2px;
   border: 1px solid;
   background-color: #1E75BB;
