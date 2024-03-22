@@ -12,7 +12,10 @@
     "test:e2e:run": "cypress run"
   },
   "dependencies": {
+    "@firebase/firestore": "^4.5.0",
+    "@firebase/storage": "^0.12.2",
     "firebase": "^10.8.0",
+    "formidable": "^3.5.1",
     "next": "^14.1.0",
     "next-auth": "^4.24.7",
     "react": "^18",
@@ -23,6 +26,8 @@
     "@babel/core": "^7.23.9",
     "@testing-library/cypress": "^10.0.1",
     "@types/node": "^20",
+    "@types/formidable": "^3.4.5",
+    "@types/node": "^20.11.30",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "cypress": "^13.6.6",
