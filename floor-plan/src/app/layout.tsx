@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import './globals.css'
 import { Inter } from 'next/font/google'
 import SessionProvider from './SessionProvider';
-import Login from './Login';
+import Login from '../../pages/login';
 import Home from './page';
 
 const inter = Inter({ subsets: ['latin'] })
