@@ -1,21 +1,40 @@
 "use client";
-import { signOut, useSession } from "next-auth/react";
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  User,
+} from "firebase/auth";
 import styles from "./page.module.css";
+import { auth, googleProvider } from "../../firebase";
 
-export default function Home() {
-  const session = useSession();
+
+interface HomeProps {
+  user: User | null;
+  setUser: (user: User | null) => void;
+}
+
+export default function Home({ user, setUser }: HomeProps) {
+  const signOutWithGoogle = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.loginBox}>
-        <p>
-          Floor plan editor page
-        </p>
+        <p>Floor plan editor page</p>
         <>
-          <div>{"Welcome back, " + session?.data?.user?.name}</div>
-          <button className={styles.button} onClick={() => signOut()}>Logout</button>
+          <div>Welcome back, {user?.displayName?.split(" ")[0]}</div>
+          <button className={styles.button} onClick={() => signOutWithGoogle()}>
+            Logout
+          </button>
         </>
       </div>
     </main>
   );
 }
-

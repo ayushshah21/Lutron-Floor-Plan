@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
-import { app } from '../../../firebaseConfig';
+import { app } from '../../../firebase';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import formidable from 'formidable';
 import * as fs from 'fs';
 
-// Found a workaround for error I was getting: This disables the default body parser to use the 
+// Found a workaround for an error I was getting: This disables the default body parser to use the 
 // formidable library for file parsing for our POST requests
 export const config = {
     api: {

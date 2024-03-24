@@ -1,30 +1,37 @@
-import { authOptions } from './authOptions';
-import { getServerSession } from 'next-auth'
-import './globals.css'
-import { Inter } from 'next/font/google'
-import SessionProvider from './SessionProvider';
-import Login from './Login';
-import Home from './page';
+"use client";
+import { useState, useEffect } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "../../firebase"; // Adjust the path as needed to import your Firebase auth object
+import "./globals.css";
+import { Inter } from "next/font/google";
+import Login from "./Login";
+import Home from "./page";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const logout = onAuthStateChanged(auth, (currentUser: User | null) => {
+      setUser(currentUser);
+    });
+    return () => logout();
+  }, []);
+
   return (
     <html lang="en">
       <body className={inter.className}>
-      <SessionProvider session={session}>
-        {!session ? (
-          <Login/>
-        ): (
-          <Home/>
+        {user ? (
+          <Home user={user} setUser={setUser} />
+        ) : (
+          <Login user={user} setUser={setUser} />
         )}
-      </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
