@@ -1,147 +1,98 @@
-/* Global settings */
-:root {
-  --sidebar-bg-color: #f7f7f7;
-  --sidebar-width: 240px;
-  --main-bg-color: #ffffff;
-  --main-color: #515151;
-  --button-bg-color: #1E75BB;
-  --button-color: #ffffff;
-}
+/* page.module.css */
 
-/* Flex container for the whole app layout */
+/* Main container of your app, which includes the sidebar and main content */
 .container {
   display: flex;
-  min-height: 100vh;
-  font-family: "Helvetica", sans-serif;
+  height: 100vh; /* Take full height of the viewport */
 }
 
-.lutronLogo {
-  max-width: 200px; /* Adjust the width as needed */
-  margin-bottom: 2rem; /* Spacing below the logo */
-  /* Other styles remain the same */
-}
-
-/* Sidebar styles */
+/* The sidebar styles */
 .sidebar {
-  width: var(--sidebar-width);
-  background-color: var(--sidebar-bg-color);
+  width: var(--sidebar-width); /* Use the global variable for consistent sizing */
+  background: var(--sidebar-bg-color); /* Use the global color variable */
   padding: 1rem;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Align the logout button to the bottom */
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
 }
 
-/* Navigation menu styles */
-.navigation {
-  display: flex;
-  flex-direction: column;
+/* Logo style, adjust as necessary */
+.lutronLogo {
+  max-width: 80%; /* Adjust the size of the logo */
+  margin-bottom: 2rem;
+  align-self: center; /* Center the logo in the sidebar */
 }
 
-/* Individual navigation button styles */
+/* Navigation buttons within the sidebar */
 .navButton {
   background: none;
   border: none;
-  text-align: left;
   padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  text-align: left;
   cursor: pointer;
-  font-size: 1rem;
-  color: var(--main-color);
-  transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.3s;
 }
 
 .navButton:hover {
-  background-color: #eaeaea;
+  background-color: #e4e4e4; /* A light grey for hover state */
 }
 
-/* Logout button styles */
+/* Logout button at the bottom of the sidebar */
 .logoutButton {
+  margin-top: auto; /* Push it to the bottom */
   padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  color: var(--main-color);
-  background-color: #e4e4e4;
+  width: 100%;
+  background: none;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s;
 }
 
 .logoutButton:hover {
-  background-color: #d4d4d4;
+  background-color: #e4e4e4;
 }
 
 /* Main content area */
 .mainContent {
   flex-grow: 1;
-  background-color: var(--main-bg-color);
-  color: var(--main-color);
+  overflow-y: auto; /* In case of scrolling */
   padding: 2rem;
+  background-color: #fff; /* A neutral white background */
 }
 
-/* Search bar styles */
-.searchBar input {
-  width: 100%;
-  padding: 0.5rem;
+/* Search bar at the top of the main content */
+.searchBar {
+  display: flex;
   margin-bottom: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
 }
 
-/* Common button styles */
+.searchInput {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc; /* A light grey border */
+  border-radius: var(--border-radius); /* Use the global border-radius variable */
+}
+
+/* Button used in your main content area, like the "New" button */
 .button {
-  cursor: pointer;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  color: var(--button-color);
-  background-color: var(--button-bg-color);
+  background-color: #1E75BB; /* Brand color for the button background */
+  color: white; /* White text color */
   border: none;
-  border-radius: 4px;
-  transition: background-color 0.2s ease-in-out;
+  padding: 0.5rem 1rem;
+  margin-left: 1rem; /* Space it out from other elements */
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s;
 }
 
 .button:hover {
-  background-color: darken(var(--button-bg-color), 10%);
+  background-color: darken(#1E75BB, 10%); /* Darken the button on hover */
 }
 
-/* Styles for login box and other modal/dialog-like components */
-.loginBox {
-  background-color: #FFFFFF;
-  border-radius: 8px;
+/* Specific styles for your prompt text */
+.prompt {
+  font-size: 1rem;
+  color: #666; /* A medium grey for the prompt text */
   padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: auto;
-  max-width: 400px; /* Adjust width as necessary */
 }
 
-/* Logo styles */
-.lutronLogo {
-  width: 50%; /* Adjust width as necessary */
-  margin-bottom: 2rem;
-}
-
-/* Additional styles for cards and animations can be adjusted or removed based on the actual usage in your components */
-
-/* Mobile responsiveness */
-@media (max-width: 700px) {
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative; /* If you want the sidebar to be on top */
-  }
-
-  .mainContent {
-    padding: 1rem;
-  }
-
-  /* Adjust logout button for mobile */
-  .logoutButton {
-    padding: 0.5rem;
-  }
-
-  /* Adjust other styles as necessary for mobile layout */
-}
-
-/* Dark mode preferences */
-@media (prefers-color-scheme: dark) {
-  /* Adjust colors for dark mode if necessary */
-}
