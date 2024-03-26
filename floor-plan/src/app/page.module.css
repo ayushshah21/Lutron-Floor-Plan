@@ -8,12 +8,31 @@
 
 /* The sidebar styles */
 .sidebar {
-  width: var(--sidebar-width); /* Use the global variable for consistent sizing */
-  background: var(--sidebar-bg-color); /* Use the global color variable */
+  background: #FFFFFF;
   padding: 1rem;
-  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.2);
+  width: 240px;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar nav {
+  margin-top: 20px; /* Spacing at the top inside the sidebar */
+}
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.navItem:not(:last-child) {
+  margin-bottom: 10px; /* Spacing between nav items */
 }
 
+.navItem:hover {
+  background-color: #ececec; /* Light grey background on hover */
+}
 /* Logo style, adjust as necessary */
 .lutronLogo {
   max-width: 80%; /* Adjust the size of the logo */
@@ -39,14 +58,14 @@
 
 /* Logout button at the bottom of the sidebar */
 .logoutButton {
-  margin-top: auto; /* Push it to the bottom */
-  padding: 0.5rem 1rem;
-  width: 100%;
   background: none;
   border: none;
+  color: #1E75BB;
+  padding: 10px 20px;
+  text-align: left;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
+
 
 .logoutButton:hover {
   background-color: #e4e4e4;
@@ -55,22 +74,26 @@
 /* Main content area */
 .mainContent {
   flex-grow: 1;
-  overflow-y: auto; /* In case of scrolling */
   padding: 2rem;
-  background-color: #fff; /* A neutral white background */
+  background-color: #F9F9F9;
 }
 
 /* Search bar at the top of the main content */
 .searchBar {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 10px 15px;
+  margin-bottom: 20px; /* Adjust the margin as needed */
   display: flex;
-  margin-bottom: 1rem;
+  align-items: center;
 }
 
 .searchInput {
-  flex-grow: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc; /* A light grey border */
-  border-radius: var(--border-radius); /* Use the global border-radius variable */
+  border: none;
+  outline: none;
+  padding-left: 10px;
+  margin-right: 10px;
+  width: 100%; /* Full width */
 }
 
 /* Button used in your main content area, like the "New" button */
@@ -91,8 +114,20 @@
 
 /* Specific styles for your prompt text */
 .prompt {
-  font-size: 1rem;
-  color: #666; /* A medium grey for the prompt text */
-  padding: 1rem;
+  color: #7A7A7A; /* Light gray color for the text */
+  margin-left: 20px; /* Give some space from the left */
 }
 
+.newButton {
+  background-color: #fff;
+  border: 1px solid #D3D3D3; /* Light gray border */
+  border-radius: 20px;
+  color: #000000;
+  padding: 10px 15px;
+  margin-bottom: 20px; /* Space between button and prompt */
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
