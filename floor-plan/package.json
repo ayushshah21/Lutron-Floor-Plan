@@ -14,7 +14,7 @@
   "dependencies": {
     "@firebase/firestore": "^4.5.0",
     "@firebase/storage": "^0.12.2",
-    "firebase": "^10.8.0",
+    "firebase": "^10.9.0",
     "formidable": "^3.5.1",
     "next": "^14.1.0",
     "next-auth": "^4.24.7",
