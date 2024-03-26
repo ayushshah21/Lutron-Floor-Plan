@@ -119,15 +119,23 @@
 }
 
 .newButton {
-  background-color: #fff;
-  border: 1px solid #D3D3D3; /* Light gray border */
-  border-radius: 20px;
-  color: #000000;
-  padding: 10px 15px;
-  margin-bottom: 20px; /* Space between button and prompt */
+  background-color: #1E75BB; /* Assuming you want the button to have the brand color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  box-shadow: none; /* No box-shadow */
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 0.875rem;
   cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  justify-content: center;
+  border-radius: 22px;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  gap: 8px;
+  outline: none;
+  transition: background-color 0.3s ease;
+}
+.newButton:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); /* larger box-shadow on hover */
+  transform: translateY(-2px); /* slight move up effect on hover */
 }
