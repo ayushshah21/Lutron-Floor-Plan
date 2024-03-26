@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth, googleProvider } from "../../firebase";
-import styles from "./page.module.css";
+import styles from "./login.module.css";
 
 interface HomeProps {
   user: User | null;
