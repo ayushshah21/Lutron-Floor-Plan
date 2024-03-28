@@ -4,7 +4,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import SessionProvider from './SessionProvider';
 import Login from './Login';
-import Home from './page';
+import Home from './editor';
 
 const inter = Inter({ subsets: ['latin'] })
 

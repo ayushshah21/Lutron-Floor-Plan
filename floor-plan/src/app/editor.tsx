@@ -23,33 +23,35 @@ export default function Home() {
   };
 
   return (
-    <main className={"main"}>
+    <main className="main">
 
-      <nav className={"navbar"}>
+      <nav className="navbar">
         <img
-          className={"lutronLogo"}
+          className="lutronLogo"
           src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
           alt="Lutron-logo"
         />
-        <h1 className={"navbarBrand"}>Test Floor Plan #1 </h1>
-        <ul className={"navbarNav"}>
-          <li className={"navbarItem"}>
-            <button className={"button"} onClick={() => signOut()}>Logout</button>
+        <h1 className="navbarBrand">Test Floor Plan #1 </h1>
+        <ul className="navbarNav">
+          <li className="navbarItem">
+            <button className="button" onClick={() => signOut()}>Logout</button>
+          </li>
+          <li>
+            {/* File Import Button */}
+            <form>
+              <input type="file" onChange={handleFileChange} accept="application/pdf" />
+            </form>
+            {/* File Export Button to be added: */}
           </li>
         </ul>
       </nav>
-      <div className={"canvasBox"}>
-        <p>This is where the pdf should appear</p>
-
-        <form>
-          <input type="file" onChange={handleFileChange} accept="application/pdf" />
-        </form>
-
-        {/* Displays pdf but I can't control the height or width */}
+      <div className="canvasBox">
+        {/* Displays pdf*/}
+        {/* Add feature to zoom in and zoom out of pdf */}
         {pdfFile && (
-            <Document file={URL.createObjectURL(pdfFile)}>
-                <Page pageNumber={1} renderAnnotationLayer={false} renderTextLayer={false}/>
-            </Document>
+          <Document file={URL.createObjectURL(pdfFile)}>
+            <Page pageNumber={1} renderAnnotationLayer={false} renderTextLayer={false} />
+          </Document>
         )}
 
       </div>
