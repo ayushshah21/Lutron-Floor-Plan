@@ -1,0 +1,141 @@
+/* page.module.css */
+
+/* Main container of your app, which includes the sidebar and main content */
+.container {
+  display: flex;
+  height: 100vh; /* Take full height of the viewport */
+}
+
+/* The sidebar styles */
+.sidebar {
+  background: #FFFFFF;
+  padding: 1rem;
+  width: 240px;
+  height: 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+.sidebar nav {
+  margin-top: 20px; /* Spacing at the top inside the sidebar */
+}
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+.navItem:not(:last-child) {
+  margin-bottom: 10px; /* Spacing between nav items */
+}
+
+.navItem:hover {
+  background-color: #ececec; /* Light grey background on hover */
+}
+/* Logo style, adjust as necessary */
+.lutronLogo {
+  max-width: 80%; /* Adjust the size of the logo */
+  margin-bottom: 2rem;
+  align-self: center; /* Center the logo in the sidebar */
+}
+
+/* Navigation buttons within the sidebar */
+.navButton {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navButton:hover {
+  background-color: #e4e4e4; /* A light grey for hover state */
+}
+
+/* Logout button at the bottom of the sidebar */
+.logoutButton {
+  background: none;
+  border: none;
+  color: #1E75BB;
+  padding: 10px 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+
+.logoutButton:hover {
+  background-color: #e4e4e4;
+}
+
+/* Main content area */
+.mainContent {
+  flex-grow: 1;
+  padding: 2rem;
+  background-color: #F9F9F9;
+}
+
+/* Search bar at the top of the main content */
+.searchBar {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 10px 15px;
+  margin-bottom: 20px; /* Adjust the margin as needed */
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  border: none;
+  outline: none;
+  padding-left: 10px;
+  margin-right: 10px;
+  width: 100%; /* Full width */
+}
+
+/* Button used in your main content area, like the "New" button */
+.button {
+  background-color: #1E75BB; /* Brand color for the button background */
+  color: white; /* White text color */
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-left: 1rem; /* Space it out from other elements */
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s;
+}
+
+.button:hover {
+  background-color: darken(#1E75BB, 10%); /* Darken the button on hover */
+}
+
+/* Specific styles for your prompt text */
+.prompt {
+  color: #7A7A7A; /* Light gray color for the text */
+  margin-left: 20px; /* Give some space from the left */
+}
+
+.newButton {
+  background-color: #1E75BB; /* Assuming you want the button to have the brand color */
+  color: white; /* Text color */
+  border: none; /* No border */
+  box-shadow: none; /* No box-shadow */
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  outline: none;
+  transition: background-color 0.3s ease;
+}
+.newButton:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); /* larger box-shadow on hover */
+  transform: translateY(-2px); /* slight move up effect on hover */
+}

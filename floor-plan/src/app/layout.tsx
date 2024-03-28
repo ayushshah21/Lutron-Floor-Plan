@@ -6,6 +6,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import Login from "./Login";
 import Home from "./page";
+import Editor from "./editor";
 
 const inter = Inter({ subsets: ["latin"] });
 
