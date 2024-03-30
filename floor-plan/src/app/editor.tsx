@@ -53,11 +53,8 @@ export default function Editor({ user, setUser }: HomeProps) {
     const fileUrl = URL.createObjectURL(pdfFile);
     // Create a temporary anchor element
     const a = document.createElement("a");
-    // Set the download attribute of the anchor element with the file name
     a.download = pdfFile.name;
-    // Set the href of the anchor to the file URL
     a.href = fileUrl;
-    // Append the anchor to the document
     document.body.appendChild(a);
     // Trigger the download by simulating a click on the anchor
     a.click();
