@@ -30,7 +30,7 @@ export default function RootLayout({
         {user ? (
           <Editor user={user} setUser={setUser} />
         ) : (
-          <Home user={user} setUser={setUser} />
+          <Login user={user} setUser={setUser} />
         )}
       </body>
     </html>
