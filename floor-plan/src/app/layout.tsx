@@ -28,9 +28,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {user ? (
-          <Home user={user} setUser={setUser} />
+          <Editor user={user} setUser={setUser} />
         ) : (
-          <Login user={user} setUser={setUser} />
+          <Home user={user} setUser={setUser} />
         )}
       </body>
     </html>
