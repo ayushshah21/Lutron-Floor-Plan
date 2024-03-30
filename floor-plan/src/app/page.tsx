@@ -7,7 +7,8 @@ import {
 } from "firebase/auth";
 import styles from "./page.module.css";
 import { auth, googleProvider } from "../../firebase";
-
+import { useUploadPdf } from "./useUploadPdf";
+import { useState } from "react";
 
 interface HomeProps {
   user: User | null;
@@ -15,12 +16,22 @@ interface HomeProps {
 }
 
 export default function Home({ user, setUser }: HomeProps) {
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const { uploadPdf, uploading, error } = useUploadPdf();
   const signOutWithGoogle = async () => {
     try {
       await signOut(auth);
       setUser(null);
     } catch (err) {
       console.error(err);
+    }
+  };
+  const handleUpload = async () => {
+    await uploadPdf(pdfFile);
+    if (error) {
+      alert(error);
+    } else {
+      alert("PDF uploaded successfully!");
     }
   };
 
@@ -45,11 +56,20 @@ export default function Home({ user, setUser }: HomeProps) {
       </aside>
       <main className={styles.mainContent}>
         <div className={styles.searchBar}>
-          <input type="text" placeholder="Search floor plans" className={styles.searchInput} />
+          <input
+            type="text"
+            placeholder="Search floor plans"
+            className={styles.searchInput}
+          />
         </div>
-        <div className={styles.newButton}>
-          <button className={styles.button}>+ New</button>
-        </div>
+        <button
+          className={styles.button}
+          onClick={handleUpload}
+          disabled={uploading}
+        >
+          {uploading ? "Uploading..." : "+ New"}
+        </button>
+
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>

@@ -22,8 +22,6 @@ interface HomeProps {
 export default function Editor({ user, setUser }: HomeProps) {
   // Store state of pdfFile
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const { uploadPdf, uploading, error } = useUploadPdf(); 
-
 
   // Sign out
   const signOutWithGoogle = async () => {
@@ -35,15 +33,6 @@ export default function Editor({ user, setUser }: HomeProps) {
     }
   };
 
-  const handleUpload = async () => {
-    await uploadPdf(pdfFile);
-    if (error) {
-      alert(error);
-    } else {
-      alert("PDF uploaded successfully!");
-    }
-  };
-
   // Checks file type and if it is a pdf
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
@@ -52,6 +41,29 @@ export default function Editor({ user, setUser }: HomeProps) {
     } else {
       alert("Please select a valid PDF file.");
     }
+  };
+
+  const handleDownload = () => {
+    if (!pdfFile) {
+      alert("No PDF file selected.");
+      return;
+    }
+
+    // Create a URL for the PDF file
+    const fileUrl = URL.createObjectURL(pdfFile);
+    // Create a temporary anchor element
+    const a = document.createElement("a");
+    // Set the download attribute of the anchor element with the file name
+    a.download = pdfFile.name;
+    // Set the href of the anchor to the file URL
+    a.href = fileUrl;
+    // Append the anchor to the document
+    document.body.appendChild(a);
+    // Trigger the download by simulating a click on the anchor
+    a.click();
+    // Clean up by revoking the object URL and removing the anchor from the document
+    URL.revokeObjectURL(fileUrl);
+    document.body.removeChild(a);
   };
 
   return (
@@ -81,9 +93,7 @@ export default function Editor({ user, setUser }: HomeProps) {
             accept="application/pdf"
           />
         </form>
-        <button onClick={handleUpload} disabled={uploading}>
-          {uploading ? "Uploading..." : "Export"}
-        </button>
+        <button onClick={handleDownload}>Export</button>
       </div>
 
       <div className="canvasBox">

@@ -29,6 +29,15 @@ export const useUploadPdf = () => {
     setUploading(true);
     setError("");
 
+    const handleUpload = async () => {
+        await uploadPdf(pdfFile);
+        if (error) {
+          alert(error);
+        } else {
+          alert("PDF uploaded successfully!");
+        }
+      };
+
     try {
       // Define the file path in Firebase Storage
       const userId = currentUser?.uid; // Get the authenticated user's ID

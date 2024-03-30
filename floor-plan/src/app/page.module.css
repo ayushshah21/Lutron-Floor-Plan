@@ -96,46 +96,28 @@
   width: 100%; /* Full width */
 }
 
-/* Button used in your main content area, like the "New" button */
 .button {
-  background-color: #1E75BB; /* Brand color for the button background */
-  color: white; /* White text color */
+  background-image: linear-gradient(145deg, #1E75BB, #2378B5); /* Subtle gradient for depth */
+  color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  margin-left: 1rem; /* Space it out from other elements */
+  padding: 0.6rem 1.2rem; /* Slightly increased padding for a better touch area */
+  margin-left: 1rem;
   cursor: pointer;
-  border-radius: var(--border-radius);
-  transition: background-color 0.3s;
+  border-radius: var(--border-radius); /* Assuming --border-radius is defined elsewhere in your CSS */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover effects */
+  font-weight: 500; /* Slightly bolder font for clarity */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow for a floating effect */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Mild text shadow for depth */
+  margin-bottom: .5rem;
 }
 
 .button:hover {
-  background-color: darken(#1E75BB, 10%); /* Darken the button on hover */
+  transform: translateY(-3px); /* Slight lift effect on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow for a more pronounced hover effect */
 }
 
 /* Specific styles for your prompt text */
 .prompt {
   color: #7A7A7A; /* Light gray color for the text */
   margin-left: 20px; /* Give some space from the left */
-}
-
-.newButton {
-  background-color: #1E75BB; /* Assuming you want the button to have the brand color */
-  color: white; /* Text color */
-  border: none; /* No border */
-  box-shadow: none; /* No box-shadow */
-  padding: 10px 20px;
-  font-weight: bold;
-  font-size: 0.875rem;
-  cursor: pointer;
-  border-radius: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  outline: none;
-  transition: background-color 0.3s ease;
-}
-.newButton:hover {
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); /* larger box-shadow on hover */
-  transform: translateY(-2px); /* slight move up effect on hover */
 }
