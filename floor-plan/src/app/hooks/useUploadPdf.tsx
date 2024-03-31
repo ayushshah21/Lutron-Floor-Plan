@@ -31,6 +31,7 @@ export const useUploadPdf = () => {
     try {
       const userId = currentUser?.uid; // Get the authenticated user's ID
       console.log(`Uploading PDF for user: ${userId}`);
+      console.log(currentUser?.email);
       const filePath = `floorplans/${userId}/${pdfFile.name}`; // Construct the file path
       const storageRef = ref(storage, filePath);
 
@@ -45,6 +46,7 @@ export const useUploadPdf = () => {
       // Save the PDF metadata in Firestore
       await addDoc(collection(firestore, "FloorPlans"), {
         originalCreator: userId,
+        creatorEmail: currentUser?.email,
         contributors: [userId],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
