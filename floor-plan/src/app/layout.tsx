@@ -1,37 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "../../firebase"; // Adjust the path as needed to import your Firebase auth object
-import "./globals.css";
 import { Inter } from "next/font/google";
-import Login from "./Login";
-import Home from "./page";
-import Editor from "./editor";
 
+// Apply the Inter font
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const logout = onAuthStateChanged(auth, (currentUser: User | null) => {
-      setUser(currentUser);
-    });
-    return () => logout();
-  }, []);
-
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        {user ? (
-          <Editor user={user} setUser={setUser} />
-        ) : (
-          <Login user={user} setUser={setUser} />
-        )}
+    <html lang="en" className={inter.className}>
+      <body>
+        {/* You can add a common header or navigation bar here */}
+        <main>{children}</main>{" "}
+        {/* This will render the content of your pages */}
+        {/* Common footer can go here */}
       </body>
     </html>
   );

@@ -1,80 +1,29 @@
 "use client";
-import {
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  User,
-} from "firebase/auth";
-import styles from "./page.module.css";
-import { auth, googleProvider } from "../../firebase";
-import { useUploadPdf } from "./useUploadPdf";
-import { useState } from "react";
+import Link from "next/link";
+import { Inter } from "next/font/google";
+import styles from "./page.module.css"; // Ensure you have some basic styles
+import { User } from "firebase/auth";
+import { auth } from "../../firebase";
+import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
 
-interface HomeProps {
-  user: User | null;
-  setUser: (user: User | null) => void;
-}
+const inter = Inter({ subsets: ["latin"] });
 
-export default function Home({ user, setUser }: HomeProps) {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const { uploadPdf, uploading, error } = useUploadPdf();
-  const signOutWithGoogle = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  const handleUpload = async () => {
-    await uploadPdf(pdfFile);
-    if (error) {
-      alert(error);
-    } else {
-      alert("PDF uploaded successfully!");
-    }
-  };
+export default function Page() {
+  const router = useRouter();
+  const currentUser = auth.currentUser;
 
-  return (
-    <div className={styles.container}>
-      <aside className={styles.sidebar}>
-        {/* Assuming you are using an SVG for the logo */}
-        <img
-          className={styles.lutronLogo}
-          src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
-          alt="Lutron Logo"
-        />
-        <nav className={styles.navigation}>
-          {/* Your navigation links/buttons */}
-          <button className={styles.navButton}>Shared with me</button>
-          <button className={styles.navButton}>Recent</button>
-          <button className={styles.navButton}>Starred</button>
-        </nav>
-        <button className={styles.logoutButton} onClick={signOutWithGoogle}>
-          Logout
-        </button>
-      </aside>
-      <main className={styles.mainContent}>
-        <div className={styles.searchBar}>
-          <input
-            type="text"
-            placeholder="Search floor plans"
-            className={styles.searchInput}
-          />
-        </div>
-        <button
-          className={styles.button}
-          onClick={handleUpload}
-          disabled={uploading}
-        >
-          {uploading ? "Uploading..." : "+ New"}
-        </button>
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        router.push('/home');
+      } else {
+        router.push('/login');
+      }
+    });
 
-        <div className={styles.prompt}>
-          Use the “New” button to upload a file
-        </div>
-        {/* Add other components and content as needed */}
-      </main>
-    </div>
-  );
+    return () => unsubscribe();
+  }, [router]);
+
+  return null; //We should probably create a nice landing page sometime soon to put here
 }
