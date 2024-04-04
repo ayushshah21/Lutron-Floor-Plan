@@ -6,10 +6,16 @@ import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
+import { useUserFiles } from '../hooks/useUserFiles';
+import { FloorPlanDocument } from '../FloorPlanDocument'; 
+
+
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
+  const { files, loading } = useUserFiles();
+
 
   const { isLoading } = useAuthRedirect();
   const router = useRouter();
@@ -45,6 +51,11 @@ export default function Home() {
       alert("PDF uploaded successfully!");
     }
   };
+
+  const handleFileOpen = (pdfURL: string) => {
+    window.open(pdfURL, '_blank');
+  };
+  
 
   return isLoading ? (
     <div>Loading...</div>
@@ -92,6 +103,14 @@ export default function Home() {
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
+        <div className={styles.fileList}>
+          {files.map((file) => ( // Ensure you're using 'file' from 'files' state
+            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+              <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+            </div>
+          ))}
+        </div>
 
         <div className={styles.prompt}>
           Use the “New” button to upload a file
