@@ -1,12 +1,13 @@
-import React from 'react'
-import Login from '../login/page'
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom'; 
+import Login from '../login/page'; 
 
 describe('Login Page Tests', () => {
-    // Fix this test as this test only worked for NextAuth when made by Amelia
-    // Look into Jest Mocks
-    it('renders', () => {
-
-        // see: https://on.cypress.io/mounting-react
-        cy.mount(<Login />)
-    })
-})
+    // Right now, this is test is still giving errors due to testing configurations in NextJS
+    test('should render the login page', () => {
+        render(<Login />);
+        const heading = screen.getByText("Sign into Lutron Floor Plan");
+        expect(heading); 
+    });
+});
