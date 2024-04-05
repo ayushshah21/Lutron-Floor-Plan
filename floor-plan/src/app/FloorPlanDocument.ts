@@ -7,5 +7,6 @@ export interface FloorPlanDocument {
     originalCreator: string;
     pdfURL: string;
     updatedAt: Date;
+    name?: string;
   }
   

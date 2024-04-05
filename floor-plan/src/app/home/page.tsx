@@ -14,7 +14,7 @@ import { FloorPlanDocument } from '../FloorPlanDocument';
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
-  const { files, loading } = useUserFiles();
+  const { floorPlans, loading } = useUserFiles();
 
 
   const { isLoading } = useAuthRedirect();
@@ -104,13 +104,14 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.fileList}>
-          {files.map((file) => ( // Ensure you're using 'file' from 'files' state
-            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-              <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
-              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
-            </div>
-          ))}
-        </div>
+        {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
+          <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+            <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+            <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+          </div>
+        ))}
+      </div>
+
 
         <div className={styles.prompt}>
           Use the “New” button to upload a file
