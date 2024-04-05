@@ -27,6 +27,16 @@ A Miro-like multi-user application where users can upload floor plans (ceiling p
 - Run npm install to get dependencies
 - Run npm run dev to start application
 
+# How to run Cypress Tests
+- Follow steps above with installing dependencies with npm i 
+- Run npm run test:e2e:open to open Cypress test (this makes a Cypress pop up)
+- Run npm run test:e2e:run to run Cypress test or run the tests manually in the pop up
+- Make sure another instance of Lutron-floor-plan (localhost) is running with npm run dev in conjunction with Cypress running
+
+# How to run Jest Tests
+- Install Jest Runner extension on VSCode
+- This will make run | debug options appear above Jest test, simplifying the process 
+
 ## Important links
 - Slack: https://join.slack.com/t/lutronfp/shared_invite/zt-2cgk3ghi8-dHCIgmIh9WhkKwXdo2896g
 - Jira: https://lutron-capstone.atlassian.net/jira/software/projects/SCRUM/boards/1 
