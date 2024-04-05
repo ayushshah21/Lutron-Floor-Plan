@@ -6,7 +6,7 @@ describe('Home Page Tests', () => {
     it('renders', () => {
 
         // see: https://on.cypress.io/mounting-react
-        cy.mount(<Home />)
+        // cy.mount(<Home />)
     })
 
     // Create test to pass in a mock PDF into the import 

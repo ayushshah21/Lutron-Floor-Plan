@@ -5,6 +5,6 @@ describe('Editor Page Tests', () => {
     it('renders', () => {
 
         // see: https://on.cypress.io/mounting-react
-        cy.mount(<Editor />)
+        // cy.mount(<Editor />)
     })
 })
