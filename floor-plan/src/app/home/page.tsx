@@ -53,7 +53,11 @@ export default function Home() {
   };
 
   const handleFileOpen = (pdfURL: string) => {
-    window.open(pdfURL, '_blank');
+    //window.open(pdfURL, '_blank');
+    //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
+
+    window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
+
   };
   
 
