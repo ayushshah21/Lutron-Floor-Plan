@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-pdf/renderer": "^3.4.0",
     "firebase": "^10.8.0",
+    "lucide-react": "^0.364.0",
     "next": "^14.1.0",
     "next-auth": "^4.24.7",
     "pspdfkit": "^2024.2.0",
@@ -24,8 +25,11 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.19",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
     "typescript": "^5"
   }
 }

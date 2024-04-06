@@ -96,7 +96,6 @@ export default function Home() {
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>
-        {/* Further content and components as needed */}
       </main>
     </div>
   );

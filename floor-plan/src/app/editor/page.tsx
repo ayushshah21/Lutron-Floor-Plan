@@ -127,6 +127,10 @@
 
 "use client";
 import { useEffect, useRef, useState } from "react";
+import "./editor.css";
+import { Upload } from "lucide-react"; // Assuming lucide-react is used for icons
+import { useRouter, useSearchParams } from "next/navigation";
+import useAuthRedirect from "../hooks/useAuthRedirect";
 
 declare module "pspdfkit" {
   export function unload(container: HTMLElement): void;
@@ -140,6 +144,10 @@ declare module "pspdfkit" {
 const App: React.FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [fileUrl, setFileUrl] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const queryPdf = searchParams.get("pdf");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -150,10 +158,20 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    // Check if there's a 'pdf' query parameter and set it as fileUrl
+    if (typeof queryPdf === 'string' && queryPdf) {
+      setFileUrl(queryPdf);
+    }
+  }, [queryPdf]); // Depend on `queryPdf`
+
+  useEffect(() => {
     const container = containerRef.current;
     if (container && fileUrl && typeof window !== "undefined") {
+      container.style.display = "block"; // Ensure the container is displayed
+      container.style.height = "100vh"; // Set a specific height for the container
+
       import("pspdfkit").then((PSPDFKit) => {
-        PSPDFKit.unload(container); // Ensure any previously loaded documents are unloaded
+        PSPDFKit.unload(container);
         PSPDFKit.load({
           container,
           document: fileUrl,
@@ -162,16 +180,37 @@ const App: React.FC = () => {
       });
     }
 
-    // Cleanup function to revoke the object URL when the component unmounts or the file changes
     return () => {
       URL.revokeObjectURL(fileUrl);
     };
-  }, [fileUrl]); // Depend on `fileUrl` so the effect runs when a new file is selected
+  }, [fileUrl]);
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} accept="application/pdf" />
-      <div ref={containerRef} style={{ height: "100vh" }} />
+    <div className="app-container">
+      <div
+        className={`file-chooser-container ${
+          fileUrl ? "file-chooser-small" : ""
+        }`}
+      >
+        <div className="text-center">
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileChange}
+            accept="application/pdf"
+            className="file-input"
+            id="fileInput"
+          />
+          <label htmlFor="fileInput" className="file-label">
+            <Upload className="upload-icon" size={24} />
+            <span>{fileUrl ? "Change PDF" : "Select a PDF file"}</span>
+          </label>
+        </div>
+      </div>
+      <div
+        ref={containerRef}
+        className={`pdf-viewer ${fileUrl ? "pdf-viewer-visible" : ""}`}
+      />
     </div>
   );
 };
