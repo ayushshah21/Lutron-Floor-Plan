@@ -21,10 +21,10 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-const db = getFirestore(app); // Initialize Firestore
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
 // Exporting the necessary Firebase services
-export { app, auth, googleProvider, db }; // Export `db` here
+export { app, auth, googleProvider, db };
