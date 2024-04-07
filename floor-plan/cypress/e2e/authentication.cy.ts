@@ -5,32 +5,29 @@ describe("Login page", () => {
     cy.visit("http://localhost:3000")
   });
 
-  it(`Make sure login contents exist`, () => {
+  it(`Test going from login to home to editor page`, () => {
+    // Login page
     // Check login box exists
     cy.get('#loginBox').should('exist');
     
     // Check that login button exists and can be clicked on (taking us to google sign in pop up)
     cy.get('#loginButton').should('exist').click();
-  });
 
-  // Only run this test if the test above passed
-  // Cypress test should typically run independently, probably should combine this test with above
-  it(`Check that we redirected to home page after logging in`, () => {
+    // Home page
     // Check that url is now on /home
-    cy.location('pathname').should('eq', '/home');
+    // Give user time to login with their credentials
+    cy.location('pathname', { timeout: 20000 }).should('eq', '/home');
 
     // Check that sidebar exists: shared with me, recent ... 
     cy.get('#navSidebar').should('exist');
 
     // Click on import button
     cy.get('#importButton').should('exist').click();
-  });
 
-  // Messed up right now, importing file takes us to a weird url: http://localhost:3000/editor?pdf=https%3A%2F%2Ffirebasestorage.googleapis.com%2Fv0%2Fb%2Flutron-floor-plan-69652.appspot.com%2Fo%2Ffloorplans%252FW3VxAjKBu5PiW0ph4pxXwYNA78g1%252Ffloorplan.pdf%3Falt%3Dmedia%26token%3D364b25a5-9851-44c1-8864-5b2714c38caf
-  // Floor uploading not completely finished as Ayush switched to pdfskit
-  it(`Check that we redirected to editor page`, () => {
-    // Check that url is now on /editor
-    cy.location('pathname').should('eq', '/editor');
+    // Editor page
+    // Check that url is now on /editor after importing a file
+    // Give user time to upload a floorplan pdf
+    cy.location('pathname', { timeout: 20000 }).should('eq', '/editor');
   });
 
 
