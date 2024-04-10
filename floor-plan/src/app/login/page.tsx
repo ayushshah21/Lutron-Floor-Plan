@@ -7,7 +7,7 @@ import styles from "./login.module.css"; // Ensure this is the correct path to y
 import Image from "next/image"; // Importing Next.js Image component
 
 export default function Login() {
-    const router = useRouter();
+  const router = useRouter();
     
   const signInWithGoogle = async () => {
     try {
@@ -16,7 +16,7 @@ export default function Login() {
     } catch (err) {
       console.error(err);
     }
-  };
+  };  
 
   return (
     <main className={styles.main}>
