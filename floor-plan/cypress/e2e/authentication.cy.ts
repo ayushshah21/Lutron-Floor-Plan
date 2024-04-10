@@ -31,7 +31,6 @@ describe("Login page", () => {
   });
 
 
-  
   // Amelia's code
   // it("Triggers email sign-in when login button is clicked", () => {
   //   // Check that button exists
