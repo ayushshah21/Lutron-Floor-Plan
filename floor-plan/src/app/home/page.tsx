@@ -71,7 +71,7 @@ export default function Home() {
           src="../images/logo-lutron-blue.svg" // Moved to the public directory
           alt="Lutron Logo"
         />
-        <nav className={styles.navigation}>
+        <nav className={styles.navigation} id="navSidebar">
           <button className={styles.navButton}>Shared with me</button>
           <button className={styles.navButton}>Recent</button>
           <button className={styles.navButton}>Starred</button>
@@ -98,6 +98,7 @@ export default function Home() {
           />
           <button
             className={styles.button}
+            id="importButton"
             onClick={(e) => {
               e.preventDefault(); // Prevent form submission
               document.getElementById("fileInput")?.click(); // Programmatically click the file input
