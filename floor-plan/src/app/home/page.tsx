@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
+import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument'; 
 
@@ -30,11 +31,12 @@ export default function Home() {
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
+    const url = URL.createObjectURL(file);
     if (file && file.type === "application/pdf") {
       setPdfFile(file);
       const pdfURL = await uploadPdf(file);
       if (pdfURL) {
-        router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`); // Redirect to the editor page with the PDF URL
+        router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
       } else {
         alert("Failed to upload PDF.");
       }
@@ -121,7 +123,6 @@ export default function Home() {
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>
-        {/* Further content and components as needed */}
       </main>
     </div>
   );
