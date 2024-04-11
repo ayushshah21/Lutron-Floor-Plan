@@ -121,3 +121,25 @@
   color: #7A7A7A; /* Light gray color for the text */
   margin-left: 20px; /* Give some space from the left */
 }
+
+.fileList {
+  display: flex;
+  flex-wrap: wrap;
+  /* Add more styles for layout */
+}
+
+.fileItem {
+  cursor: pointer;
+  margin: 10px;
+  /* Add more styles for individual file items */
+}
+
+.fileIcon {
+  width: 50px; /* Or any appropriate size */
+  margin-right: 10px;
+  /* Add more styles for the PDF icon */
+}
+
+.fileName {
+  /* Add more styles for the file name text */
+}
