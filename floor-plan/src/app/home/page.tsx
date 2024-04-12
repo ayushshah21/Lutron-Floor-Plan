@@ -6,10 +6,17 @@ import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
+import Link from 'next/link'
+import { useUserFiles } from '../hooks/useUserFiles';
+import { FloorPlanDocument } from '../FloorPlanDocument'; 
+
+
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
+  const { floorPlans, loading } = useUserFiles();
+
 
   const { isLoading } = useAuthRedirect();
   const router = useRouter();
@@ -24,11 +31,12 @@ export default function Home() {
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
+    const url = URL.createObjectURL(file);
     if (file && file.type === "application/pdf") {
       setPdfFile(file);
       const pdfURL = await uploadPdf(file);
       if (pdfURL) {
-        router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`); // Redirect to the editor page with the PDF URL
+        router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
       } else {
         alert("Failed to upload PDF.");
       }
@@ -46,6 +54,15 @@ export default function Home() {
     }
   };
 
+  const handleFileOpen = (pdfURL: string) => {
+    //window.open(pdfURL, '_blank');
+    //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
+
+    window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
+
+  };
+  
+
   return isLoading ? (
     <div>Loading...</div>
   ) : (
@@ -56,7 +73,7 @@ export default function Home() {
           src="../images/logo-lutron-blue.svg" // Moved to the public directory
           alt="Lutron Logo"
         />
-        <nav className={styles.navigation}>
+        <nav className={styles.navigation} id="navSidebar">
           <button className={styles.navButton}>Shared with me</button>
           <button className={styles.navButton}>Recent</button>
           <button className={styles.navButton}>Starred</button>
@@ -83,6 +100,7 @@ export default function Home() {
           />
           <button
             className={styles.button}
+            id="importButton"
             onClick={(e) => {
               e.preventDefault(); // Prevent form submission
               document.getElementById("fileInput")?.click(); // Programmatically click the file input
@@ -92,11 +110,19 @@ export default function Home() {
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
+        <div className={styles.fileList}>
+        {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
+          <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+            <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+            <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+          </div>
+        ))}
+      </div>
+
 
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>
-        {/* Further content and components as needed */}
       </main>
     </div>
   );
