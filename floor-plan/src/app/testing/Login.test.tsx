@@ -11,8 +11,8 @@ describe('Login Page Tests', () => {
     mockRouter.setCurrentUrl('/login');
   });
 
-  test('should render the login page', () => {
-    render(<Login />);
+  test('Login page heading', () => {
+    render(<Login/>);
     const heading = screen.getByText("Sign into Lutron Floor Plan");
     expect(heading).toBeInTheDocument();
   });

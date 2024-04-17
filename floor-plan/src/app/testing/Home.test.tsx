@@ -1,14 +1,19 @@
-import React from 'react'
-import Home from '../home/page'
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import Home from '../home/page';
+import mockRouter from 'next-router-mock';
+
+jest.mock('next/router', () => require('next-router-mock'));
 
 describe('Home Page Tests', () => {
-    // Check that home page renders
-    it('renders', () => {
+    beforeEach(() => {
+        mockRouter.setCurrentUrl('/home'); // Setup the initial URL
+    });
 
-        // see: https://on.cypress.io/mounting-react
-        // cy.mount(<Home />)
-    })
-
-    // Create test to pass in a mock PDF into the import 
-    // Check that it passes either by (no errors are returned)
-})
+    test('Home page heading', () => {
+        render(<Home/>);
+        const heading = screen.getByText("Search floor plans");
+        expect(heading).toBeInTheDocument();
+    });
+});
