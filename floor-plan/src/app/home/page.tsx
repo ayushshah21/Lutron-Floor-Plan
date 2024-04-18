@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -28,6 +28,7 @@ export default function Home() {
       console.error(err);
     }
   };
+
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
@@ -59,8 +60,9 @@ export default function Home() {
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
 
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
-
   };
+
+
   
 
   return isLoading ? (
@@ -118,8 +120,6 @@ export default function Home() {
           </div>
         ))}
       </div>
-
-
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>

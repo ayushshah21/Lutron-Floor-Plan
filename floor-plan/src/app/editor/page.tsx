@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -75,10 +76,13 @@ const App: React.FC = () => {
             className="file-input"
             id="fileInput"
           />
+          <div className="buttons">
           <label htmlFor="fileInput" className="file-label">
             <Upload className="upload-icon" size={24} />
             <span>{fileUrl ? "Change PDF" : "Select a PDF file"}</span>
           </label>
+          <button onClick={() => router.push('/home')} className="button-71" role="button">Home Page</button>
+          </div>
         </div>
       </div>
       <div
