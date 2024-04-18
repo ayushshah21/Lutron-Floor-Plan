@@ -9,13 +9,21 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument'; 
+//import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
+//import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
 
+
+//import PDFasImage from './PDFasImage'; 
 
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
+  //const { Thumbnails } = thumbnailPluginInstance;
+
+  
+  //const [selectedImage, setSelectImage] = useState<string>();
 
 
   const { isLoading } = useAuthRedirect();
@@ -113,7 +121,7 @@ export default function Home() {
         <div className={styles.fileList}>
         {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
           <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-            <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+            <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
             <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
           </div>
         ))}

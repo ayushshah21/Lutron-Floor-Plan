@@ -50,6 +50,7 @@
   text-align: left;
   cursor: pointer;
   transition: background-color 0.3s;
+  display: block; 
 }
 
 .navButton:hover {
@@ -135,11 +136,12 @@
 }
 
 .fileIcon {
-  width: 50px; /* Or any appropriate size */
-  margin-right: 10px;
+  width: 200px; /* Or any appropriate size */
+  margin-right: 40px;
   /* Add more styles for the PDF icon */
 }
 
 .fileName {
+
   /* Add more styles for the file name text */
 }
