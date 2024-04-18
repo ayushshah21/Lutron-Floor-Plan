@@ -8,14 +8,15 @@ import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
-import { FloorPlanDocument } from '../FloorPlanDocument'; 
-
+import { FloorPlanDocument } from '../FloorPlanDocument';
+import { useDeleteDocument } from '../hooks/useDeleteDocument';
 
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
+  const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 
 
   const { isLoading } = useAuthRedirect();
@@ -61,7 +62,7 @@ export default function Home() {
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
 
   };
-  
+
 
   return isLoading ? (
     <div>Loading...</div>
@@ -111,13 +112,15 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.fileList}>
-        {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
-          <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-            <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
-            <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
-          </div>
-        ))}
-      </div>
+          {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
+            <div key={file.id} className={styles.fileItem}>
+              <p onClick={() => handleFileOpen(file.pdfURL)}>file.name</p>
+              <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+              <button onClick={() => deleteDocument(file.id!)}>Delete</button>
+            </div>
+          ))}
+        </div>
 
 
         <div className={styles.prompt}>
