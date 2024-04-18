@@ -124,24 +124,28 @@
 }
 
 .fileList {
-  display: flex;
-  flex-wrap: wrap;
-  /* Add more styles for layout */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
+  grid-gap: 16px; /* Space between items */
+  padding: 20px;
 }
 
 .fileItem {
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   margin: 10px;
-  /* Add more styles for individual file items */
+  border: 1px solid #000000; 
+  background: #f9f9f9; 
 }
 
 .fileIcon {
-  width: 200px; /* Or any appropriate size */
-  margin-right: 40px;
-  /* Add more styles for the PDF icon */
+  width: 100%; /* Makes the image take the full width of its container */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 8px;
 }
 
 .fileName {
-
-  /* Add more styles for the file name text */
+  text-align: center; /* Center-align the file name */
 }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
-import { FloorPlanDocument } from '../FloorPlanDocument'; 
+import { FloorPlanDocument } from '../FloorPlanDocument';
 //import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
 //import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
 
@@ -22,7 +22,7 @@ export default function Home() {
   const { floorPlans, loading } = useUserFiles();
   //const { Thumbnails } = thumbnailPluginInstance;
 
-  
+
   //const [selectedImage, setSelectImage] = useState<string>();
 
 
@@ -69,7 +69,7 @@ export default function Home() {
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
 
   };
-  
+
 
   return isLoading ? (
     <div>Loading...</div>
@@ -78,7 +78,7 @@ export default function Home() {
       <aside className={styles.sidebar}>
         <img
           className={styles.lutronLogo}
-          src="../images/logo-lutron-blue.svg" // Moved to the public directory
+          src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" // Moved to the public directory
           alt="Lutron Logo"
         />
         <nav className={styles.navigation} id="navSidebar">
@@ -119,13 +119,13 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.fileList}>
-        {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
-          <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-            <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
-            <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
-          </div>
-        ))}
-      </div>
+          {floorPlans.map((file) => (
+            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+              <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
+              <span className={styles.fileName}>{file.name || 'Unnamed Floorplan'}</span>
+            </div>
+          ))}
+        </div>
 
 
         <div className={styles.prompt}>
