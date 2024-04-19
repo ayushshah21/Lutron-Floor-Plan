@@ -10,6 +10,11 @@ import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
 import { useDeleteDocument } from '../hooks/useDeleteDocument';
+//import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
+//import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
+
+
+//import PDFasImage from './PDFasImage'; 
 
 
 export default function Home() {
@@ -17,6 +22,11 @@ export default function Home() {
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
+
+  //const { Thumbnails } = thumbnailPluginInstance;
+
+
+  //const [selectedImage, setSelectImage] = useState<string>();
 
 
   const { isLoading } = useAuthRedirect();
@@ -71,7 +81,7 @@ export default function Home() {
       <aside className={styles.sidebar}>
         <img
           className={styles.lutronLogo}
-          src="../images/logo-lutron-blue.svg" // Moved to the public directory
+          src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" // Moved to the public directory
           alt="Lutron Logo"
         />
         <nav className={styles.navigation} id="navSidebar">
@@ -115,7 +125,7 @@ export default function Home() {
           {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
             <div key={file.id} className={styles.fileItem}>
               <p onClick={() => handleFileOpen(file.pdfURL)}>file.name</p>
-              <img src="/icons/pdf-icon.png" alt="PDF" className={styles.fileIcon} />
+              <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
               <button onClick={() => deleteDocument(file.id!)}>Delete</button>
             </div>
