@@ -9,12 +9,20 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument'; 
+import { Clock, Search, Star, Users } from "lucide-react"; 
+//import {} from "../lutron-electronics-vector-logo.svg"; 
+
+
 //import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
 //import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
 
 
 //import PDFasImage from './PDFasImage'; 
 
+// Assuming the original FloorPlanDocument is defined somewhere in your project
+interface ExtendedFloorPlanDocument extends FloorPlanDocument {
+  thumbnailUrl: string; // Ensure this matches the expected type for thumbnail URLs
+}
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -76,22 +84,26 @@ export default function Home() {
   ) : (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
-        <img
-          className={styles.lutronLogo}
-          src="../images/logo-lutron-blue.svg" // Moved to the public directory
-          alt="Lutron Logo"
-        />
+        <img className={styles.lutronLogo} src="/lutron-electronics-vector-logo.svg" alt="Lutron Logo" />
         <nav className={styles.navigation} id="navSidebar">
-          <button className={styles.navButton}>Shared with me</button>
-          <button className={styles.navButton}>Recent</button>
-          <button className={styles.navButton}>Starred</button>
+          <button className={`${styles.navButton} ${styles.iconButton}`}>
+            < Users />Shared with me
+          </button>
+          <button className={`${styles.navButton} ${styles.iconButton}`}>
+            <Clock color="white" /> Recent
+          </button>
+          <button className={`${styles.navButton} ${styles.iconButton}`}>
+            <Star /> Starred
+          </button>
         </nav>
         <button className={styles.logoutButton} onClick={signOutWithGoogle}>
           Logout
+         
         </button>
       </aside>
       <main className={styles.mainContent}>
         <div className={styles.searchBar}>
+          <Search className={styles.searchIcon}/>
           <input
             type="text"
             placeholder="Search floor plans"
@@ -100,7 +112,6 @@ export default function Home() {
         </div>
         <form>
           <input
-            type="file"
             onChange={handleFileChange}
             accept="application/pdf"
             id="fileInput"
@@ -114,20 +125,24 @@ export default function Home() {
               document.getElementById("fileInput")?.click(); // Programmatically click the file input
             }}
             disabled={uploading}
+            
           >
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
         <div className={styles.fileList}>
-        {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
+        {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
           <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-            <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
+            {/* Conditional rendering to handle missing 'thumbnailUrl' */}
+            {file.thumbnailUrl ? (
+              <img src={file.thumbnailUrl} alt="PDF Thumbnail" className={styles.fileIcon} />
+            ) : (
+              <div className={styles.fileIconPlaceholder}>No Image</div> // Placeholder when 'thumbnailUrl' is missing
+            )}
             <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
           </div>
         ))}
       </div>
-
-
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>
