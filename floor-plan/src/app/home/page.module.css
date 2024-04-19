@@ -19,7 +19,9 @@
 .sidebar nav {
   margin-top: 20px; /* Spacing at the top inside the sidebar */
 }
+
 .navItem {
+  
   display: flex;
   align-items: center;
   padding: 10px 20px;
@@ -38,10 +40,12 @@
   max-width: 80%; /* Adjust the size of the logo */
   margin-bottom: 2rem;
   align-self: center; /* Center the logo in the sidebar */
+  
 }
 
 /* Navigation buttons within the sidebar */
 .navButton {
+  
   background: none;
   border: none;
   padding: 0.5rem 1rem;
@@ -52,6 +56,7 @@
   transition: background-color 0.3s;
   display: block; 
 }
+
 
 .navButton:hover {
   background-color: #e4e4e4; /* A light grey for hover state */
@@ -77,10 +82,12 @@
   flex-grow: 1;
   padding: 2rem;
   background-color: #F9F9F9;
+  
 }
 
 /* Search bar at the top of the main content */
 .searchBar {
+  
   background-color: #FFFFFF;
   border-radius: 20px;
   padding: 10px 15px;
@@ -88,6 +95,7 @@
   display: flex;
   align-items: center;
 }
+
 
 .searchInput {
   border: none;
@@ -98,6 +106,7 @@
 }
 
 .button {
+  
   background-image: linear-gradient(145deg, #1E75BB, #2378B5); /* Subtle gradient for depth */
   color: white;
   border: none;

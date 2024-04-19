@@ -9,6 +9,7 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
+import { useDeleteDocument } from '../hooks/useDeleteDocument';
 //import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
 //import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
 
@@ -20,6 +21,8 @@ export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
+  const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
+
   //const { Thumbnails } = thumbnailPluginInstance;
 
 
@@ -119,10 +122,12 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.fileList}>
-          {floorPlans.map((file) => (
-            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+          {floorPlans.map((file) => ( // Ensure you're using 'floorPlans' from the state
+            <div key={file.id} className={styles.fileItem}>
+              <p onClick={() => handleFileOpen(file.pdfURL)}>file.name</p>
               <img src="//image.thum.io/get/http://www.google.com/" alt="PDF" className={styles.fileIcon} />
-              <span className={styles.fileName}>{file.name || 'Unnamed Floorplan'}</span>
+              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+              <button onClick={() => deleteDocument(file.id!)}>Delete</button>
             </div>
           ))}
         </div>
