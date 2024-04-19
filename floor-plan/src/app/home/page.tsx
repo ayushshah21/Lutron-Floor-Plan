@@ -28,9 +28,11 @@ export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
+  const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
+
   //const { Thumbnails } = thumbnailPluginInstance;
 
-  
+
   //const [selectedImage, setSelectImage] = useState<string>();
 
 
@@ -77,7 +79,7 @@ export default function Home() {
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
 
   };
-  
+
 
   return isLoading ? (
     <div>Loading...</div>

@@ -19,7 +19,9 @@
 .sidebar nav {
   margin-top: 20px; /* Spacing at the top inside the sidebar */
 }
+
 .navItem {
+  
   display: flex;
   align-items: center;
   padding: 10px 20px;
@@ -38,10 +40,12 @@
   max-width: 80%; /* Adjust the size of the logo */
   margin-bottom: 2rem;
   align-self: center; /* Center the logo in the sidebar */
+  
 }
 
 /* Navigation buttons within the sidebar */
 .navButton {
+  
   background: none;
   border: none;
   padding: 0.5rem 1rem;
@@ -52,6 +56,7 @@
   transition: background-color 0.3s;
   display: block; 
 }
+
 
 .navButton:hover {
   background-color: #e4e4e4; /* A light grey for hover state */
@@ -77,10 +82,12 @@
   flex-grow: 1;
   padding: 2rem;
   background-color: #F9F9F9;
+  
 }
 
 /* Search bar at the top of the main content */
 .searchBar {
+  
   background-color: #FFFFFF;
   border-radius: 20px;
   padding: 10px 15px;
@@ -88,6 +95,7 @@
   display: flex;
   align-items: center;
 }
+
 
 .searchInput {
   border: none;
@@ -98,8 +106,14 @@
 }
 
 .button {
+<<<<<<< HEAD
   background-image: linear-gradient(145deg, #ffffff, #ffffff); /* Subtle gradient for depth */
   color: rgb(0, 0, 0);
+=======
+  
+  background-image: linear-gradient(145deg, #1E75BB, #2378B5); /* Subtle gradient for depth */
+  color: white;
+>>>>>>> e40214335e1c7e454d72126583b3af9f6dd50400
   border: none;
   padding: 0.6rem 1.2rem; /* Slightly increased padding for a better touch area */
   margin-left: 1rem;
@@ -124,24 +138,30 @@
 }
 
 .fileList {
-  display: flex;
-  flex-wrap: wrap;
-  /* Add more styles for layout */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
+  grid-gap: 16px; /* Space between items */
+  padding: 20px;
 }
 
 .fileItem {
-  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   margin: 10px;
-  /* Add more styles for individual file items */
+  border: 1px solid #000000; 
+  background: #f9f9f9; 
 }
 
 .fileIcon {
-  width: 200px; /* Or any appropriate size */
-  margin-right: 40px;
-  /* Add more styles for the PDF icon */
+  width: 100%; /* Makes the image take the full width of its container */
+  height: auto; /* Maintain aspect ratio */
+  margin-bottom: 8px;
 }
 
 .fileName {
+<<<<<<< HEAD
 
   /* Add more styles for the file name text */
 }
@@ -173,4 +193,7 @@
 /* Ensure you include FontAwesome in your project for these classes to work */
 .fa-icon {
   margin-right: 10px; /* Space between icon and text */
+=======
+  text-align: center; /* Center-align the file name */
+>>>>>>> e40214335e1c7e454d72126583b3af9f6dd50400
 }
