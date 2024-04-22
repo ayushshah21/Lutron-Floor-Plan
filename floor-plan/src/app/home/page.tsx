@@ -134,7 +134,7 @@ export default function Home() {
         </form>
         <div className={styles.fileList}>
           {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
-            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+            <div key={file.id} className={styles.fileItem}>
               {/* Conditional rendering to handle missing 'thumbnailUrl' */}
               {file.thumbnailUrl ? (
                 <img src={file.thumbnailUrl} alt="PDF Thumbnail" className={styles.fileIcon} />
@@ -142,6 +142,8 @@ export default function Home() {
                 <div className={styles.fileIconPlaceholder}>No Image</div> // Placeholder when 'thumbnailUrl' is missing
               )}
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+              <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+              <button onClick={() => deleteDocument(file.id!)}>Delete</button>
             </div>
           ))}
         </div>
