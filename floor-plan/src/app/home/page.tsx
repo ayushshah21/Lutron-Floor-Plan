@@ -4,12 +4,13 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
+import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
-import { FloorPlanDocument } from '../FloorPlanDocument'; 
-import { Clock, Search, Star, Users } from "lucide-react"; 
+import { FloorPlanDocument } from '../FloorPlanDocument';
+import { Clock, Search, Star, Users } from "lucide-react";
 //import {} from "../lutron-electronics-vector-logo.svg"; 
 
 
@@ -86,13 +87,13 @@ export default function Home() {
   ) : (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
-        <img className={styles.lutronLogo} src="/lutron-electronics-vector-logo.svg" alt="Lutron Logo" />
+        <img className={styles.lutronLogo} src="lutron-electronics-vector-logo.svg" alt="Lutron Logo" />
         <nav className={styles.navigation} id="navSidebar">
           <button className={`${styles.navButton} ${styles.iconButton}`}>
             < Users />Shared with me
           </button>
           <button className={`${styles.navButton} ${styles.iconButton}`}>
-            <Clock color="white" /> Recent
+            <Clock color="black" /> Recent
           </button>
           <button className={`${styles.navButton} ${styles.iconButton}`}>
             <Star /> Starred
@@ -100,12 +101,11 @@ export default function Home() {
         </nav>
         <button className={styles.logoutButton} onClick={signOutWithGoogle}>
           Logout
-         
         </button>
       </aside>
       <main className={styles.mainContent}>
         <div className={styles.searchBar}>
-          <Search className={styles.searchIcon}/>
+          <Search className={styles.searchIcon} />
           <input
             type="text"
             placeholder="Search floor plans"
@@ -114,6 +114,7 @@ export default function Home() {
         </div>
         <form>
           <input
+            type="file"
             onChange={handleFileChange}
             accept="application/pdf"
             id="fileInput"
@@ -127,24 +128,23 @@ export default function Home() {
               document.getElementById("fileInput")?.click(); // Programmatically click the file input
             }}
             disabled={uploading}
-            
           >
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
         <div className={styles.fileList}>
-        {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
-          <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
-            {/* Conditional rendering to handle missing 'thumbnailUrl' */}
-            {file.thumbnailUrl ? (
-              <img src={file.thumbnailUrl} alt="PDF Thumbnail" className={styles.fileIcon} />
-            ) : (
-              <div className={styles.fileIconPlaceholder}>No Image</div> // Placeholder when 'thumbnailUrl' is missing
-            )}
-            <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
-          </div>
-        ))}
-      </div>
+          {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
+            <div key={file.id} className={styles.fileItem} onClick={() => handleFileOpen(file.pdfURL)}>
+              {/* Conditional rendering to handle missing 'thumbnailUrl' */}
+              {file.thumbnailUrl ? (
+                <img src={file.thumbnailUrl} alt="PDF Thumbnail" className={styles.fileIcon} />
+              ) : (
+                <div className={styles.fileIconPlaceholder}>No Image</div> // Placeholder when 'thumbnailUrl' is missing
+              )}
+              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+            </div>
+          ))}
+        </div>
         <div className={styles.prompt}>
           Use the “New” button to upload a file
         </div>
