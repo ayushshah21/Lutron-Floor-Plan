@@ -83,9 +83,15 @@ export default function Home() {
 
   // Creates a pop up when user tries to delete a floor plan
   // Askes if they want to proceed
-  const handleDelete = (id: any) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this file?")) {
-      deleteDocument(id);
+      try {
+        await deleteDocument(id);
+        window.location.reload(); // Refreshes the page after successful deletion
+      } catch (error) {
+        console.error("Failed to delete the floor plan:", error);
+        alert("Failed to delete the floor plan.");
+      }
     }
   };
 

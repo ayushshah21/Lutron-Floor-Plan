@@ -1,68 +1,45 @@
 // hooks/useUserFiles.ts
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../../../firebase'; // Adjust this path as needed
-import { FloorPlanDocument } from '../FloorPlanDocument'; 
-//import { db } from '../../../firebase'; // Make sure the path is correct
+import { FloorPlanDocument } from '../FloorPlanDocument';
 
 export const useUserFiles = () => {
-    const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
-    const [loading, setLoading] = useState(false);
-  
+  const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
+  const [loading, setLoading] = useState(false);
 
-useEffect(() => {
-    const fetchFloorPlans = async () => {
-      if (auth.currentUser) {
-        setLoading(true);
-        try {
-          const q = query(
-            collection(db, 'FloorPlans'),
-            where('originalCreator', '==', auth.currentUser.uid)
-          );
-          const querySnapshot = await getDocs(q);
-          const fetchedFloorPlans: FloorPlanDocument[] = querySnapshot.docs.map(doc => {
-            // Make sure you're not overwriting the id property
-            const data = doc.data() as Omit<FloorPlanDocument, 'id'>;
-            return {
-              id: doc.id, // Correctly set the id property from the doc ref
-              ...data, // Spread the Firestore document data
-            };
-          });        
+  useEffect(() => {
+      // Set up an authentication state listener
+      const unsubscribe = auth.onAuthStateChanged(user => {
+          if (user) {
+              // Define a function to fetch floor plans when a user is authenticated
+              const fetchFloorPlans = async () => {
+                  setLoading(true); // Indicate loading process starts
+                  try {
+                      // Create a query to fetch floor plans where 'originalCreator' is the current user
+                      const q = query(
+                        collection(db, 'FloorPlans'), 
+                        where('originalCreator', '==', user.uid));
+                      const querySnapshot = await getDocs(q);
 
-          setFloorPlans(fetchedFloorPlans); // Update state with the fetched documents
-        } catch (error) {
-          console.error("Error fetching floor plans:", error);
-          // Handle errors appropriately
-        }
-        setLoading(false);
-      }
-    };
+                      // Map over each document and reconstruct it into a FloorPlanDocument format
+                      const fetchedFloorPlans = querySnapshot.docs.map(doc => ({
+                          id: doc.id, // Ensure document ID is included
+                          ...doc.data() as Omit<FloorPlanDocument, 'id'> // Spread the rest of the data
+                      }));
+                      setFloorPlans(fetchedFloorPlans); // Update state with fetched documents
+                  } catch (error) {
+                      console.error("Error fetching floor plans:", error); // Handle possible errors
+                  }
+                  setLoading(false); // Indicate loading process ends
+              };
+              fetchFloorPlans(); // Call the fetch function
+          }
+      });
 
-    fetchFloorPlans();
+      return () => unsubscribe();  // Clean up the listener when the component unmounts
   }, []);
 
   return { floorPlans, loading };
 };
-  
-  /**
-  useEffect(() => {
-    const fetchFiles = async () => {
-      if (auth.currentUser) {
-        const filesQuery = query(
-          collection(db, 'FloorPlans'),
-          where('originalCreator', '==', auth.currentUser.uid)
-        );
-        const querySnapshot = await getDocs(filesQuery);
-        const filesData: FileData[] = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-          ...doc.data() as FileData,
-        }));
-        setFiles(filesData);
-      }
-      setLoading(false);
-    };
-
-    fetchFiles();
-  }, []);
-*/
 
