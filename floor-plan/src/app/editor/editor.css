@@ -67,7 +67,9 @@
 }
 
 .navbarBrand {
-	margin: 0;
+	justify-self: center;
+	align-self: center;
+	margin-right: 15rem;
 	font-size: 1.5rem;
 }
 
@@ -152,3 +154,36 @@
 		transform: rotate(0deg);
 	}
 }
+
+.canvas-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+  }
+
+  .container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 50px;
+	font-family: Arial, sans-serif;
+  }
+  
+  .file-input {
+	margin: 20px 0;
+	padding: 10px;
+	font-size: 16px;
+  }
+  
+  .canvas-container {
+	border: 1px solid #ccc;
+	padding: 10px;
+  }
+
+  .icon {
+	width: 50px;
+	height: 50px;
+	margin: 10px;
+	cursor: pointer;
+  }
