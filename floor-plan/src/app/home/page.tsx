@@ -11,6 +11,8 @@ import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
 import { Clock, Search, Star, Users } from "lucide-react";
+import { useUpdateFileName } from '../hooks/useUpdateFileName';
+
 //import {} from "../lutron-electronics-vector-logo.svg"; 
 
 
@@ -30,6 +32,20 @@ export default function Home() {
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
+
+
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [docToRename, setDocToRename] = useState(null);
+  const [newName, setNewName] = useState('');
+
+  const { updateFileName } = useUpdateFileName();
+
+  /*
+  const { updateFileName } = useUpdateFileName(); // Destructure the function from your custom hook
+  const [isRenaming, setIsRenaming] = useState(false); // State to track if rename mode is active
+  const [newName, setNewName] = useState(''); // State to track the new name input by the user
+  const [docToRename, setDocToRename] = useState<string | null>(null); // ID of the document to rename
+  */
 
   //const { Thumbnails } = thumbnailPluginInstance;
 
@@ -61,6 +77,26 @@ export default function Home() {
       }
     } else {
       alert("Please select a valid PDF file.");
+    }
+  };
+
+  const startRenaming = (docId: string, currentName: string) => {
+    setIsRenaming(true);
+    setDocToRename(docId);
+    setNewName(currentName || ''); // Pre-fill with current name if available
+  };
+
+  const cancelRenaming = () => {
+    setIsRenaming(false);
+    setDocToRename(null);
+  };
+
+  const submitNewName = async () => {
+    if (docToRename && newName) {
+      await updateFileName(docToRename, newName);
+      setIsRenaming(false);
+      setDocToRename(null);
+      // Optionally refresh the list of floor plans to show the updated name
     }
   };
 
@@ -146,13 +182,22 @@ export default function Home() {
           </button>
         </form>
         <div className={styles.fileList}>
-          {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
+          {floorPlans.map((file: FloorPlanDocument) => (
             <div key={file.id} className={styles.fileItem}>
-              {/* Conditional rendering to handle missing 'thumbnailUrl' */}
-
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
-              <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
-              <button onClick={() => handleDelete(file.id!)}>Delete</button>
+              {isRenaming && docToRename === file.id ? (
+                <>
+                  <input value={newName} onChange={(e) => setNewName(e.target.value)} />
+                  <button onClick={submitNewName}>Save</button>
+                  <button onClick={cancelRenaming}>Cancel</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+                  <button onClick={() => handleDelete(file.id!)}>Delete</button>
+                  <button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+                </>
+              )}
             </div>
           ))}
         </div>
