@@ -1,3 +1,5 @@
+//uploads pdf to firebase
+
 import { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -17,6 +19,14 @@ export const useUploadPdf = () => {
 
   const auth = getAuth();
   const currentUser = auth.currentUser;
+  
+  // Function to extract the name of the floor plan from the PDF file name
+  const extractFloorPlanName = (file: { name: any; }) => {
+    if (!file) return '';
+    const name = file.name;
+    const floorPlanName = name.replace(/\.pdf$/i, '');
+    return floorPlanName;
+  };
 
   const uploadPdf = async (pdfFile: File | null): Promise<string | null> => {
     if (!pdfFile) {
@@ -44,14 +54,18 @@ export const useUploadPdf = () => {
       console.log("PDF URL:", pdfURL);
 
       // Save the PDF metadata in Firestore
-      await addDoc(collection(firestore, "FloorPlans"), {
+      const floorPlanName = extractFloorPlanName(pdfFile); // Call the function to extract the name
+      const docRef = await addDoc(collection(firestore, "FloorPlans"), {
         originalCreator: userId,
         creatorEmail: currentUser?.email,
         contributors: [userId],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         pdfURL,
+        name: floorPlanName, // Use your extract function here
       });
+
+      console.log("Document written with ID: ", docRef.id);
 
       setUploading(false);
       return pdfURL; // Return the PDF URL after successful upload

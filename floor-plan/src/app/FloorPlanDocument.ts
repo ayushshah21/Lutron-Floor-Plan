@@ -1,6 +1,6 @@
 
 export interface FloorPlanDocument {
-    id?: string;
+    id: string;
     contributors: string[];
     createdAt: Date;
     creatorEmail: string;

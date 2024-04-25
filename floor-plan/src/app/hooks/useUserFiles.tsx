@@ -1,3 +1,5 @@
+//loads in the user's files
+
 // hooks/useUserFiles.ts
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';

@@ -76,6 +76,7 @@ export default function Home() {
   const handleFileOpen = (pdfURL: string) => {
     //window.open(pdfURL, '_blank');
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
+    console.log(pdfURL); // Add this just before the return statement in the editor component
 
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
 
@@ -136,12 +137,8 @@ export default function Home() {
           {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
             <div key={file.id} className={styles.fileItem}>
               {/* Conditional rendering to handle missing 'thumbnailUrl' */}
-              {file.thumbnailUrl ? (
-                <img src={file.thumbnailUrl} alt="PDF Thumbnail" className={styles.fileIcon} />
-              ) : (
-                <div className={styles.fileIconPlaceholder}>No Image</div> // Placeholder when 'thumbnailUrl' is missing
-              )}
-              <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+
+              <span className={styles.fileName}>{file.name ||file.name}</span>
               <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
               <button onClick={() => deleteDocument(file.id!)}>Delete</button>
             </div>

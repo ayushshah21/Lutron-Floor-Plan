@@ -7,6 +7,9 @@ import {
 } from "firebase/auth";
 import { useState, useEffect, useRef } from "react";
 import "./editor.css";
+import { useUserFiles } from "../hooks/useUserFiles"; // Adjust this path as necessary
+
+
 //import { auth, googleProvider } from "../../firebase";
 
 // Needed for react-pdf to work
@@ -20,6 +23,10 @@ interface HomeProps {
 }
 
 export default function Editor({ user, setUser }: HomeProps) {
+
+    const { floorPlans, loading } = useUserFiles(); // Fetch floor plans from Firebase
+    const [currentPdfUrl, setCurrentPdfUrl] = useState<string | null>(null); // State for the current floor plan URL
+    
     // Store state of pdfFile
     const [pdfFile, setPdfFile] = useState<File | null>(null);
 
