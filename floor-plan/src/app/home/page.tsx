@@ -81,6 +81,19 @@ export default function Home() {
 
   };
 
+  // Creates a pop up when user tries to delete a floor plan
+  // Askes if they want to proceed
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this file?")) {
+      try {
+        await deleteDocument(id);
+        window.location.reload(); // Refreshes the page after successful deletion
+      } catch (error) {
+        console.error("Failed to delete the floor plan:", error);
+        alert("Failed to delete the floor plan.");
+      }
+    }
+  };
 
   return isLoading ? (
     <div>Loading...</div>
@@ -143,7 +156,7 @@ export default function Home() {
               )}
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
               <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
-              <button onClick={() => deleteDocument(file.id!)}>Delete</button>
+              <button onClick={() => handleDelete(file.id!)}>Delete</button>
             </div>
           ))}
         </div>
