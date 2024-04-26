@@ -7,8 +7,10 @@ import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
 import { useUserFiles } from "../hooks/useUserFiles";
 
+// Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
+// Consider moving these into a utils folder, better to modularize code / functions / annotations
 interface IExtendedRectOptions extends fabric.IRectOptions {
   isOriginal?: boolean;
 }
@@ -41,17 +43,7 @@ export default function Editor() {
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const searchParams = useSearchParams();
-
-  // const handleFileChange = (event: any) => {
-  //   if (event.target) {
-  //     const file = event.target.files[0];
-  //     if (file && file.type === "application/pdf") {
-  //       setPdfFile(file);
-  //     } else {
-  //       alert("Please select a valid PDF file.");
-  //     }
-  //   }
-  // };
+  const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -114,21 +106,50 @@ export default function Editor() {
     }
   };
 
-  const addRectangleToCanvas = (x: number, y: number, isOriginal = false) => {
-    const rect = new ExtendedRect({
-      left: x,
-      top: y,
-      fill: "red",
-      width: 60,
-      height: 70,
-      isOriginal: isOriginal,
-    });
-
-    if (canvasRef.current) {
-      canvasRef.current.add(rect);
+  // Add a pink rectangle to the canvas
+  const addRectangleToCanvas = () => {
+    const fabricCanvas = canvasRef.current;
+    if (fabricCanvas) {
+      const rect = new fabric.Rect({
+        left: 900, // Starting position on the canvas
+        top: 600, // Starting position on the canvas
+        fill: 'pink',
+        width: 60,
+        height: 70,
+        selectable: true,
+        opacity: 0.5,
+      });
+      fabricCanvas.add(rect);
     }
   };
-  
+
+  // Delete a selected object 
+  const deleteSelectedObject = () => {
+    const fabricCanvas = canvasRef.current;
+    if (fabricCanvas) {
+      const activeObject = fabricCanvas.getActiveObject();
+      if (activeObject) {
+        fabricCanvas.remove(activeObject);
+      }
+    }
+  };
+
+  // const addRectangleToCanvas = (x: number, y: number, isOriginal = false) => {
+  //   const rect = new ExtendedRect({
+  //     left: x,
+  //     top: y,
+  //     fill: "red",
+  //     width: 60,
+  //     height: 70,
+  //     isOriginal: isOriginal,
+  //   });
+
+  //   if (canvasRef.current) {
+  //     canvasRef.current.add(rect);
+  //   }
+  // };
+
+  // Renders FabricJS canvas on top of floor plan
   useEffect(() => {
     if (fileUrl) {
       const reader = new FileReader();
@@ -177,10 +198,10 @@ export default function Editor() {
             );
 
             // Add a rectangle object to the canvas initially
-            addRectangleToCanvas(100, 100);
+            // addRectangleToCanvas(100, 100);
 
             // Add a light icon to the canvas initially
-            addLightIconToCanvas(200, 200);
+            // addLightIconToCanvas(200, 200);
 
             fabricCanvas.on('mouse:down', function (options) {
               if (options.target) {
@@ -217,10 +238,30 @@ export default function Editor() {
     }
   }, [fileUrl]);
 
+  // Zoom into the floor plan
+  const zoomIn = () => {
+    const newZoom = zoomLevel * 1.1; // Increase zoom by 10%
+    canvasRef.current?.setZoom(newZoom);
+    setZoomLevel(newZoom);
+  };
+
+  // Zoom out of the floor plan
+  const zoomOut = () => {
+    const newZoom = zoomLevel * 0.9; // Decrease zoom by 10%
+    canvasRef.current?.setZoom(newZoom);
+    setZoomLevel(newZoom);
+  };
+
   return (
-    <div className="container">
-      <div className="canvas-container">
-        <canvas id="canvas"></canvas>
+    <div>
+      <div className="container">
+        <div className="canvas-container">
+          <canvas id="canvas"></canvas>
+        </div>
+        <button onClick={zoomIn}>Zoom In</button>
+        <button onClick={zoomOut}>Zoom Out</button>
+        <button onClick={addRectangleToCanvas}>Add Rectangle</button>
+        <button onClick={deleteSelectedObject}>Delete Selected Object</button>
       </div>
     </div>
   );
