@@ -80,7 +80,7 @@ export default function Home() {
   ) : (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
-        <img className={styles.lutronLogo} src="lutron-electronics-vector-logo.svg" alt="Lutron Logo" />
+        <img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
         <nav className={styles.navigation} id="navSidebar">
           <button className={`${styles.navButton} ${styles.iconButton}`}>
             < Users />Shared with me

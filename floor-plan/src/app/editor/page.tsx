@@ -128,9 +128,7 @@ export default function Editor() {
       canvasRef.current.add(rect);
     }
   };
-
-
-
+  
   useEffect(() => {
     if (fileUrl) {
       const reader = new FileReader();
@@ -157,18 +155,24 @@ export default function Editor() {
 
           img.onload = function () {
             const fabricCanvas = new fabric.Canvas("canvas", {
-              width: viewport.width + 500,
-              height: viewport.height + 500,
+              width: viewport.width,
+              height: viewport.height,
             });
             canvasRef.current = fabricCanvas;
+            // Ensure width and height are not undefined before using
+            const canvasWidth = fabricCanvas.width || 800; // Default to 800 if width is undefined
+            const canvasHeight = fabricCanvas.height || 600; // Default to 600 if height is undefined
+
             fabricCanvas.setBackgroundImage(
               img.src,
               fabricCanvas.renderAll.bind(fabricCanvas),
               {
-                width: 900,
-                height: 900,
-                originX: "left",
-                originY: "top",
+                originX: 'center',
+                originY: 'center',
+                top: canvasHeight / 2,
+                left: canvasWidth / 2,
+                scaleX: 1,
+                scaleY: 1,
               }
             );
 

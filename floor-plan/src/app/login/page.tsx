@@ -22,7 +22,7 @@ export default function Login() {
     <main className={styles.main}>
       <div className={styles.loginBox} id="loginBox">
         <Image
-          src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" // Consider hosting this yourself or ensuring you have permission to link directly
+          src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
           alt="Lutron-logo"
           width={100} // Set appropriate width
           height={100} // Set appropriate height
