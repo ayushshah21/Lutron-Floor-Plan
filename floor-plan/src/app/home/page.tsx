@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+//import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -13,6 +14,8 @@ import { FloorPlanDocument } from '../FloorPlanDocument';
 import { Clock, Search, Star, Users } from "lucide-react";
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { useFirestoreOperations } from "../hooks/useFirestoreOperations";
+
+
 
 
 //import {} from "../lutron-electronics-vector-logo.svg"; 
@@ -32,9 +35,9 @@ interface ExtendedFloorPlanDocument extends FloorPlanDocument {
 export default function Home() {
   //Uploading files
   const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const { uploadPdf, uploading, error } = useUploadPdf();
-  //delete files
-  const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+  const { uploadPdf, uploading, error: uploadError } = useUploadPdf();
+  const { floorPlans, loading: loadingFiles, fetchFloorPlans } = useUserFiles();
+  //delete file
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
   //rename files
   const [isRenaming, setIsRenaming] = useState(false);
@@ -43,9 +46,10 @@ export default function Home() {
   const { updateFileName } = useUpdateFileName();
   //use folders
   const [newFolderName, setNewFolderName] = useState('');
-  const [folders, setFolders] = useState([]); // State to store folder data
-  //const { createFolder } = useFirestoreOperations(); // From our new hook
-  const { createFolder, fetchFolders, assignFileToFolder } = useFirestoreOperations();
+  const [folders, setFolders] = useState([]);
+  const [currentFolderId, setCurrentFolderId] = useState('0'); // '0' indicates the home directory
+  const { createFolder, assignFileToFolder, fetchFolders, error } = useFirestoreOperations();
+
 
   
   /*
@@ -61,8 +65,20 @@ export default function Home() {
   //const [selectedImage, setSelectImage] = useState<string>();
 
 
-  const { isLoading } = useAuthRedirect();
+  //const { isLoading } = useAuthRedirect();
+  const [isLoading, setIsLoading] = useState(false); // Ensure this is the only place isLoading is declared
+
   const router = useRouter();
+
+  useEffect(() => {
+    // Function to fetch folders and set them in state
+    const loadFolders = async () => {
+      const fetchedFolders = await fetchFolders(auth.currentUser?.uid || '');
+      setFolders(fetchedFolders);
+    };
+
+    loadFolders();
+  }, []);
 
   const signOutWithGoogle = async () => {
     try {
@@ -72,55 +88,6 @@ export default function Home() {
     }
   };
 
-
-  //handler for creating a new folder
-  const handleCreateFolder = async () => {
-    if (!newFolderName.trim()) {
-      alert("Folder name cannot be empty");
-      return;
-    }
-    try {
-      const userId = auth.currentUser?.uid; // Assuming you have the current user's ID
-      if (userId) {
-        const folderDocRef = await createFolder(newFolderName, userId);
-        // You may want to fetch folders again or add the new folder to the state
-        setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
-        setNewFolderName(''); // Clear the input after creating the folder
-      } else {
-        throw new Error('User ID is not available');
-      }
-    } catch (error) {
-      console.error("Failed to create folder:", error);
-      // Handle the error, possibly by showing a message to the user
-    }
-  };
-
-  //adds file to folder
-  const assignFileToFolder = async (fileId: string, folderId: string) => {
-    // Show loading indicator if needed
-    // ...
-
-    try {
-      const fileRef = doc(db, 'FloorPlans', fileId);
-      await updateDoc(fileRef, {
-        folderId: folderId
-      });
-
-      // Update the local state to reflect the change
-      setFloorPlans(prevFloorPlans => prevFloorPlans.map(file => {
-        if (file.id === fileId) {
-          return { ...file, folderId: folderId };
-        }
-        return file;
-      }));
-    } catch (error) {
-      console.error("Error assigning file to folder:", error);
-      // Handle the error, possibly showing a message to the user
-    } finally {
-      // Hide loading indicator if it was shown
-      // ...
-    }
-  };
 
 
   const handleFileChange = async (event: any) => {
@@ -196,6 +163,47 @@ export default function Home() {
       }
     }
   };
+  
+
+  const handleCreateFolderClick = async () => {
+    if (!newFolderName.trim()) {
+      alert("Folder name cannot be empty.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      const folderDocRef = await createFolder(newFolderName, auth.currentUser?.uid);
+      setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
+      setNewFolderName(''); // Clear the folder name input
+    } catch (error) {
+      console.error("Error creating folder:", error);
+      alert("Failed to create folder. Please try again.");
+    } finally {
+      setIsLoading(false);
+      fetchFolders(auth.currentUser?.uid); // Re-fetch folders to update the UI
+    }
+  };
+  
+
+  const assignFileToFolderHandler = async (fileId: string, folderId: string) => {
+    try {
+      setIsLoading(true);
+      await assignFileToFolder(fileId, folderId);
+      setFloorPlans((currentFloorPlans) =>
+        currentFloorPlans.map((file) =>
+          file.id === fileId ? { ...file, folderId: folderId } : file
+        )
+      );
+    } catch (error) {
+      console.error("Error moving file to folder:", error);
+      alert("Failed to move file. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+
 
   return isLoading ? (
     <div>Loading...</div>
@@ -255,7 +263,7 @@ export default function Home() {
             placeholder="New folder name"
             className={styles.folderInput}
           />
-          <button onClick={handleCreateFolder} className={styles.createFolderButton}>
+          <button onClick={handleCreateFolderClick} disabled={isLoading}>
             Create Folder
           </button>
         </div>
@@ -266,12 +274,12 @@ export default function Home() {
               
               {/* Add the dropdown for folder selection here */}
               <select
-                value={file.folderId || ''}
-                onChange={(e) => assignFileToFolder(file.id, e.target.value)}
+                value={file.folderId}
+                onChange={(e) => assignFileToFolderHandler(file.id, e.target.value)}
                 className={styles.folderSelect}
+                disabled={isLoading}
               >
-                <option value="">No Folder</option>
-                {/* Render the folder options here */}
+                <option value="0">Home</option>
                 {folders.map(folder => (
                   <option key={folder.id} value={folder.id}>{folder.name}</option>
                 ))}
