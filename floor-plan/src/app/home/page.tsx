@@ -12,6 +12,7 @@ import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
 import { Clock, Search, Star, Users } from "lucide-react";
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
+import { useFirestoreOperations } from "../hooks/useFirestoreOperations";
 
 
 //import {} from "../lutron-electronics-vector-logo.svg"; 
@@ -29,19 +30,24 @@ interface ExtendedFloorPlanDocument extends FloorPlanDocument {
 }
 
 export default function Home() {
+  //Uploading files
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
+  //delete files
   const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
-
-
+  //rename files
   const [isRenaming, setIsRenaming] = useState(false);
   const [docToRename, setDocToRename] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
-  
-
   const { updateFileName } = useUpdateFileName();
+  //use folders
+  const [newFolderName, setNewFolderName] = useState('');
+  const [folders, setFolders] = useState([]); // State to store folder data
+  //const { createFolder } = useFirestoreOperations(); // From our new hook
+  const { createFolder, fetchFolders, assignFileToFolder } = useFirestoreOperations();
 
+  
   /*
   const { updateFileName } = useUpdateFileName(); // Destructure the function from your custom hook
   const [isRenaming, setIsRenaming] = useState(false); // State to track if rename mode is active
@@ -65,6 +71,57 @@ export default function Home() {
       console.error(err);
     }
   };
+
+
+  //handler for creating a new folder
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) {
+      alert("Folder name cannot be empty");
+      return;
+    }
+    try {
+      const userId = auth.currentUser?.uid; // Assuming you have the current user's ID
+      if (userId) {
+        const folderDocRef = await createFolder(newFolderName, userId);
+        // You may want to fetch folders again or add the new folder to the state
+        setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
+        setNewFolderName(''); // Clear the input after creating the folder
+      } else {
+        throw new Error('User ID is not available');
+      }
+    } catch (error) {
+      console.error("Failed to create folder:", error);
+      // Handle the error, possibly by showing a message to the user
+    }
+  };
+
+  //adds file to folder
+  const assignFileToFolder = async (fileId: string, folderId: string) => {
+    // Show loading indicator if needed
+    // ...
+
+    try {
+      const fileRef = doc(db, 'FloorPlans', fileId);
+      await updateDoc(fileRef, {
+        folderId: folderId
+      });
+
+      // Update the local state to reflect the change
+      setFloorPlans(prevFloorPlans => prevFloorPlans.map(file => {
+        if (file.id === fileId) {
+          return { ...file, folderId: folderId };
+        }
+        return file;
+      }));
+    } catch (error) {
+      console.error("Error assigning file to folder:", error);
+      // Handle the error, possibly showing a message to the user
+    } finally {
+      // Hide loading indicator if it was shown
+      // ...
+    }
+  };
+
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
@@ -96,6 +153,9 @@ export default function Home() {
   };
 
   
+  /*
+  Changes the new name in firebase and on screen
+  */
   const submitNewName = async () => {
     if (docToRename && newName) {
       await updateFileName(docToRename, newName);
@@ -107,7 +167,6 @@ export default function Home() {
     }
   };
   
-
   const handleUpload = async () => {
     await uploadPdf(pdfFile);
     if (error) {
@@ -120,10 +179,9 @@ export default function Home() {
   const handleFileOpen = (pdfURL: string) => {
     //window.open(pdfURL, '_blank');
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
-
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
-
   };
+
 
   // Creates a pop up when user tries to delete a floor plan
   // Askes if they want to proceed
@@ -189,10 +247,37 @@ export default function Home() {
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
+        <div className={styles.folderCreationContainer}>
+          <input
+            type="text"
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            placeholder="New folder name"
+            className={styles.folderInput}
+          />
+          <button onClick={handleCreateFolder} className={styles.createFolderButton}>
+            Create Folder
+          </button>
+        </div>
         <div className={styles.fileList}>
           {floorPlans.map((file: FloorPlanDocument) => (
             <div key={file.id} className={styles.fileItem}>
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+              
+              {/* Add the dropdown for folder selection here */}
+              <select
+                value={file.folderId || ''}
+                onChange={(e) => assignFileToFolder(file.id, e.target.value)}
+                className={styles.folderSelect}
+              >
+                <option value="">No Folder</option>
+                {/* Render the folder options here */}
+                {folders.map(folder => (
+                  <option key={folder.id} value={folder.id}>{folder.name}</option>
+                ))}
+              </select>
+
+              {/* Existing buttons for file operations */}
               {isRenaming && docToRename === file.id ? (
                 <>
                   <input value={newName} onChange={(e) => setNewName(e.target.value)} />
