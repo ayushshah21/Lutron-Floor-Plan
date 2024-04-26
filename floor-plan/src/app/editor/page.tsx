@@ -1,6 +1,7 @@
 "use client";
 import { fabric } from "fabric";
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { Document, Page, pdfjs } from "react-pdf";
 import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
@@ -34,19 +35,37 @@ class ExtendedGroup extends fabric.Group {
 }
 
 export default function Editor() {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  // const [pdfFile, setPdfFile] = useState<File | null>(null);
   const canvasRef = useRef<fabric.Canvas | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>("");
+  const [pdfUrl, setPdfUrl] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const searchParams = useSearchParams();
 
-  const handleFileChange = (event: any) => {
-    if (event.target) {
-      const file = event.target.files[0];
-      if (file && file.type === "application/pdf") {
-        setPdfFile(file);
-      } else {
-        alert("Please select a valid PDF file.");
-      }
+  // const handleFileChange = (event: any) => {
+  //   if (event.target) {
+  //     const file = event.target.files[0];
+  //     if (file && file.type === "application/pdf") {
+  //       setPdfFile(file);
+  //     } else {
+  //       alert("Please select a valid PDF file.");
+  //     }
+  //   }
+  // };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setFileUrl(url);
     }
   };
+
+  useEffect(() => {
+    if (!searchParams.get('pdf')) return;
+    const url = String(searchParams.get('pdf'));
+    setFileUrl(url);
+  }, [searchParams])
 
   const addImageToCanvas = (imageUrl: string, x: number, y: number) => {
     fabric.Image.fromURL(imageUrl, function (img) {
@@ -74,14 +93,14 @@ export default function Editor() {
       originX: "center",
       originY: "center",
     });
-  
+
     const line = new fabric.Line([x, y + 20, x, y + 40], {
       stroke: "yellow",
       strokeWidth: 5,
       originX: "center",
       originY: "center",
     });
-  
+
     const group = new ExtendedGroup([circle, line], {
       left: x,
       top: y,
@@ -89,7 +108,7 @@ export default function Editor() {
       isOriginal: isOriginal,
     });
     group.isOriginal = true;
-  
+
     if (canvasRef.current) {
       canvasRef.current.add(group);
     }
@@ -104,16 +123,16 @@ export default function Editor() {
       height: 70,
       isOriginal: isOriginal,
     });
-  
+
     if (canvasRef.current) {
       canvasRef.current.add(rect);
     }
   };
 
-  
+
 
   useEffect(() => {
-    if (pdfFile) {
+    if (fileUrl) {
       const reader = new FileReader();
       reader.onload = async function (event) {
         if (event.target?.result) {
@@ -122,7 +141,7 @@ export default function Editor() {
           ).promise;
           const page = await pdf.getPage(1);
           const viewport = page.getViewport({ scale: 1 });
-  
+
           const canvasEl = document.createElement("canvas");
           const context = canvasEl.getContext("2d");
           canvasEl.width = viewport.width;
@@ -130,12 +149,12 @@ export default function Editor() {
           if (!context) {
             throw new Error("Could not get 2D context from canvas");
           }
-  
+
           await page.render({ canvasContext: context, viewport }).promise;
-  
+
           const img = new Image();
           img.src = canvasEl.toDataURL();
-  
+
           img.onload = function () {
             const fabricCanvas = new fabric.Canvas("canvas", {
               width: viewport.width + 500,
@@ -152,26 +171,26 @@ export default function Editor() {
                 originY: "top",
               }
             );
-          
+
             // Add a rectangle object to the canvas initially
             addRectangleToCanvas(100, 100);
-          
+
             // Add a light icon to the canvas initially
             addLightIconToCanvas(200, 200);
-          
+
             fabricCanvas.on('mouse:down', function (options) {
               if (options.target) {
                 const target = options.target as ExtendedRect | ExtendedGroup;
                 if (target.isOriginal) {
                   const clone = fabric.util.object.clone(target);
-                  clone.set("top", clone.top+5);
-                  clone.set("left", clone.left+5);
+                  clone.set("top", clone.top + 5);
+                  clone.set("left", clone.left + 5);
                   clone.isOriginal = false; // Set isOriginal to false for the cloned object
                   fabricCanvas.add(clone);
                 }
               }
             });
-          
+
             // Make all objects on the canvas selectable and movable
             fabricCanvas.forEachObject(function (o) {
               o.selectable = true;
@@ -181,18 +200,21 @@ export default function Editor() {
           };
         }
       };
-      reader.readAsArrayBuffer(pdfFile);
+      // Fetch the file and read it as an ArrayBuffer in one line
+      fetch(fileUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok.');
+          }
+          return response.blob();
+        })
+        .then(blob => reader.readAsArrayBuffer(blob))
+        .catch(error => console.error("Failed to fetch or read file:", error));
     }
-  }, [pdfFile]);
+  }, [fileUrl]);
 
   return (
     <div className="container">
-      <input
-        className="file-input"
-        type="file"
-        onChange={handleFileChange}
-        accept="application/pdf"
-      />
       <div className="canvas-container">
         <canvas id="canvas"></canvas>
       </div>

@@ -11,32 +11,12 @@ import Link from 'next/link'
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
 import { Clock, Search, Star, Users } from "lucide-react";
-//import {} from "../lutron-electronics-vector-logo.svg"; 
-
-
-//import { thumbnailPlugin } from '@react-pdf-viewer/thumbnail';
-//import '@react-pdf-viewer/thumbnail/lib/styles/index.css';
-
-
-//import PDFasImage from './PDFasImage'; 
-
-// Assuming the original FloorPlanDocument is defined somewhere in your project
-interface ExtendedFloorPlanDocument extends FloorPlanDocument {
-  thumbnailUrl: string; // Ensure this matches the expected type for thumbnail URLs
-}
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
   const { floorPlans, loading } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
-
-  //const { Thumbnails } = thumbnailPluginInstance;
-
-
-  //const [selectedImage, setSelectImage] = useState<string>();
-
-
   const { isLoading } = useAuthRedirect();
   const router = useRouter();
 
@@ -76,7 +56,7 @@ export default function Home() {
   const handleFileOpen = (pdfURL: string) => {
     //window.open(pdfURL, '_blank');
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
-
+    
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
 
   };
