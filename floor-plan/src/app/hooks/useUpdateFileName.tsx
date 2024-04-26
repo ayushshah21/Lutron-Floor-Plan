@@ -6,7 +6,7 @@ import { db } from '../../../firebase';
 /**
  * Hook to handle the renaming of documents in Firestore.
  */
-export const useUpdateDocumentName = () => {
+export const useUpdateFileName = () => {
     const [isUpdating, setIsUpdating] = useState(false); // State to track whether update file name is in progress
     const [error, setError] = useState<Error | null>(null); // State to store any errors that occur
   
@@ -15,7 +15,7 @@ export const useUpdateDocumentName = () => {
      * @param {string} docId - The ID of the document to update.
      * @param {string} newName - The new name for the document.
      */
-    const updateDocumentName = async (docId: string, newName: string) => {
+    const updateFileName = async (docId: string, newName: string) => {
         setIsUpdating(true);
         try {
         const docRef = doc(db, 'FloorPlans', docId);
@@ -28,5 +28,5 @@ export const useUpdateDocumentName = () => {
     };
 
 
-    return { updateDocumentName, isUpdating, error };
+    return { updateFileName, isUpdating, error };
 };

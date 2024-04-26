@@ -13,6 +13,7 @@ import { FloorPlanDocument } from '../FloorPlanDocument';
 import { Clock, Search, Star, Users } from "lucide-react";
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 
+
 //import {} from "../lutron-electronics-vector-logo.svg"; 
 
 
@@ -30,13 +31,14 @@ interface ExtendedFloorPlanDocument extends FloorPlanDocument {
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
-  const { floorPlans, loading } = useUserFiles();
+  const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 
 
   const [isRenaming, setIsRenaming] = useState(false);
-  const [docToRename, setDocToRename] = useState(null);
+  const [docToRename, setDocToRename] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
+  
 
   const { updateFileName } = useUpdateFileName();
 
@@ -80,25 +82,31 @@ export default function Home() {
     }
   };
 
-  const startRenaming = (docId: string, currentName: string) => {
+  
+  const startRenaming = (docId: string, currentName?: string) => {
     setIsRenaming(true);
     setDocToRename(docId);
     setNewName(currentName || ''); // Pre-fill with current name if available
   };
+  
 
   const cancelRenaming = () => {
     setIsRenaming(false);
     setDocToRename(null);
   };
 
+  
   const submitNewName = async () => {
     if (docToRename && newName) {
       await updateFileName(docToRename, newName);
       setIsRenaming(false);
       setDocToRename(null);
       // Optionally refresh the list of floor plans to show the updated name
+      await fetchFloorPlans();
+
     }
   };
+  
 
   const handleUpload = async () => {
     await uploadPdf(pdfFile);
