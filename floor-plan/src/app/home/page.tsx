@@ -58,7 +58,6 @@ export default function Home() {
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
     
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
-
   };
 
   // Creates a pop up when user tries to delete a floor plan
@@ -131,6 +130,8 @@ export default function Home() {
               {/* Conditional rendering to handle missing 'thumbnailUrl' */}
 
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+              <p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+              
               <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
               <button onClick={() => handleDelete(file.id!)}>Delete</button>
             </div>
