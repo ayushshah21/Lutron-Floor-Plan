@@ -3,7 +3,8 @@
 /* Main container of your app, which includes the sidebar and main content */
 .container {
   display: flex;
-  height: 100vh; /* Take full height of the viewport */
+  height: 100vh;
+  /* Take full height of the viewport */
 }
 
 /* The sidebar styles */
@@ -16,36 +17,54 @@
   display: flex;
   flex-direction: column;
 }
+
 .sidebar nav {
-  margin-top: 20px; /* Spacing at the top inside the sidebar */
+  margin-top: 20px;
+  /* Spacing at the top inside the sidebar */
 }
 
 .navItem {
-  
+
   display: flex;
   align-items: center;
   padding: 10px 20px;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
+
 .navItem:not(:last-child) {
-  margin-bottom: 10px; /* Spacing between nav items */
+  margin-bottom: 10px;
+  /* Spacing between nav items */
 }
 
 .navItem:hover {
-  background-color: #ececec; /* Light grey background on hover */
+  background-color: #ececec;
+  /* Light grey background on hover */
 }
+
 /* Logo style, adjust as necessary */
 .lutronLogo {
-  max-width: 80%; /* Adjust the size of the logo */
+  max-width: 80%;
+  /* Adjust the size of the logo */
   margin-bottom: 2rem;
-  align-self: center; /* Center the logo in the sidebar */
-  
+  align-self: center;
+  /* Center the logo in the sidebar */
+}
+
+.threeDotLogo {
+  width: 24px;
+  height: 24px;
+  margin-left: 40px;
+}
+
+.floorPlanLogo {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
 }
 
 /* Navigation buttons within the sidebar */
 .navButton {
-  
   background: none;
   border: none;
   padding: 0.5rem 1rem;
@@ -54,12 +73,13 @@
   text-align: left;
   cursor: pointer;
   transition: background-color 0.3s;
-  display: block; 
+  display: block;
 }
 
 
 .navButton:hover {
-  background-color: #e4e4e4; /* A light grey for hover state */
+  background-color: #e4e4e4;
+  /* A light grey for hover state */
 }
 
 /* Logout button at the bottom of the sidebar */
@@ -82,16 +102,17 @@
   flex-grow: 1;
   padding: 2rem;
   background-color: #F9F9F9;
-  
+
 }
 
 /* Search bar at the top of the main content */
 .searchBar {
-  
+
   background-color: #FFFFFF;
   border-radius: 20px;
   padding: 10px 15px;
-  margin-bottom: 20px; /* Adjust the margin as needed */
+  margin-bottom: 20px;
+  /* Adjust the margin as needed */
   display: flex;
   align-items: center;
 }
@@ -102,39 +123,53 @@
   outline: none;
   padding-left: 10px;
   margin-right: 10px;
-  width: 100%; /* Full width */
+  width: 100%;
+  /* Full width */
 }
 
 .button {
-  background-image: linear-gradient(145deg, #1E75BB, #2378B5); /* Subtle gradient for depth */
+  background-image: linear-gradient(145deg, #1E75BB, #2378B5);
+  /* Subtle gradient for depth */
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem; /* Slightly increased padding for a better touch area */
+  padding: 0.6rem 1.2rem;
+  /* Slightly increased padding for a better touch area */
   margin-left: 1rem;
   cursor: pointer;
-  border-radius: var(--border-radius); /* Assuming --border-radius is defined elsewhere in your CSS */
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions for hover effects */
-  font-weight: 500; /* Slightly bolder font for clarity */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* Subtle shadow for a floating effect */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Mild text shadow for depth */
+  border-radius: var(--border-radius);
+  /* Assuming --border-radius is defined elsewhere in your CSS */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Smooth transitions for hover effects */
+  font-weight: 500;
+  /* Slightly bolder font for clarity */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  /* Subtle shadow for a floating effect */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  /* Mild text shadow for depth */
   margin-bottom: .5rem;
 }
 
 .button:hover {
-  transform: translateY(-3px); /* Slight lift effect on hover */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow for a more pronounced hover effect */
+  transform: translateY(-3px);
+  /* Slight lift effect on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  /* Enhanced shadow for a more pronounced hover effect */
 }
 
 /* Specific styles for your prompt text */
 .prompt {
-  color: #7A7A7A; /* Light gray color for the text */
-  margin-left: 20px; /* Give some space from the left */
+  color: #7A7A7A;
+  /* Light gray color for the text */
+  margin-left: 20px;
+  /* Give some space from the left */
 }
 
 .fileList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust minmax as needed */
-  grid-gap: 16px; /* Space between items */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* Adjust minmax as needed */
+  grid-gap: 16px;
+  /* Space between items */
   padding: 20px;
 }
 
@@ -144,22 +179,86 @@
   align-items: center;
   padding: 20px;
   margin: 10px;
-  border: 1px solid #000000; 
+  border: 1px solid #000000;
   border-radius: 12px;
-  background: #f9f9f9; 
+  background: #f9f9f9;
 }
 
 .fileItem:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1), 0 6px 20px rgba(0,0,0,0.19); /* Add shadow for depth */
-  transform: scale(1.05); /* Slightly increase size */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.19);
+  /* Add shadow for depth */
+  transform: scale(1.05);
+  /* Slightly increase size */
 }
 
 .fileIcon {
-  width: 100%; /* Makes the image take the full width of its container */
-  height: auto; /* Maintain aspect ratio */
+  width: 100%;
+  /* Makes the image take the full width of its container */
+  height: auto;
+  /* Maintain aspect ratio */
   margin-bottom: 8px;
 }
 
 .fileName {
-  text-align: center; /* Center-align the file name */
+  text-align: center;
+  /* Center-align the file name */
+}
+
+.fileNamePopup {
+  visibility: hidden;
+  width: 100px;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px 0;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+  font-size: small;
+}
+
+.fileName:hover .fileNamePopup {
+  visibility: visible;
+}
+
+.fileItemTopRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.popupMenu {
+  position: absolute;
+  right: -100px;
+  top: 0;
+  width: 120px;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.popupMenu button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+
+.popupMenu button:last-child {
+  border-bottom: none;
+}
+
+.popupMenu button:hover {
+  background-color: #f0f0f0;
 }
