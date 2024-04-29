@@ -6,6 +6,8 @@ import { Document, Page, pdfjs } from "react-pdf";
 import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
 import { useUserFiles } from "../hooks/useUserFiles";
+import { jsPDF } from "jspdf";
+
 
 // Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -53,7 +55,7 @@ export default function Editor() {
       setFileUrl(url);
     }
   };
-
+  
   useEffect(() => {
     if (!searchParams.get('pdf')) return;
     const url = String(searchParams.get('pdf'));
@@ -142,21 +144,6 @@ export default function Editor() {
       }
     }
   };
-
-  // const addRectangleToCanvas = (x: number, y: number, isOriginal = false) => {
-  //   const rect = new ExtendedRect({
-  //     left: x,
-  //     top: y,
-  //     fill: "red",
-  //     width: 60,
-  //     height: 70,
-  //     isOriginal: isOriginal,
-  //   });
-
-  //   if (canvasRef.current) {
-  //     canvasRef.current.add(rect);
-  //   }
-  // };
 
   // Renders FabricJS canvas on top of floor plan
   useEffect(() => {
@@ -256,6 +243,36 @@ export default function Editor() {
     setZoomLevel(newZoom);
   };
 
+  // Export floor plan including annotations back as a pdf using jsPDF
+  const exportCanvasAsPDF = () => {
+    const fabricCanvas = canvasRef.current;
+    if (!fabricCanvas) {
+      console.error("No canvas reference");
+      return;
+    }
+
+    // Set options for toDataURL
+    const options = {
+      format: 'png',  // Specify the format as 'png'
+      quality: 1      // Optional: set the quality from 0 to 1
+    };
+
+    const imgData = fabricCanvas.toDataURL(options);
+
+    // Check canvas dimensions are defined
+    const width = fabricCanvas.width || 800; // Provide default if undefined
+    const height = fabricCanvas.height || 600; // Provide default if undefined
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: [width, height]
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+    pdf.save('annotated-floorplan.pdf');
+  };
+
   return (
     <div>
       <img className="lutronLogo" onClick={() => router.push('/home')} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="bruh" />
@@ -266,6 +283,7 @@ export default function Editor() {
           onChange={handleFileChange}
           accept="application/pdf"
         />
+        <button onClick={exportCanvasAsPDF}>Export as PDF</button>
         <button onClick={zoomIn}>Zoom In</button>
         <button onClick={zoomOut}>Zoom Out</button>
         <button onClick={addRectangleToCanvas}>Add Rectangle</button>
