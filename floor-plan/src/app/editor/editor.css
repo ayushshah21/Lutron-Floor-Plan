@@ -85,10 +85,9 @@
 }
 
 .sideToolBar {
-	position: absolute;
-	top: 100;
-	left: 0;
-	margin-left: 40px;
+	position: fixed;
+	top: 100px;
+	left: 20px;
 	width: 100px;
 	height: 50%;
 	background-color: #f0f0f0;
@@ -168,6 +167,7 @@
 	justify-content: center;
 	padding: 50px;
 	font-family: Arial, sans-serif;
+	margin-left: 200px;
 }
 
 .file-input {
@@ -197,5 +197,6 @@
 }
 
 .lutronLogo:hover {
-	transform: scale(1.05); /* Slightly increase size */
-  }
+	transform: scale(1.05);
+	/* Slightly increase size */
+}

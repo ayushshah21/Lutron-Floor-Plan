@@ -259,10 +259,7 @@ export default function Editor() {
   return (
     <div>
       <img className="lutronLogo" onClick={() => router.push('/home')} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="bruh" />
-      <div className="container">
-        <div className="canvas-container">
-          <canvas id="canvas"></canvas>
-        </div>
+      <div className="sideToolBar">
         <input
           className="file-input"
           type="file"
@@ -274,6 +271,12 @@ export default function Editor() {
         <button onClick={addRectangleToCanvas}>Add Rectangle</button>
         <button onClick={addLightIcon}>Add Light Icon</button>  {/* Added button for adding light icon */}
         <button onClick={deleteSelectedObject}>Delete Selected Object</button>
+      </div>
+
+      <div className="container">
+        <div className="canvas-container">
+          <canvas id="canvas"></canvas>
+        </div>
       </div>
     </div>
   );
