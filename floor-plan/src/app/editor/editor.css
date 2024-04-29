@@ -85,10 +85,9 @@
 }
 
 .sideToolBar {
-	position: absolute;
-	top: 100;
-	left: 0;
-	margin-left: 40px;
+	position: fixed;
+	top: 100px;
+	left: 20px;
 	width: 100px;
 	height: 50%;
 	background-color: #f0f0f0;
@@ -159,31 +158,45 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-  }
+}
 
-  .container {
+.container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	padding: 50px;
 	font-family: Arial, sans-serif;
-  }
-  
-  .file-input {
+	margin-left: 200px;
+}
+
+.file-input {
 	margin: 20px 0;
 	padding: 10px;
 	font-size: 16px;
-  }
-  
-  .canvas-container {
+}
+
+.canvas-container {
 	border: 1px solid #ccc;
 	padding: 10px;
-  }
+}
 
-  .icon {
+.icon {
 	width: 50px;
 	height: 50px;
 	margin: 10px;
 	cursor: pointer;
-  }
+}
+
+.lutronLogo {
+	max-width: 80%;
+	/* Adjust the size of the logo */
+	margin-bottom: 2rem;
+	align-self: center;
+	/* Center the logo in the sidebar */
+}
+
+.lutronLogo:hover {
+	transform: scale(1.05);
+	/* Slightly increase size */
+}

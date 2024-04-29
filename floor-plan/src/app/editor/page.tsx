@@ -1,11 +1,13 @@
 "use client";
 import { fabric } from "fabric";
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Document, Page, pdfjs } from "react-pdf";
 import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
 import { useUserFiles } from "../hooks/useUserFiles";
+import { jsPDF } from "jspdf";
+
 
 // Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -44,6 +46,7 @@ export default function Editor() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const searchParams = useSearchParams();
   const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -52,7 +55,7 @@ export default function Editor() {
       setFileUrl(url);
     }
   };
-
+  
   useEffect(() => {
     if (!searchParams.get('pdf')) return;
     const url = String(searchParams.get('pdf'));
@@ -106,6 +109,14 @@ export default function Editor() {
     }
   };
 
+  // Function to add a light icon to the canvas at a default position
+  const addLightIcon = () => {
+    // You can set default positions or get them from state or props
+    const defaultX = 900;
+    const defaultY = 600;
+    addLightIconToCanvas(defaultX, defaultY);
+  };
+
   // Add a pink rectangle to the canvas
   const addRectangleToCanvas = () => {
     const fabricCanvas = canvasRef.current;
@@ -117,7 +128,7 @@ export default function Editor() {
         width: 60,
         height: 70,
         selectable: true,
-        opacity: 0.5,
+        opacity: 0.9,
       });
       fabricCanvas.add(rect);
     }
@@ -134,21 +145,6 @@ export default function Editor() {
     }
   };
 
-  // const addRectangleToCanvas = (x: number, y: number, isOriginal = false) => {
-  //   const rect = new ExtendedRect({
-  //     left: x,
-  //     top: y,
-  //     fill: "red",
-  //     width: 60,
-  //     height: 70,
-  //     isOriginal: isOriginal,
-  //   });
-
-  //   if (canvasRef.current) {
-  //     canvasRef.current.add(rect);
-  //   }
-  // };
-
   // Renders FabricJS canvas on top of floor plan
   useEffect(() => {
     if (fileUrl) {
@@ -159,7 +155,7 @@ export default function Editor() {
             new Uint8Array(event.target.result as ArrayBuffer)
           ).promise;
           const page = await pdf.getPage(1);
-          const viewport = page.getViewport({ scale: 1 });
+          const viewport = page.getViewport({ scale: 0.8 });
 
           const canvasEl = document.createElement("canvas");
           const context = canvasEl.getContext("2d");
@@ -197,11 +193,6 @@ export default function Editor() {
               }
             );
 
-            // Add a rectangle object to the canvas initially
-            // addRectangleToCanvas(100, 100);
-
-            // Add a light icon to the canvas initially
-            // addLightIconToCanvas(200, 200);
 
             fabricCanvas.on('mouse:down', function (options) {
               if (options.target) {
@@ -252,16 +243,58 @@ export default function Editor() {
     setZoomLevel(newZoom);
   };
 
+  // Export floor plan including annotations back as a pdf using jsPDF
+  const exportCanvasAsPDF = () => {
+    const fabricCanvas = canvasRef.current;
+    if (!fabricCanvas) {
+      console.error("No canvas reference");
+      return;
+    }
+
+    // Set options for toDataURL
+    const options = {
+      format: 'png',  // Specify the format as 'png'
+      quality: 1      // Optional: set the quality from 0 to 1
+    };
+
+    const imgData = fabricCanvas.toDataURL(options);
+
+    // Check canvas dimensions are defined
+    const width = fabricCanvas.width || 800; // Provide default if undefined
+    const height = fabricCanvas.height || 600; // Provide default if undefined
+
+    const pdf = new jsPDF({
+      orientation: 'landscape',
+      unit: 'px',
+      format: [width, height]
+    });
+
+    pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+    pdf.save('annotated-floorplan.pdf');
+  };
+
   return (
     <div>
+      <img className="lutronLogo" onClick={() => router.push('/home')} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="bruh" />
+      <div className="sideToolBar">
+        <input
+          className="file-input"
+          type="file"
+          onChange={handleFileChange}
+          accept="application/pdf"
+        />
+        <button onClick={exportCanvasAsPDF}>Export as PDF</button>
+        <button onClick={zoomIn}>Zoom In</button>
+        <button onClick={zoomOut}>Zoom Out</button>
+        <button onClick={addRectangleToCanvas}>Add Rectangle</button>
+        <button onClick={addLightIcon}>Add Light Icon</button>  {/* Added button for adding light icon */}
+        <button onClick={deleteSelectedObject}>Delete Selected Object</button>
+      </div>
+
       <div className="container">
         <div className="canvas-container">
           <canvas id="canvas"></canvas>
         </div>
-        <button onClick={zoomIn}>Zoom In</button>
-        <button onClick={zoomOut}>Zoom Out</button>
-        <button onClick={addRectangleToCanvas}>Add Rectangle</button>
-        <button onClick={deleteSelectedObject}>Delete Selected Object</button>
       </div>
     </div>
   );
