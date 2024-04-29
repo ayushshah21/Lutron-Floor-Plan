@@ -204,6 +204,27 @@
   /* Center-align the file name */
 }
 
+.fileNamePopup {
+  visibility: hidden;
+  width: 100px;
+  background-color: white;
+  color: black;
+  text-align: center;
+  border-radius: 6px;
+  padding: 4px 0;
+  position: absolute;
+  z-index: 1;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 5px;
+  font-size: small;
+}
+
+.fileName:hover .fileNamePopup {
+  visibility: visible;
+}
+
 .fileItemTopRow {
   display: flex;
   flex-direction: row;

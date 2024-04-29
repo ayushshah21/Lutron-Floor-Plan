@@ -86,6 +86,12 @@ export default function Home() {
     }
   };
 
+  // Truncate a floor plan name
+  const truncateFloorPlanName = (name: string | undefined) => {
+    if (!name) return 'Unnamed File'; // Handle undefined or empty names
+    return name.length > 10 ? `${name.substring(0, 7)}...` : name;
+  };
+
   return isLoading ? (
     <div>Loading...</div>
   ) : (
@@ -144,7 +150,10 @@ export default function Home() {
                   className={styles.floorPlanLogo}
                   src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
                   alt="floor plan logo" />
-                <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
+                <div className={styles.fileName}>
+                  {truncateFloorPlanName(file.name)}
+                  <div className={styles.fileNamePopup}>{file.name}</div>
+                </div>
                 <img
                   className={styles.threeDotLogo}
                   src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
