@@ -1,3 +1,120 @@
+import React, { useState, useEffect } from 'react';
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/router";
+import { auth } from "../../../firebase";
+import styles from "./page.module.css";
+import { useUploadPdf, useDeleteDocument, useUserFiles, useUpdateFileName, useFirestoreOperations } from "../hooks";
+import { Clock, Search, Star, Users } from "lucide-react";
+
+export default function Home() {
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const { uploadPdf, uploading } = useUploadPdf();
+  const { floorPlans, fetchFloorPlans } = useUserFiles();
+  const { deleteDocument } = useDeleteDocument();
+  const { updateFileName } = useUpdateFileName();
+  const { createFolder, assignFileToFolder, fetchFolders } = useFirestoreOperations();
+  const [folders, setFolders] = useState([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function loadFolders() {
+      const fetchedFolders = await fetchFolders(auth.currentUser?.uid);
+      setFolders(fetchedFolders);
+    }
+    loadFolders();
+    fetchFloorPlans();
+  }, []);
+
+  const handleCreateFolderClick = async () => {
+    if (!newFolderName.trim()) {
+      alert("Folder name cannot be empty.");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const folderDocRef = await createFolder(newFolderName, auth.currentUser?.uid);
+      setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
+      setNewFolderName('');
+    } catch (error) {
+      alert("Failed to create folder. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === "application/pdf") {
+      setPdfFile(file);
+      const pdfURL = await uploadPdf(file);
+      if (pdfURL) {
+        router.push(`/editor?pdf=${pdfURL}`);
+      } else {
+        alert("Failed to upload PDF.");
+      }
+    } else {
+      alert("Please select a valid PDF file.");
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <aside className={styles.sidebar}>
+        <img src="lutron-electronics-vector-logo.svg" alt="Lutron Logo" className={styles.lutronLogo} />
+        <nav className={styles.navigation}>
+          <button className={styles.navButton}><Users />Shared with me</button>
+          <button className={styles.navButton}><Clock />Recent</button>
+          <button className={styles.navButton}><Star />Starred</button>
+        </nav>
+        <button onClick={() => signOut(auth)} className={styles.logoutButton}>Logout</button>
+      </aside>
+      <main className={styles.mainContent}>
+        <div className={styles.searchBar}>
+          <Search />
+          <input type="text" placeholder="Search floor plans" className={styles.searchInput} />
+        </div>
+        <button onClick={handleCreateFolderClick} disabled={isLoading || !newFolderName}>
+          Create New Folder
+        </button>
+        <input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Folder name" />
+        <div>
+          {folders.map(folder => (
+            <div key={folder.id}>
+              <span>{folder.name}</span>
+              {floorPlans.filter(fp => fp.folderId === folder.id).map(file => (
+                <div key={file.id}>{file.name}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 "use client";
 //import { useState, useEffect } from "react";
 import React, { useState, useEffect } from 'react';
@@ -66,6 +183,7 @@ export default function Home() {
 
 
   //const { isLoading } = useAuthRedirect();
+  /*
   const [isLoading, setIsLoading] = useState(false); // Ensure this is the only place isLoading is declared
 
   const router = useRouter();
@@ -123,6 +241,7 @@ export default function Home() {
   /*
   Changes the new name in firebase and on screen
   */
+ /*
   const submitNewName = async () => {
     if (docToRename && newName) {
       await updateFileName(docToRename, newName);
@@ -272,7 +391,7 @@ export default function Home() {
             <div key={file.id} className={styles.fileItem}>
               <span className={styles.fileName}>{file.name || 'Unnamed File'}</span>
               
-              {/* Add the dropdown for folder selection here */}
+              
               <select
                 value={file.folderId}
                 onChange={(e) => assignFileToFolderHandler(file.id, e.target.value)}
@@ -285,7 +404,6 @@ export default function Home() {
                 ))}
               </select>
 
-              {/* Existing buttons for file operations */}
               {isRenaming && docToRename === file.id ? (
                 <>
                   <input value={newName} onChange={(e) => setNewName(e.target.value)} />
@@ -309,3 +427,4 @@ export default function Home() {
     </div>
   );
 }
+*/
