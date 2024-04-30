@@ -14,6 +14,14 @@ export interface FloorPlanDocument {
 }
 
 
+export interface Folder {
+  id: string;
+  name: string;
+  parentFolderId?: string;  // Optional, for subfolders; '0' for top-level folders
+  childFolders?: Folder[];  // Optional, for nested folders
+  documents?: FloorPlanDocument[];  // Optional, to store documents directly in this folder
+}
+
 /*
 export interface FloorPlanDocument {
     id: string;

@@ -18,7 +18,7 @@ export default function Home() {
   const { deleteDocument } = useDeleteDocument();
   const { updateFileName } = useUpdateFileName();
   const { createFolder, assignFileToFolder, fetchFolders } = useFirestoreOperations();
-  const [folders, setFolders] = useState([]);
+  const [folders, setFolders] = useState<{id: string, name: string}[]>([]);
   const router = useRouter();
 
   useEffect(() => {

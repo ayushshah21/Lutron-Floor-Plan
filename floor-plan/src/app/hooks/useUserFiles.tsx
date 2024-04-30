@@ -18,9 +18,10 @@ export const useUserFiles = () => {
       const q = query(collection(db, 'FloorPlans'), where('originalCreator', '==', auth.currentUser?.uid));
       const querySnapshot = await getDocs(q);
       setFloorPlans(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Omit<FloorPlanDocument, 'id'> })));
-    } catch (err) {
-      console.error("Error fetching floor plans:", err);
-      setError(err);
+    } catch (error) {
+      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
+      console.error("Failed to fetch the files: ", errorMessage);     // Now you are passing a string to setError
+      alert("Failed to fetch the files: " + errorMessage);
     }
     setLoading(false);
   };

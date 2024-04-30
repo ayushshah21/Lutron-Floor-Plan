@@ -43,8 +43,10 @@ export const useUploadPdf = () => {
 
       setUploading(false);
       return pdfURL;
-    } catch (err) {
-      setError("Error uploading PDF: " + err.message);
+    } catch (error) {
+      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
+      console.error("Failed to upload the file: ", errorMessage);     // Now you are passing a string to setError
+      alert("Failed to upload the file: " + errorMessage);
       setUploading(false);
       return null;
     }
