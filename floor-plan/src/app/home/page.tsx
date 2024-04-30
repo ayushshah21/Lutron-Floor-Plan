@@ -3,9 +3,17 @@ import { signOut } from "firebase/auth";
 import { useRouter } from "next/router";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
-import { useUploadPdf, useDeleteDocument, useUserFiles, useUpdateFileName, useFirestoreOperations } from "../hooks";
+//import { useUploadPdf, useDeleteDocument, useUserFiles, useUpdateFileName, useFirestoreOperations } from "../hooks";
+
 import { Clock, Search, Star, Users } from "lucide-react";
-import { Folder, FloorPlanDocument } from './interfaces';  // Adjust the import path as needed
+import { Folder, FloorPlanDocument } from "../FloorPlanDocument"; // Assuming the interface file is in ../interfaces
+
+
+import { useUploadPdf } from "../hooks/useUploadPdf";
+import { useDeleteDocument } from "../hooks/useDeleteDocument";
+import { useUserFiles } from '../hooks/useUserFiles';
+import { useUpdateFileName } from '../hooks/useUpdateFileName';
+import { useFirestoreOperations } from "../hooks/useFirestoreOperations";
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -19,8 +27,9 @@ export default function Home() {
   const { deleteDocument } = useDeleteDocument();
   const { updateFileName } = useUpdateFileName();
   const { createFolder, assignFileToFolder, fetchFolders } = useFirestoreOperations();
-  const [folders, setFolders] = useState<Folder[]>([]); // Adjusted to use the Folder interface
+  const [folders, setFolders] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
+  
 
   useEffect(() => {
     async function loadFolders() {
@@ -48,8 +57,8 @@ export default function Home() {
     }
   };
 
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (file && file.type === "application/pdf") {
       setPdfFile(file);
       const pdfURL = await uploadPdf(file);
@@ -106,7 +115,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
-        <img src="lutron-electronics-vector-logo.svg" alt="Lutron Logo" className={styles.lutronLogo} />
+        <img src="/lutron-electronics-vector-logo.svg" alt="Lutron Logo" className={styles.lutronLogo} />
         <nav className={styles.navigation}>
           <button className={styles.navButton}><Users />Shared with me</button>
           <button className={styles.navButton}><Clock />Recent</button>
@@ -131,7 +140,7 @@ export default function Home() {
             className={styles.button}
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById("fileInput").click();
+              document.getElementById("fileInput")?.click();
             }}
             disabled={uploading}
           >
@@ -154,7 +163,7 @@ export default function Home() {
           {folders.map(folder => (
             <div key={folder.id}>
               <span>{folder.name}</span>
-              {floorPlans.filter(fp => fp.folderId === folder.id).map(file => (
+              {floorPlans.filter((fp: FloorPlanDocument) => fp.folderId === folder.id).map((file: FloorPlanDocument) => (
                 <div key={file.id}>{file.name}</div>
               ))}
             </div>
@@ -164,7 +173,6 @@ export default function Home() {
     </div>
   );
 }
-
 
 
 
