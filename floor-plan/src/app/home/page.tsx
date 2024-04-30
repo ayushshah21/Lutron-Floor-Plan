@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -6,6 +5,7 @@ import { auth } from "../../../firebase";
 import styles from "./page.module.css";
 import { useUploadPdf, useDeleteDocument, useUserFiles, useUpdateFileName, useFirestoreOperations } from "../hooks";
 import { Clock, Search, Star, Users } from "lucide-react";
+import { Folder, FloorPlanDocument } from './interfaces';  // Adjust the import path as needed
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -19,7 +19,7 @@ export default function Home() {
   const { deleteDocument } = useDeleteDocument();
   const { updateFileName } = useUpdateFileName();
   const { createFolder, assignFileToFolder, fetchFolders } = useFirestoreOperations();
-  const [folders, setFolders] = useState<{id: string, name: string}[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]); // Adjusted to use the Folder interface
   const router = useRouter();
 
   useEffect(() => {
@@ -164,7 +164,6 @@ export default function Home() {
     </div>
   );
 }
-
 
 
 
