@@ -10,7 +10,10 @@ export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const { uploadPdf, uploading } = useUploadPdf();
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [docToRename, setDocToRename] = useState<string | null>(null);
+  const [newName, setNewName] = useState('');
+  const { uploadPdf, uploading, error: uploadError } = useUploadPdf();
   const { floorPlans, fetchFloorPlans } = useUserFiles();
   const { deleteDocument } = useDeleteDocument();
   const { updateFileName } = useUpdateFileName();
@@ -59,6 +62,46 @@ export default function Home() {
     }
   };
 
+  const startRenaming = (docId: string, currentName?: string) => {
+    setIsRenaming(true);
+    setDocToRename(docId);
+    setNewName(currentName || ''); // Pre-fill with current name if available
+  };
+
+  const cancelRenaming = () => {
+    setIsRenaming(false);
+    setDocToRename(null);
+  };
+
+  const submitNewName = async () => {
+    if (docToRename && newName) {
+      await updateFileName(docToRename, newName);
+      setIsRenaming(false);
+      setDocToRename(null);
+      await fetchFloorPlans();
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this file?")) {
+      try {
+        await deleteDocument(id);
+        window.location.reload(); // Refreshes the page after successful deletion
+      } catch (error) {
+        console.error("Failed to delete the floor plan:", error);
+        alert("Failed to delete the floor plan.");
+      }
+    }
+  };
+
+  const signOutWithGoogle = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <aside className={styles.sidebar}>
@@ -68,18 +111,45 @@ export default function Home() {
           <button className={styles.navButton}><Clock />Recent</button>
           <button className={styles.navButton}><Star />Starred</button>
         </nav>
-        <button onClick={() => signOut(auth)} className={styles.logoutButton}>Logout</button>
+        <button onClick={signOutWithGoogle} className={styles.logoutButton}>Logout</button>
       </aside>
       <main className={styles.mainContent}>
         <div className={styles.searchBar}>
           <Search />
           <input type="text" placeholder="Search floor plans" className={styles.searchInput} />
         </div>
-        <button onClick={handleCreateFolderClick} disabled={isLoading || !newFolderName}>
-          Create New Folder
-        </button>
-        <input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)} placeholder="Folder name" />
-        <div>
+        <form>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="application/pdf"
+            id="fileInput"
+            style={{ display: "none" }}
+          />
+          <button
+            className={styles.button}
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById("fileInput").click();
+            }}
+            disabled={uploading}
+          >
+            {uploading ? "Uploading..." : "+ New File"}
+          </button>
+        </form>
+        <div className={styles.folderCreationContainer}>
+          <input
+            type="text"
+            value={newFolderName}
+            onChange={(e) => setNewFolderName(e.target.value)}
+            placeholder="New folder name"
+            className={styles.folderInput}
+          />
+          <button onClick={handleCreateFolderClick} disabled={isLoading}>
+            Create Folder
+          </button>
+        </div>
+        <div className={styles.fileList}>
           {folders.map(folder => (
             <div key={folder.id}>
               <span>{folder.name}</span>
@@ -93,9 +163,6 @@ export default function Home() {
     </div>
   );
 }
-
-
-
 
 
 
