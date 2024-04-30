@@ -17,9 +17,9 @@ export interface FloorPlanDocument {
 export interface Folder {
   id: string;
   name: string;
-  parentFolderId?: string;  // Optional, for subfolders; '0' for top-level folders
+  parentFolderId?: string;  // Optional, for nesting folders
   childFolders?: Folder[];  // Optional, for nested folders
-  documents?: FloorPlanDocument[];  // Optional, to store documents directly in this folder
+  documents?: FloorPlanDocument[];  // Documents in the folder
 }
 
 /*

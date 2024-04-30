@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -179,6 +180,8 @@ export default function Home() {
 
 
 
+
+//No folders
 
 
 /*
