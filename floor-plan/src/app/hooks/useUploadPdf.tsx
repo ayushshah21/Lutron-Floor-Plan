@@ -1,5 +1,59 @@
 //uploads pdf to firebase
 
+// uploads pdf to firebase
+import { useState } from "react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+
+const storage = getStorage();
+const firestore = getFirestore();
+const auth = getAuth();
+
+export const useUploadPdf = () => {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+
+  const uploadPdf = async (pdfFile: File | null): Promise<string | null> => {
+    if (!pdfFile) {
+      setError("No PDF file selected.");
+      return null;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      const userId = auth.currentUser?.uid;
+      const filePath = `floorplans/${userId}/${pdfFile.name}`;
+      const storageRef = ref(storage, filePath);
+      const uploadResult = await uploadBytes(storageRef, pdfFile);
+      const pdfURL = await getDownloadURL(uploadResult.ref);
+
+      const floorPlanName = pdfFile.name.replace(/\.pdf$/i, '');
+      await addDoc(collection(firestore, "FloorPlans"), {
+        originalCreator: userId,
+        creatorEmail: auth.currentUser?.email,
+        contributors: [userId],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        pdfURL,
+        name: floorPlanName,
+      });
+
+      setUploading(false);
+      return pdfURL;
+    } catch (err) {
+      setError("Error uploading PDF: " + err.message);
+      setUploading(false);
+      return null;
+    }
+  };
+
+  return { uploadPdf, uploading, error };
+};
+
+/*
 import { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
@@ -78,3 +132,4 @@ export const useUploadPdf = () => {
 
   return { uploadPdf, uploading, error };
 };
+*/
