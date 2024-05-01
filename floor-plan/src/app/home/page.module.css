@@ -107,7 +107,6 @@
 
 /* Search bar at the top of the main content */
 .searchBar {
-
   background-color: #FFFFFF;
   border-radius: 20px;
   padding: 10px 15px;
@@ -179,9 +178,8 @@
   align-items: center;
   padding: 20px;
   margin: 10px;
-  border: 1px solid #000000;
   border-radius: 12px;
-  background: #f9f9f9;
+  background-color: #FFFFFF;
 }
 
 .fileItem:hover {

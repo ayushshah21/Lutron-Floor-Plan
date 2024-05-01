@@ -59,6 +59,7 @@ export default function Home() {
     //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
 
     window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
+    // router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
   };
 
   // Creates a pop up when user tries to delete a floor plan
@@ -85,6 +86,7 @@ export default function Home() {
       setShowThreeDotPopup(true); // Show the popup
     }
   };
+  
 
   // Truncate a floor plan name
   const truncateFloorPlanName = (name: string | undefined) => {

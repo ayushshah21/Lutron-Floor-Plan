@@ -155,7 +155,7 @@ export default function Editor() {
             new Uint8Array(event.target.result as ArrayBuffer)
           ).promise;
           const page = await pdf.getPage(1);
-          const viewport = page.getViewport({ scale: 0.8 });
+          const viewport = page.getViewport({ scale: 0.6 });
 
           const canvasEl = document.createElement("canvas");
           const context = canvasEl.getContext("2d");
@@ -277,12 +277,12 @@ export default function Editor() {
     <div>
       <img className="lutronLogo" onClick={() => router.push('/home')} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="bruh" />
       <div className="sideToolBar">
-        <input
+        {/* <input
           className="file-input"
           type="file"
           onChange={handleFileChange}
           accept="application/pdf"
-        />
+        /> */}
         <button onClick={exportCanvasAsPDF}>Export as PDF</button>
         <button onClick={zoomIn}>Zoom In</button>
         <button onClick={zoomOut}>Zoom Out</button>
