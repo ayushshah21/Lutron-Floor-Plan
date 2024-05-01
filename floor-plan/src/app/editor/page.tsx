@@ -7,6 +7,8 @@ import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
 import { useUserFiles } from "../hooks/useUserFiles";
 import { jsPDF } from "jspdf";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 
 // Needed for pdfjs to work
@@ -275,21 +277,22 @@ export default function Editor() {
 
   return (
     <div>
-      <img className="lutronLogo" onClick={() => router.push('/home')} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="bruh" />
-      <div className="sideToolBar">
-        {/* <input
-          className="file-input"
-          type="file"
-          onChange={handleFileChange}
-          accept="application/pdf"
-        /> */}
-        <button onClick={exportCanvasAsPDF}>Export as PDF</button>
-        <button onClick={zoomIn}>Zoom In</button>
-        <button onClick={zoomOut}>Zoom Out</button>
-        <button onClick={addRectangleToCanvas}>Add Rectangle</button>
-        <button onClick={addLightIcon}>Add Light Icon</button>  {/* Added button for adding light icon */}
-        <button onClick={deleteSelectedObject}>Delete Selected Object</button>
-      </div>
+      <img
+        className="lutronLogo"
+        onClick={() => router.push('/home')}
+        src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
+        alt="Lutron Electronics Logo"
+      />
+      <nav className="sideToolBar">
+        <ul>
+          <li><button onClick={exportCanvasAsPDF}><FontAwesomeIcon icon={faFilePdf} /> Export as PDF</button></li>
+          <li><button onClick={zoomIn}><FontAwesomeIcon icon={faSearchPlus} /> Zoom In</button></li>
+          <li><button onClick={zoomOut}><FontAwesomeIcon icon={faSearchMinus} /> Zoom Out</button></li>
+          <li><button onClick={addRectangleToCanvas}><FontAwesomeIcon icon={faSquare} /> Add Rectangle</button></li>
+          <li><button onClick={addLightIcon}><FontAwesomeIcon icon={faLightbulb} /> Add Light Icon</button></li>
+          <li><button onClick={deleteSelectedObject}><FontAwesomeIcon icon={faTrashAlt} />  Delete Selected Object</button></li>
+        </ul>
+      </nav>
 
       <div className="container">
         <div className="canvas-container">

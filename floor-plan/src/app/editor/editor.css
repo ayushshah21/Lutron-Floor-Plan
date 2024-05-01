@@ -86,11 +86,10 @@
 
 .sideToolBar {
 	position: fixed;
-	top: 100px;
+	top: 130px;
 	left: 20px;
-	width: 100px;
-	height: 50%;
-	background-color: #f0f0f0;
+	width: 11rem;
+	background-color: rgb(224, 221, 221);
 	border-right: 1px solid #ccc;
 	border-radius: 15px;
 	padding: 10px;
@@ -189,14 +188,53 @@
 }
 
 .lutronLogo {
+	position: fixed;
+	top: 0;
+	left: 0;
 	max-width: 80%;
-	/* Adjust the size of the logo */
+	margin: 1rem;
 	margin-bottom: 2rem;
 	align-self: center;
-	/* Center the logo in the sidebar */
+	cursor: pointer;
 }
 
 .lutronLogo:hover {
 	transform: scale(1.05);
 	/* Slightly increase size */
 }
+
+  .sideToolBar ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+  }
+  
+  .sideToolBar li {
+	margin-bottom: 1rem;
+  }
+  
+  .sideToolBar button {
+	background-color: whitesmoke; 
+	color: #0057B8; 
+	border: none;
+	padding: 10px 20px;
+	width: 100%;
+	border-radius: 5px;
+	text-align: left;
+	font-size: 1rem;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	cursor: pointer;
+  }
+  
+  .sideToolBar button:hover {
+	background-color: #0057B8; 
+	color: white;
+  }
+  
+  .sideToolBar button i {
+	margin-right: 10px;
+  }
+  
+  .fa-icon {
+	margin-right: 8px;
+  }
