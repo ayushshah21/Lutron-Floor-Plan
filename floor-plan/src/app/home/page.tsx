@@ -50,12 +50,27 @@ export default function Home() {
 
   useEffect(() => {
     const loadFolders = async () => {
-      const fetchedFolders = await fetchFolders(currentFolderId);
-      setFolders(fetchedFolders); // Update your state with fetched folders
+      // Logging the currentFolderId to debug
+      console.log('Current Folder ID:', currentFolderId);
+  
+      if (currentFolderId) { // Ensure currentFolderId is not undefined
+        const fetchedFolders = await fetchFolders(currentFolderId);
+        setFolders(fetchedFolders);
+      } else {
+        console.error('Current folder ID is undefined');
+      }
     };
-    loadFolders();
-    fetchFloorPlans();
+  
+    // Make sure the user is authenticated and currentFolderId is defined
+    if (auth.currentUser && currentFolderId) {
+      loadFolders();
+      fetchFloorPlans();
+    } else {
+      console.error('No user logged in or currentFolderId is undefined');
+    }
   }, [currentFolderId]);
+  
+
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
