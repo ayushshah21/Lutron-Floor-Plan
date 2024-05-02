@@ -1,8 +1,4 @@
 // src/app/hooks/useFirestoreOperations.tsx
-
-
-
-// src/app/hooks/useFirestoreOperations.tsx
 import { db } from '../../../firebase';
 import { useState } from 'react';
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
@@ -11,174 +7,42 @@ export const useFirestoreOperations = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const createFolder = async (folderName: string, userId: string) => {
+  const createFolder = async (folderName: string, parentId: string, userId: string) => {
     setIsLoading(true);
     try {
       const folderRef = collection(db, 'Folders');
       const folderDocRef = await addDoc(folderRef, {
         name: folderName,
+        parentId: parentId, // reference to the parent folder
         creatorId: userId,
         createdAt: new Date(),
       });
       return folderDocRef;
     } catch (error) {
-      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      console.error("Failed to create a folder: ", errorMessage);     // Now you are passing a string to setError
-      alert("Failed to create a folder: " + errorMessage);
+      console.error("Failed to create a folder: ", error);
+      //alert("Failed to create a folder: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  
-
-  const assignFileToFolder = async (fileId: string, folderId: string) => {
+  const fetchFolders = async (userId: string) => {
     setIsLoading(true);
-    try {
-      const fileRef = doc(db, 'FloorPlans', fileId);
-      await updateDoc(fileRef, { folderId });
-    } catch (error) {
-      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      console.error("Failed to assign the file to a folder: ", errorMessage);     // Now you are passing a string to setError
-      alert("Failed to assign the file to a folder: " + errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-
-  const fetchFolders = async (userId: string): Promise<{ id: string; name: string }[]> => {
-    setIsLoading(true);
-    setError(null);
     try {
       const q = query(collection(db, 'Folders'), where('creatorId', '==', userId));
       const querySnapshot = await getDocs(q);
       return querySnapshot.docs.map(doc => ({
         id: doc.id,
-        name: doc.data().name as string  // Ensure 'name' is treated as a string.
+        name: doc.data().name,
+        parentId: doc.data().parentId,
       }));
     } catch (error) {
-      const errorMessage = (error as Error).message;
-      console.error("Failed to fetch the folder: ", errorMessage);
-      //setError(errorMessage);
-      return [];  // Always return an empty array on error.
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  
-  /*
-  const fetchFolders = async (userId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const q = query(collection(db, 'Folders'), where('creatorId', '==', userId));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      console.error("Failed to fetch the folder: ", errorMessage);     // Now you are passing a string to setError
-      alert("Failed to fetch the folder: " + errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  */
-
-  const fetchStarredFiles = async (userId: string) => {
-    setIsLoading(true);
-    try {
-      const q = query(collection(db, 'FloorPlans'), where('originalCreator', '==', userId), where('isStarred', '==', true));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      console.error("Failed to fetch started files: ", errorMessage);     // Now you are passing a string to setError
-      alert("Failed to fetch started files: " + errorMessage);
+      console.error("Failed to fetch folders: ", error);
+      return [];
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { createFolder, assignFileToFolder, fetchStarredFiles, fetchFolders, isLoading, error };
+  return { createFolder, fetchFolders, isLoading, error };
 };
-
-/*
-import { db } from '../../../firebase'; 
-import { useState } from 'react';
-import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
-
-export const useFirestoreOperations = () => {
-  // State to handle loading or any errors could be added here
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // Function to create a new folder
-  const createFolder = async (folderName: string, userId: string) => {
-    setIsLoading(true);
-    try {
-      const folderRef = collection(db, 'Folders');
-      const folderDocRef = await addDoc(folderRef, {
-        name: folderName,
-        creatorId: userId,
-        createdAt: new Date(),
-      });
-      return folderDocRef;
-    } catch (err) {
-      setError(err as any); // Use the caught error, not the state error variable
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to assign a file to a folder
-  const assignFileToFolder = async (fileId: string, folderId: string) => {
-    setIsLoading(true);
-    try {
-      const fileRef = doc(db, 'FloorPlans', fileId);
-      await updateDoc(fileRef, { folderId });
-    } catch (err) {
-      setError(error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-    // Function to fetch folders
-  const fetchFolders = async (userId: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const q = query(collection(db, 'Folders'), where('creatorId', '==', userId));
-      const querySnapshot = await getDocs(q);
-      const folders = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setIsLoading(false);
-      return folders;
-    } catch (err) {
-      setError(err as any);
-      setIsLoading(false);
-      return []; // or handle the error as appropriate
-    }
-  };
-
-  // Function to fetch starred files
-  const fetchStarredFiles = async (userId: string) => {
-    setIsLoading(true);
-    try {
-      const q = query(collection(db, 'FloorPlans'), where('originalCreator', '==', userId), where('isStarred', '==', true));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (err) {
-      setError(error);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return { createFolder, assignFileToFolder, fetchStarredFiles, fetchFolders, isLoading, error };
-};
-*/

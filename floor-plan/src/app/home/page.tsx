@@ -1,6 +1,7 @@
 
 "use client";
-import { useState } from "react";
+//import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -9,12 +10,10 @@ import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
-import { FloorPlanDocument } from '../FloorPlanDocument';
+import { Folder, FloorPlanDocument } from '../FloorPlanDocument';
+import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
 
-
-//import React, { useState, useEffect } from 'react';
-import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { useFirestoreOperations } from "../hooks/useFirestoreOperations";
 
 
@@ -31,11 +30,15 @@ export default function Home() {
   const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(String);
   const router = useRouter();
-
+  const [currentFolderId, setCurrentFolderId] = useState('root'); // Default to root folder
+  const { createFolder, fetchFolders } = useFirestoreOperations();
   const [isRenaming, setIsRenaming] = useState(false);
   const [docToRename, setDocToRename] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
   const { updateFileName } = useUpdateFileName();
+  const [folders, setFolders] = useState<Folder[]>([]); // Initialize folders state here
+
+  
 
   const signOutWithGoogle = async () => {
     try {
@@ -44,6 +47,15 @@ export default function Home() {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    const loadFolders = async () => {
+      const fetchedFolders = await fetchFolders(currentFolderId);
+      setFolders(fetchedFolders); // Update your state with fetched folders
+    };
+    loadFolders();
+    fetchFloorPlans();
+  }, [currentFolderId]);
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0];
@@ -138,6 +150,13 @@ export default function Home() {
     }
   };
 
+  const handleNewFolder = async () => {
+    const folderName = prompt('Enter folder name:');
+    if (folderName) {
+      await createFolder(folderName, currentFolderId, 'userId'); // Assuming 'userId' is available
+    }
+  };
+
   return isLoading ? (
     <div>Loading...</div>
   ) : (
@@ -188,6 +207,14 @@ export default function Home() {
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
+        <div>
+          {/* Folder display */}
+          {folders.map(folder => (
+            <div key={folder.id} onClick={() => setCurrentFolderId(folder.id)}>
+              Folder: {folder.name}
+            </div>
+          ))}
+        </div>
         <div className={styles.fileList}>
           {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
             <div key={file.id} className={styles.fileItem}>
