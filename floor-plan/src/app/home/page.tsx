@@ -30,12 +30,16 @@ export default function Home() {
   const [folders, setFolders] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
   
+  
 
   useEffect(() => {
-    async function loadFolders() {
-      const fetchedFolders = await fetchFolders(auth.currentUser?.uid);
-      setFolders(fetchedFolders);
-    }
+    const loadFolders = async() => {
+      // Ensure currentUser is not null before accessing uid
+      if (auth.currentUser) {
+        const fetchedFolders = await fetchFolders(auth.currentUser.uid);
+        setFolders(fetchedFolders || []);
+      }
+    };
     loadFolders();
     fetchFloorPlans();
   }, []);
@@ -47,9 +51,14 @@ export default function Home() {
     }
     setIsLoading(true);
     try {
-      const folderDocRef = await createFolder(newFolderName, auth.currentUser?.uid);
-      setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
-      setNewFolderName('');
+      // Ensure currentUser is not null before accessing uid
+      if (auth.currentUser) {
+        const folderDocRef = await createFolder(newFolderName, auth.currentUser.uid);
+        if (folderDocRef) {
+          setFolders([...folders, { id: folderDocRef.id, name: newFolderName }]);
+          setNewFolderName('');
+        }
+      }
     } catch (error) {
       alert("Failed to create folder. Please try again.");
     } finally {

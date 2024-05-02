@@ -46,7 +46,28 @@ export const useFirestoreOperations = () => {
     }
   };
 
+
+  const fetchFolders = async (userId: string): Promise<{ id: string; name: string }[]> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const q = query(collection(db, 'Folders'), where('creatorId', '==', userId));
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name as string  // Ensure 'name' is treated as a string.
+      }));
+    } catch (error) {
+      const errorMessage = (error as Error).message;
+      console.error("Failed to fetch the folder: ", errorMessage);
+      //setError(errorMessage);
+      return [];  // Always return an empty array on error.
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
+  /*
   const fetchFolders = async (userId: string) => {
     setIsLoading(true);
     setError(null);
@@ -62,6 +83,7 @@ export const useFirestoreOperations = () => {
       setIsLoading(false);
     }
   };
+  */
 
   const fetchStarredFiles = async (userId: string) => {
     setIsLoading(true);
