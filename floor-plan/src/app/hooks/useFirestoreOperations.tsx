@@ -47,6 +47,7 @@ export const useFirestoreOperations = () => {
   };
 
 
+
   const fetchFolders = async (userId: string): Promise<{ id: string; name: string }[]> => {
     setIsLoading(true);
     setError(null);

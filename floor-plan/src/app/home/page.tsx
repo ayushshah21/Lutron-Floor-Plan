@@ -1,6 +1,9 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { signOut } from "firebase/auth";
-import { useRouter } from "next/router";
+//import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";  // Correct import from next/navigation
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
 //import { useUploadPdf, useDeleteDocument, useUserFiles, useUpdateFileName, useFirestoreOperations } from "../hooks";
@@ -29,6 +32,8 @@ export default function Home() {
   const { createFolder, assignFileToFolder, fetchFolders } = useFirestoreOperations();
   const [folders, setFolders] = useState<{ id: string; name: string }[]>([]);
   const router = useRouter();
+  //const navigation = useNavigation();
+
   
   
 
@@ -81,6 +86,11 @@ export default function Home() {
     }
   };
 
+  const handleFileOpen = (pdfURL: string) => {
+    //window.open(pdfURL, '_blank');
+    //router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
+    window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
+  };
   const startRenaming = (docId: string, currentName?: string) => {
     setIsRenaming(true);
     setDocToRename(docId);
