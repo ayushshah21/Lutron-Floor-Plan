@@ -172,6 +172,7 @@ export default function Home() {
       await createFolder(folderName, currentFolderId, 'userId'); // Assuming 'userId' is available
       setShowNewDropdown(false); // Close dropdown after action
     }
+    fetchFolders();
   };
 
   const toggleNewDropdown = () => {
@@ -210,10 +211,10 @@ export default function Home() {
             className={styles.searchInput}
           />
         </div>
-        <button onClick={toggleNewDropdown}>{uploading ? "Uploading..." : "+ New"}</button>
+        <button className={styles.button} onClick={toggleNewDropdown}>{uploading ? "Uploading..." : "+ New"}</button>
         {showNewDropdown && (
           <div>
-            <button onClick={handleNewFolder}>New Folder</button>
+            <button className={styles.button} onClick={handleNewFolder}>New Folder</button>
             <button
               className={styles.button}
               id="importButton"

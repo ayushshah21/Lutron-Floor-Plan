@@ -2,47 +2,62 @@
 import { db } from '../../../firebase';
 import { useState } from 'react';
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
+import { Folder, FloorPlanDocument } from '../FloorPlanDocument';
 
 export const useFirestoreOperations = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const createFolder = async (folderName: string, parentId: string, userId: string) => {
+
+
+  const createFolder = async (folderName: string, parentFolderId: string, userId: string) => {
     setIsLoading(true);
     try {
       const folderRef = collection(db, 'Folders');
-      const folderDocRef = await addDoc(folderRef, {
+      const newFolder = {
         name: folderName,
-        parentId: parentId, // reference to the parent folder
+        parentFolderId: parentFolderId,
         creatorId: userId,
         createdAt: new Date(),
-      });
+      };
+      const folderDocRef = await addDoc(folderRef, newFolder);
       return folderDocRef;
     } catch (error) {
       console.error("Failed to create a folder: ", error);
-      //alert("Failed to create a folder: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchFolders = async (userId: string) => {
+  const fetchFoldersAndDocuments = async (folderId: string) => {
     setIsLoading(true);
+    const folders: Folder[] = [];
+    const documents: FloorPlanDocument[] = [];
     try {
-      const q = query(collection(db, 'Folders'), where('creatorId', '==', userId));
-      const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        parentId: doc.data().parentId,
-      }));
+
+      
+      // Fetch sub-folders
+      const folderQuery = query(collection(db, 'Folders'), where('parentFolderId', '==', folderId));
+      const folderSnapshot = await getDocs(folderQuery);
+      folderSnapshot.forEach(doc => {
+        folders.push({ id: doc.id, ...doc.data() } as Folder);
+      });
+
+      // Fetch documents
+      const documentQuery = query(collection(db, 'Documents'), where('folderId', '==', folderId));
+      const documentSnapshot = await getDocs(documentQuery);
+      documentSnapshot.forEach(doc => {
+        documents.push({ id: doc.id, ...doc.data() } as FloorPlanDocument);
+      });
+
+      return { folders, documents };
     } catch (error) {
-      console.error("Failed to fetch folders: ", error);
-      return [];
+      console.error("Failed to fetch folders and documents: ", error);
+      return { folders: [], documents: [] }; // Return empty arrays on error
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { createFolder, fetchFolders, isLoading, error };
+  return { createFolder, fetchFoldersAndDocuments, isLoading, error };
 };
