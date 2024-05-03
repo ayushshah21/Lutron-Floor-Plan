@@ -31,7 +31,7 @@ export default function Home() {
   const [selectedFileId, setSelectedFileId] = useState(String);
   const router = useRouter();
   const [currentFolderId, setCurrentFolderId] = useState('root'); // Default to root folder
-  const { createFolder, fetchFolders } = useFirestoreOperations();
+  const { createFolder, fetchFoldersAndDocuments } = useFirestoreOperations();
   const [isRenaming, setIsRenaming] = useState(false);
   const [docToRename, setDocToRename] = useState<string | null>(null);
   const [newName, setNewName] = useState('');
@@ -39,6 +39,7 @@ export default function Home() {
   const [folders, setFolders] = useState<Folder[]>([]); // Initialize folders state here
   const [showNewDropdown, setShowNewDropdown] = useState(false); // State to toggle new dropdown
 
+  
   
 
   const signOutWithGoogle = async () => {
@@ -55,8 +56,9 @@ export default function Home() {
       console.log('Current Folder ID:', currentFolderId);
   
       if (currentFolderId) { // Ensure currentFolderId is not undefined
-        const fetchedFolders = await fetchFolders(currentFolderId);
-        setFolders(fetchedFolders);
+        const fetchedFolders = await fetchFoldersAndDocuments(currentFolderId);
+        fetchFoldersAndDocuments(currentFolderId);
+        //setFolders(fetchedFolders);
       } else {
         console.error('Current folder ID is undefined');
       }
@@ -64,8 +66,9 @@ export default function Home() {
   
     // Make sure the user is authenticated and currentFolderId is defined
     if (auth.currentUser && currentFolderId) {
-      loadFolders();
-      fetchFloorPlans();
+      fetchFoldersAndDocuments(currentFolderId);
+      //loadFolders();
+      //fetchFloorPlans();
     } else {
       console.error('No user logged in or currentFolderId is undefined');
     }
@@ -161,7 +164,7 @@ export default function Home() {
       setIsRenaming(false);
       setDocToRename(null);
       // Optionally refresh the list of floor plans to show the updated name
-      await fetchFloorPlans();
+      fetchFoldersAndDocuments(currentFolderId);
 
     }
   };
@@ -172,7 +175,7 @@ export default function Home() {
       await createFolder(folderName, currentFolderId, 'userId'); // Assuming 'userId' is available
       setShowNewDropdown(false); // Close dropdown after action
     }
-    fetchFolders();
+    fetchFoldersAndDocuments(currentFolderId);
   };
 
   const toggleNewDropdown = () => {
@@ -283,8 +286,6 @@ export default function Home() {
     </div>
   );
 }
-
-
 
 
 
