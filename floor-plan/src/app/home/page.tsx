@@ -9,7 +9,7 @@ import { useUploadPdf } from "../hooks/useUploadPdf";
 import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
-import { useUserFiles } from '../hooks/useUserFiles';
+//import { useUserFiles } from '../hooks/useUserFiles';
 import { Folder, FloorPlanDocument } from '../FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
@@ -24,7 +24,7 @@ import { useFirestoreOperations } from "../hooks/useFirestoreOperations";
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
-  const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+  //const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
   const { isLoading } = useAuthRedirect();
   const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
@@ -37,6 +37,7 @@ export default function Home() {
   const [newName, setNewName] = useState('');
   const { updateFileName } = useUpdateFileName();
   const [folders, setFolders] = useState<Folder[]>([]); // Initialize folders state here
+  const [documents, setDocuments] = useState<FloorPlanDocument[]>([]);
   const [showNewDropdown, setShowNewDropdown] = useState(false); // State to toggle new dropdown
 
   
@@ -50,28 +51,17 @@ export default function Home() {
     }
   };
 
+
   useEffect(() => {
-    const loadFolders = async () => {
-      // Logging the currentFolderId to debug
-      console.log('Current Folder ID:', currentFolderId);
-  
-      if (currentFolderId) { // Ensure currentFolderId is not undefined
-        const fetchedFolders = await fetchFoldersAndDocuments(currentFolderId);
-        fetchFoldersAndDocuments(currentFolderId);
-        //setFolders(fetchedFolders);
-      } else {
-        console.error('Current folder ID is undefined');
+    const fetchData = async () => {
+      if (currentFolderId) {
+        console.log("Fetching for folderId:", currentFolderId);
+        const { folders, documents } = await fetchFoldersAndDocuments(currentFolderId);
+        setFolders(folders);
+        setDocuments(documents);
       }
     };
-  
-    // Make sure the user is authenticated and currentFolderId is defined
-    if (auth.currentUser && currentFolderId) {
-      fetchFoldersAndDocuments(currentFolderId);
-      //loadFolders();
-      //fetchFloorPlans();
-    } else {
-      console.error('No user logged in or currentFolderId is undefined');
-    }
+    fetchData();
   }, [currentFolderId]);
   
 
@@ -242,7 +232,7 @@ export default function Home() {
           ))}
         </div>
         <div className={styles.fileList}>
-          {floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
+          {documents.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
             <div key={file.id} className={styles.fileItem}>
               <div className={styles.fileItemTopRow}>
                 <img

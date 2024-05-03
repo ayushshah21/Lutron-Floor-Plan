@@ -13,6 +13,8 @@ const auth = getAuth();
 export const useUploadPdf = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [currentFolderId, setCurrentFolderId] = useState('root'); // Default to root folder
+
 
   const uploadPdf = async (pdfFile: File | null): Promise<string | null> => {
     if (!pdfFile) {
@@ -30,6 +32,7 @@ export const useUploadPdf = () => {
       const uploadResult = await uploadBytes(storageRef, pdfFile);
       const pdfURL = await getDownloadURL(uploadResult.ref);
 
+
       const floorPlanName = pdfFile.name.replace(/\.pdf$/i, '');
       await addDoc(collection(firestore, "FloorPlans"), {
         originalCreator: userId,
@@ -39,6 +42,7 @@ export const useUploadPdf = () => {
         updatedAt: serverTimestamp(),
         pdfURL,
         name: floorPlanName,
+        folderID: currentFolderId,
       });
 
       setUploading(false);
