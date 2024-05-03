@@ -4,10 +4,48 @@ import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestor
 import { auth, db } from '../../../firebase'; // Adjust this path as needed
 import { FloorPlanDocument } from '../FloorPlanDocument';
 
+// hooks/useUserFiles.ts
+
+
+
+export const useUserFiles = () => {
+  const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchFloorPlans = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const q = query(collection(db, 'FloorPlans'), where('originalCreator', '==', auth.currentUser?.uid));
+      const querySnapshot = await getDocs(q);
+      setFloorPlans(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Omit<FloorPlanDocument, 'id'> })));
+    } catch (error) {
+      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
+      console.error("Failed to fetch the files: ", errorMessage);     // Now you are passing a string to setError
+      alert("Failed to fetch the files: " + errorMessage);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchFloorPlans();
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) fetchFloorPlans();
+    });
+    return () => unsubscribe();
+  }, []);
+
+  return { floorPlans, loading, fetchFloorPlans, error };
+};
+
+/*
 export const useUserFiles = () => {
   const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
   const [loading, setLoading] = useState(false);
 
+
+  
   useEffect(() => {
       // Set up an authentication state listener
       const unsubscribe = auth.onAuthStateChanged(user => {
@@ -43,3 +81,4 @@ export const useUserFiles = () => {
   return { floorPlans, loading };
 };
 
+*/

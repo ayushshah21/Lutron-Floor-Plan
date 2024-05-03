@@ -9,17 +9,23 @@ import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../FloorPlanDocument';
+import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
 
 export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const { uploadPdf, uploading, error } = useUploadPdf();
-  const { floorPlans, loading } = useUserFiles();
+  const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
   const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
   const { isLoading } = useAuthRedirect();
   const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(String);
   const router = useRouter();
+
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [docToRename, setDocToRename] = useState<string | null>(null);
+  const [newName, setNewName] = useState('');
+  const { updateFileName } = useUpdateFileName();
 
   const signOutWithGoogle = async () => {
     try {
@@ -94,6 +100,32 @@ export default function Home() {
     return name.length > 10 ? `${name.substring(0, 7)}...` : name;
   };
 
+
+
+  const startRenaming = (docId: string, currentName?: string) => {
+    setIsRenaming(true);
+    setDocToRename(docId);
+    setNewName(currentName || ''); // Pre-fill with current name if available
+  };
+  
+  const cancelRenaming = () => {
+    setIsRenaming(false);
+    setDocToRename(null);
+  };
+  
+  /*
+  Changes the new name in firebase and on screen
+  */
+  const submitNewName = async () => {
+    if (docToRename && newName) {
+      await updateFileName(docToRename, newName);
+      setIsRenaming(false);
+      setDocToRename(null);
+      // Optionally refresh the list of floor plans to show the updated name
+      await fetchFloorPlans();
+    }
+  };
+
   return isLoading ? (
     <div>Loading...</div>
   ) : (
@@ -164,9 +196,17 @@ export default function Home() {
                 />
               </div>
               {showThreeDotPopup && selectedFileId === file.id && (
+                  isRenaming && docToRename === file.id ? (
+                  <>
+                    <input value={newName} onChange={(e) => setNewName(e.target.value)} />
+                    <button onClick={submitNewName}>Save</button>
+                    <button onClick={cancelRenaming}>Cancel</button>
+                  </>
+                ) :
                 <div className={styles.popupMenu}>
                   <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
                   <button onClick={() => handleDelete(file.id)}>Delete</button>
+                  <button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
                 </div>
               )}
               <p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
