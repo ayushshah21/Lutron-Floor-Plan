@@ -210,47 +210,26 @@ export default function Home() {
             className={styles.searchInput}
           />
         </div>
-
-
-
-
-        <form>
-          <button
-            className={styles.button}
-            id="importButton"
-            onClick={(e) => {
-              e.preventDefault();
-              toggleNewDropdown();
-            }}
-            disabled={uploading}
-          >
-            {uploading ? "Uploading..." : "+ New"}
-          </button>
-        </form>
+        <button onClick={toggleNewDropdown}>{uploading ? "Uploading..." : "+ New"}</button>
         {showNewDropdown && (
-          <div className={styles.dropdownMenu}>
-            <button onClick={() => {
-              handleNewFolder();
-              setShowNewDropdown(false);
-            }} className={styles.dropdownItem}>New Folder</button>
-            <button onClick={() => {
-              document.getElementById("fileInput").click();
-              setShowNewDropdown(false);
-            }} className={styles.dropdownItem}>New File</button>
+          <div>
+            <button onClick={handleNewFolder}>New Folder</button>
+            <button
+              className={styles.button}
+              id="importButton"
+              onClick={(e) => {
+                e.preventDefault(); // Prevent form submission
+                document.getElementById("fileInput")?.click(); // Programmatically click the file input
+              }}
+              disabled={uploading}
+              >
+              {uploading ? "Uploading..." : "Open File"}
+            </button>          
           </div>
         )}
-        <input
-          type="file"
-          onChange={handleFileChange}
-          accept="application/pdf"
-          id="fileInput"
-          style={{ display: "none" }}
-        />
+        <input type="file" id="fileInput" style={{ display: "none" }} onChange={handleFileChange} accept="application/pdf" />
 
         <div>
-
-
-
           {/* Folder display */}
           {folders.map(folder => (
             <div key={folder.id} onClick={() => setCurrentFolderId(folder.id)}>
