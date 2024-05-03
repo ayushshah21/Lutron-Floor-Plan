@@ -37,6 +37,7 @@ export default function Home() {
   const [newName, setNewName] = useState('');
   const { updateFileName } = useUpdateFileName();
   const [folders, setFolders] = useState<Folder[]>([]); // Initialize folders state here
+  const [showNewDropdown, setShowNewDropdown] = useState(false); // State to toggle new dropdown
 
   
 
@@ -169,8 +170,15 @@ export default function Home() {
     const folderName = prompt('Enter folder name:');
     if (folderName) {
       await createFolder(folderName, currentFolderId, 'userId'); // Assuming 'userId' is available
+      setShowNewDropdown(false); // Close dropdown after action
     }
   };
+
+  const toggleNewDropdown = () => {
+    setShowNewDropdown(!showNewDropdown);
+  };
+
+
 
   return isLoading ? (
     <div>Loading...</div>
@@ -202,27 +210,47 @@ export default function Home() {
             className={styles.searchInput}
           />
         </div>
+
+
+
+
         <form>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            accept="application/pdf"
-            id="fileInput"
-            style={{ display: "none" }} // Hide the default file input
-          />
           <button
             className={styles.button}
             id="importButton"
             onClick={(e) => {
-              e.preventDefault(); // Prevent form submission
-              document.getElementById("fileInput")?.click(); // Programmatically click the file input
+              e.preventDefault();
+              toggleNewDropdown();
             }}
             disabled={uploading}
           >
             {uploading ? "Uploading..." : "+ New"}
           </button>
         </form>
+        {showNewDropdown && (
+          <div className={styles.dropdownMenu}>
+            <button onClick={() => {
+              handleNewFolder();
+              setShowNewDropdown(false);
+            }} className={styles.dropdownItem}>New Folder</button>
+            <button onClick={() => {
+              document.getElementById("fileInput").click();
+              setShowNewDropdown(false);
+            }} className={styles.dropdownItem}>New File</button>
+          </div>
+        )}
+        <input
+          type="file"
+          onChange={handleFileChange}
+          accept="application/pdf"
+          id="fileInput"
+          style={{ display: "none" }}
+        />
+
         <div>
+
+
+
           {/* Folder display */}
           {folders.map(folder => (
             <div key={folder.id} onClick={() => setCurrentFolderId(folder.id)}>
