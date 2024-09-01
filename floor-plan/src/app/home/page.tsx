@@ -8,7 +8,7 @@ import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
-import { FloorPlanDocument } from '../FloorPlanDocument';
+import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
 

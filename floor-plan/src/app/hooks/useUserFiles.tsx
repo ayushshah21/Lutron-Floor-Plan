@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../../../firebase'; // Adjust this path as needed
-import { FloorPlanDocument } from '../FloorPlanDocument';
+import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 
 // hooks/useUserFiles.ts
 
