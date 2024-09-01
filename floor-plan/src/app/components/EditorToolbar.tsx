@@ -33,5 +33,4 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
 	);
 };
 
-
 export default EditorToolbar;

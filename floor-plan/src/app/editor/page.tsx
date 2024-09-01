@@ -5,8 +5,6 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { pdfjs } from "react-pdf";
 import * as pdfjsLib from "pdfjs-dist";
 import "./editor.css";
-import { jsPDF } from "jspdf";
-
 import EditorToolbar from "../components/EditorToolbar"
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
@@ -16,12 +14,11 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 export default function Editor() {
 	// const [pdfFile, setPdfFile] = useState<File | null>(null);
-	const { canvasRef, addImageToCanvas, addLightIconToCanvas, addRectangleToCanvas, deleteSelectedObject } = useCanvas();
+	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF } = useCanvas();
 	const [fileUrl, setFileUrl] = useState<string>("");
 	const [pdfUrl, setPdfUrl] = useState<string>("");
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
 	const searchParams = useSearchParams();
-	const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
 	const router = useRouter();
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,49 +120,6 @@ export default function Editor() {
 		}
 	}, [fileUrl]);
 
-	// Zoom into the floor plan
-	const zoomIn = () => {
-		const newZoom = zoomLevel * 1.1; // Increase zoom by 10%
-		canvasRef.current?.setZoom(newZoom);
-		setZoomLevel(newZoom);
-	};
-
-	// Zoom out of the floor plan
-	const zoomOut = () => {
-		const newZoom = zoomLevel * 0.9; // Decrease zoom by 10%
-		canvasRef.current?.setZoom(newZoom);
-		setZoomLevel(newZoom);
-	};
-
-	// Export floor plan including annotations back as a pdf using jsPDF
-	const exportCanvasAsPDF = () => {
-		const fabricCanvas = canvasRef.current;
-		if (!fabricCanvas) {
-			console.error("No canvas reference");
-			return;
-		}
-
-		// Set options for toDataURL
-		const options = {
-			format: 'png',  // Specify the format as 'png'
-			quality: 1      // Optional: set the quality from 0 to 1
-		};
-
-		const imgData = fabricCanvas.toDataURL(options);
-
-		// Check canvas dimensions are defined
-		const width = fabricCanvas.width || 800; // Provide default if undefined
-		const height = fabricCanvas.height || 600; // Provide default if undefined
-
-		const pdf = new jsPDF({
-			orientation: 'landscape',
-			unit: 'px',
-			format: [width, height]
-		});
-
-		pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-		pdf.save('annotated-floorplan.pdf');
-	};
 
 	return (
 		<div>
