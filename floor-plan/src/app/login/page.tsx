@@ -8,7 +8,7 @@ import Image from "next/image"; // Importing Next.js Image component
 
 export default function Login() {
   const router = useRouter();
-    
+
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
@@ -16,7 +16,7 @@ export default function Login() {
     } catch (err) {
       console.error(err);
     }
-  };  
+  };
 
   return (
     <main className={styles.main}>
