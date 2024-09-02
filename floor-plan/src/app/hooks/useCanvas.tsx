@@ -1,4 +1,3 @@
-// hooks/useCanvas.ts
 import { fabric } from 'fabric';
 import { useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
@@ -7,6 +6,10 @@ import { ExtendedGroup } from '../utils/fabricUtil';
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
+
+    // Track drawing or erasing mode
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [isErasing, setIsErasing] = useState(false);
 
     const addImageToCanvas = (imageUrl: string, x: number, y: number) => {
         fabric.Image.fromURL(imageUrl, function (img) {
@@ -125,9 +128,68 @@ export const useCanvas = () => {
         pdf.save('annotated-floorplan.pdf');
     };
 
+    // Enable free drawing mode
+    const enableFreeDrawing = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas) {
+            fabricCanvas.isDrawingMode = true;
+            fabricCanvas.freeDrawingBrush.color = 'black'; // Set drawing color
+            fabricCanvas.freeDrawingBrush.width = 5; // Set drawing width
+            setIsDrawing(true);
+            setIsErasing(false); // Disable erasing if it was active
+        }
+    };
+
+    // Disable free drawing mode
+    const disableFreeDrawing = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas) {
+            fabricCanvas.isDrawingMode = false;
+            setIsDrawing(false);
+        }
+    };
+
+    // Enable eraser mode
+    const enableEraser = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas) {
+            fabricCanvas.isDrawingMode = false; // Disable drawing mode
+            setIsErasing(true);
+            setIsDrawing(false);
+
+            // Custom eraser functionality
+            fabricCanvas.on('mouse:down', function (event) {
+                const pointer = fabricCanvas.getPointer(event.e);
+                const point = new fabric.Point(pointer.x, pointer.y); // Create a fabric.Point instance
+
+                const objects = fabricCanvas.getObjects();
+
+                // Loop through objects on canvas, and check if the object is a free drawing (black path)
+                for (let i = 0; i < objects.length; i++) {
+                    const object = objects[i];
+                    if (object.type === 'path' && object.stroke === 'black') {
+                        if (object.containsPoint(point)) {
+                            fabricCanvas.remove(object);
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    // Disable eraser mode
+    const disableEraser = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas) {
+            fabricCanvas.isDrawingMode = false;
+            setIsErasing(false);
+        }
+    };
+
     // Save function (WIP)
     // Something similar to export pdf, take the saved pdf file and 
     // update existing floor plan pdf with the new annotated one
+    // Fix opening existing floor plan bug first before working on this
 
     return {
         canvasRef,
@@ -138,5 +200,11 @@ export const useCanvas = () => {
         zoomIn,
         zoomOut,
         exportCanvasAsPDF,
+        enableFreeDrawing,
+        disableFreeDrawing,
+        enableEraser,
+        disableEraser,
+        isDrawing,
+        isErasing,
     };
 };

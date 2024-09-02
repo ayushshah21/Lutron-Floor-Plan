@@ -14,7 +14,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 export default function Editor() {
 	// const [pdfFile, setPdfFile] = useState<File | null>(null);
-	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF } = useCanvas();
+	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, enableFreeDrawing,
+		disableFreeDrawing,
+		enableEraser,
+		disableEraser,
+		isDrawing,
+		isErasing, } = useCanvas();
 	const [fileUrl, setFileUrl] = useState<string>("");
 	const [pdfUrl, setPdfUrl] = useState<string>("");
 	const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -35,7 +40,7 @@ export default function Editor() {
 		setFileUrl(url);
 	}, [searchParams])
 
-	
+
 	// Renders FabricJS canvas on top of floor plan
 	useEffect(() => {
 		if (fileUrl) {
@@ -137,6 +142,12 @@ export default function Editor() {
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addLightIconToCanvas(900, 600)}
 				deleteSelectedObject={deleteSelectedObject}
+				enableFreeDrawing={enableFreeDrawing}
+				disableFreeDrawing={disableFreeDrawing}
+				enableEraser={enableEraser}
+				disableEraser={disableEraser}
+				isDrawing={isDrawing}
+				isErasing={isErasing}
 			/>
 
 			<div className="container">
