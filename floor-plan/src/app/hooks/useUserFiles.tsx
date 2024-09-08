@@ -22,8 +22,8 @@ export const useUserFiles = () => {
       setFloorPlans(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Omit<FloorPlanDocument, 'id'> })));
     } catch (error) {
       const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      console.error("Failed to fetch the files: ", errorMessage);     // Now you are passing a string to setError
-      alert("Failed to fetch the files: " + errorMessage);
+      // console.error("Failed to fetch the files: ", errorMessage);     // Now you are passing a string to setError
+      // alert("Failed to fetch the files: " + errorMessage);
     }
     setLoading(false);
   };

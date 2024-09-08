@@ -35,7 +35,8 @@ export default function Home() {
 		}
 	};
 
-	const handleFileChange = async (event: any) => {
+	// Upload new floor plan
+	const uploadFloorplan = async (event: any) => {
 		const file = event.target.files[0];
 		const url = URL.createObjectURL(file);
 		if (file && file.type === "application/pdf") {
@@ -51,21 +52,10 @@ export default function Home() {
 		}
 	};
 
-	const handleUpload = async () => {
-		await uploadPdf(pdfFile);
-		if (error) {
-			alert(error);
-		} else {
-			alert("PDF uploaded successfully!");
-		}
-	};
-
-	const handleFileOpen = (pdfURL: string) => {
-		//window.open(pdfURL, '_blank');
-		//router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
-
-		window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
-		// router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
+	// Opening existing floor plans
+	const openFloorplan = (pdfURL: string) => {
+		const encodedPdfURL = encodeURIComponent(pdfURL); 
+		router.push(`/editor?pdf=${(encodedPdfURL)}`);
 	};
 
 	// Creates a pop up when user tries to delete a floor plan
@@ -93,14 +83,11 @@ export default function Home() {
 		}
 	};
 
-
 	// Truncate a floor plan name
 	const truncateFloorPlanName = (name: string | undefined) => {
 		if (!name) return 'Unnamed File'; // Handle undefined or empty names
 		return name.length > 10 ? `${name.substring(0, 7)}...` : name;
 	};
-
-
 
 	const startRenaming = (docId: string, currentName?: string) => {
 		setIsRenaming(true);
@@ -113,9 +100,7 @@ export default function Home() {
 		setDocToRename(null);
 	};
 
-	/*
-	Changes the new name in firebase and on screen
-	*/
+	// Changes the new name in firebase and on screen
 	const submitNewName = async () => {
 		if (docToRename && newName) {
 			await updateFileName(docToRename, newName);
@@ -164,7 +149,7 @@ export default function Home() {
 				<form>
 					<input
 						type="file"
-						onChange={handleFileChange}
+						onChange={uploadFloorplan}
 						accept="application/pdf"
 						id="fileInput"
 						style={{ display: "none" }} // Hide the default file input
@@ -209,7 +194,7 @@ export default function Home() {
 									</>
 								) :
 									<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-										<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+										<button onClick={() => openFloorplan(file.pdfURL)}>Open</button>
 										<button onClick={() => handleDelete(file.id)}>Delete</button>
 										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 									</div>

@@ -3,9 +3,10 @@ import { fabric } from "fabric";
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { pdfjs } from "react-pdf";
-import * as pdfjsLib from "pdfjs-dist";
+import { getDocument } from "pdfjs-dist";
+
 import "./editor.css";
-import EditorToolbar from "../components/EditorToolbar"
+import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
 
@@ -13,59 +14,47 @@ import { useCanvas } from "../hooks/useCanvas";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export default function Editor() {
-	// const [pdfFile, setPdfFile] = useState<File | null>(null);
-	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, enableFreeDrawing,
-		disableFreeDrawing,
-		enableEraser,
-		disableEraser,
-		isDrawing,
-		isErasing, } = useCanvas();
-	const [fileUrl, setFileUrl] = useState<string>("");
+	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, enableFreeDrawing, disableFreeDrawing, enableEraser, disableEraser, isDrawing, isErasing } = useCanvas();
 	const [pdfUrl, setPdfUrl] = useState<string>("");
-	const fileInputRef = useRef<HTMLInputElement | null>(null);
+
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
-		if (file) {
-			const url = URL.createObjectURL(file);
-			setFileUrl(url);
-		}
-	};
-
+	// Extract pdf url from search params
 	useEffect(() => {
-		if (!searchParams.get('pdf')) return;
-		const url = String(searchParams.get('pdf'));
-		setFileUrl(url);
-	}, [searchParams])
-
+		const searchParamPdf = searchParams.get('pdf');
+		if (searchParamPdf) {
+			setPdfUrl(searchParamPdf);
+		}
+	}, [searchParams]);
 
 	// Renders FabricJS canvas on top of floor plan
 	useEffect(() => {
-		if (fileUrl) {
-			const reader = new FileReader();
-			reader.onload = async function (event) {
-				if (event.target?.result) {
-					const pdf = await pdfjsLib.getDocument(
-						new Uint8Array(event.target.result as ArrayBuffer)
-					).promise;
-					const page = await pdf.getPage(1);
-					const viewport = page.getViewport({ scale: 0.6 });
+		if (pdfUrl) {
+			(async function renderPdf() {
+				try {
+					// Fetch the PDF document
+					const pdf = await getDocument(pdfUrl).promise;
+					const page = await pdf.getPage(1); // Get the first page
+					const viewport = page.getViewport({ scale: 0.6 }); // Adjust scale as necessary
 
+					// Create a temporary canvas to render the PDF page
 					const canvasEl = document.createElement("canvas");
 					const context = canvasEl.getContext("2d");
 					canvasEl.width = viewport.width;
 					canvasEl.height = viewport.height;
+
 					if (!context) {
 						throw new Error("Could not get 2D context from canvas");
 					}
 
 					await page.render({ canvasContext: context, viewport }).promise;
 
+					// Create an image from the rendered canvas
 					const img = new Image();
 					img.src = canvasEl.toDataURL();
 
+					// When image is loaded, set it as Fabric.js background
 					img.onload = function () {
 						const fabricCanvas = new fabric.Canvas("canvas", {
 							width: viewport.width,
@@ -76,6 +65,7 @@ export default function Editor() {
 						const canvasWidth = fabricCanvas.width || 800; // Default to 800 if width is undefined
 						const canvasHeight = fabricCanvas.height || 600; // Default to 600 if height is undefined
 
+						// Set image as the background image of Fabric.js canvas
 						fabricCanvas.setBackgroundImage(
 							img.src,
 							fabricCanvas.renderAll.bind(fabricCanvas),
@@ -89,7 +79,7 @@ export default function Editor() {
 							}
 						);
 
-
+						// Example event: Allow cloning of original objects
 						fabricCanvas.on('mouse:down', function (options) {
 							if (options.target) {
 								const target = options.target as ExtendedRect | ExtendedGroup;
@@ -97,7 +87,7 @@ export default function Editor() {
 									const clone = fabric.util.object.clone(target);
 									clone.set("top", clone.top + 5);
 									clone.set("left", clone.left + 5);
-									clone.isOriginal = false; // Set isOriginal to false for the cloned object
+									clone.isOriginal = false;
 									fabricCanvas.add(clone);
 								}
 							}
@@ -110,21 +100,12 @@ export default function Editor() {
 							o.lockMovementY = false;
 						});
 					};
+				} catch (error) {
+					console.error("Error loading or rendering PDF:", error);
 				}
-			};
-			// Fetch the file and read it as an ArrayBuffer in one line
-			fetch(fileUrl)
-				.then(response => {
-					if (!response.ok) {
-						throw new Error('Network response was not ok.');
-					}
-					return response.blob();
-				})
-				.then(blob => reader.readAsArrayBuffer(blob))
-				.catch(error => console.error("Failed to fetch or read file:", error));
+			})();
 		}
-	}, [fileUrl]);
-
+	}, [pdfUrl]);
 
 	return (
 		<div>
