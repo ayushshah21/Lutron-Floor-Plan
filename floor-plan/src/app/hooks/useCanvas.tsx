@@ -98,12 +98,12 @@ export const useCanvas = () => {
         setZoomLevel(newZoom);
     };
 
-    // Export floor plan including annotations back as a pdf using jsPDF
-    const exportCanvasAsPDF = () => {
+    // Function to generate the PDF from the canvas
+    const generatePdf = () => {
         const fabricCanvas = canvasRef.current;
         if (!fabricCanvas) {
             console.error("No canvas reference");
-            return;
+            return null;
         }
 
         // Set options for toDataURL
@@ -125,7 +125,18 @@ export const useCanvas = () => {
         });
 
         pdf.addImage(imgData, 'PNG', 0, 0, width, height);
-        pdf.save('annotated-floorplan.pdf');
+
+        return pdf;
+    };
+
+    // Export floor plan as a PDF for downloading
+    const exportCanvasAsPDF = () => {
+        const pdf = generatePdf();
+        if (!pdf) return;
+
+        // Prompt user for file name
+        const fileName = prompt('Enter the file name for the exported PDF:', 'annotated-floorplan');
+        pdf.save(`${fileName || 'annotated-floorplan'}.pdf`);
     };
 
     // Enable free drawing mode
@@ -185,11 +196,6 @@ export const useCanvas = () => {
             setIsErasing(false);
         }
     };
-
-    // Save function (WIP)
-    // Something similar to export pdf, take the saved pdf file and 
-    // update existing floor plan pdf with the new annotated one
-    // Fix opening existing floor plan bug first before working on this
 
     return {
         canvasRef,

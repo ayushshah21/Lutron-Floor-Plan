@@ -62,9 +62,8 @@ export const useUploadPdf = () => {
 				createdAt: serverTimestamp(),
 				updatedAt: serverTimestamp(),
 				pdfURL,
-				name: floorPlanName, // Use your extract function here
+				name: floorPlanName, 
 			});
-
 
 			setUploading(false);
 			return pdfURL; // Return the PDF URL after successful upload
