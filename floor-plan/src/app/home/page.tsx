@@ -38,12 +38,13 @@ export default function Home() {
 	// Upload new floor plan
 	const uploadFloorplan = async (event: any) => {
 		const file = event.target.files[0];
-		const url = URL.createObjectURL(file);
 		if (file && file.type === "application/pdf") {
 			setPdfFile(file);
-			const pdfURL = await uploadPdf(file);
-			if (pdfURL) {
-				router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
+			const result = await uploadPdf(file); // Upload the PDF and get both pdfURL and documentId
+			if (result) {
+				const { pdfURL, documentId } = result;
+				// Redirect to the editor page, passing the PDF URL and documentId
+				router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentId}&fileName=${encodeURIComponent(file.name)}`);
 			} else {
 				alert("Failed to upload PDF.");
 			}
@@ -53,9 +54,8 @@ export default function Home() {
 	};
 
 	// Opening existing floor plans
-	const openFloorplan = (pdfURL: string) => {
-		const encodedPdfURL = encodeURIComponent(pdfURL); 
-		router.push(`/editor?pdf=${(encodedPdfURL)}`);
+	const openFloorplan = (pdfURL: string, documentID: string, fileName: string) => {
+		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}`);
 	};
 
 	// Creates a pop up when user tries to delete a floor plan
@@ -194,7 +194,7 @@ export default function Home() {
 									</>
 								) :
 									<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-										<button onClick={() => openFloorplan(file.pdfURL)}>Open</button>
+										<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
 										<button onClick={() => handleDelete(file.id)}>Delete</button>
 										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 									</div>

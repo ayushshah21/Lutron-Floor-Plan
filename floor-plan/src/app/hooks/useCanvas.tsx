@@ -2,10 +2,22 @@ import { fabric } from 'fabric';
 import { useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import { ExtendedGroup } from '../utils/fabricUtil';
+import { useUploadPdf } from './useUploadPdf';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import {
+	getFirestore,
+	collection,
+	addDoc,
+	serverTimestamp,
+	doc, 
+	updateDoc,
+} from "firebase/firestore";
 
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
+    const { updatePdfUrl } = useUploadPdf();
+    const storage = getStorage();
 
     // Track drawing or erasing mode
     const [isDrawing, setIsDrawing] = useState(false);
@@ -139,6 +151,34 @@ export const useCanvas = () => {
         pdf.save(`${fileName || 'annotated-floorplan'}.pdf`);
     };
 
+    const saveFloorPlanChanges = async (documentId: string, originalFileName: string) => {
+        const pdf = generatePdf();
+        if (pdf) {
+            // Convert the PDF to a Blob
+            const pdfBlob = pdf.output('blob');
+            
+            // Create a reference to where the file should be stored in Firebase Storage
+            const storageRef = ref(storage, `floorplans/${documentId}/${originalFileName}`);
+
+            try {
+                // Upload the Blob to Firebase Storage
+                const uploadResult = await uploadBytes(storageRef, pdfBlob);
+                
+                // Get the download URL
+                const downloadURL = await getDownloadURL(uploadResult.ref);
+                
+                // Update the Firestore document with the download URL
+                await updatePdfUrl(documentId, downloadURL);
+                
+                alert("Changes successfully saved");
+            } catch (err) {
+                console.error("Error uploading PDF to Firebase Storage:", err);
+            }    
+        } else {
+            console.error("Failed to generate PDF");
+        }
+    }
+
     // Enable free drawing mode
     const enableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
@@ -206,6 +246,7 @@ export const useCanvas = () => {
         zoomIn,
         zoomOut,
         exportCanvasAsPDF,
+        saveFloorPlanChanges,
         enableFreeDrawing,
         disableFreeDrawing,
         enableEraser,

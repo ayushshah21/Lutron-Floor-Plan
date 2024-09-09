@@ -14,17 +14,22 @@ import { useCanvas } from "../hooks/useCanvas";
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export default function Editor() {
-	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, enableFreeDrawing, disableFreeDrawing, enableEraser, disableEraser, isDrawing, isErasing } = useCanvas();
+	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, saveFloorPlanChanges, enableFreeDrawing, disableFreeDrawing, enableEraser, disableEraser, isDrawing, isErasing } = useCanvas();
 	const [pdfUrl, setPdfUrl] = useState<string>("");
-
+	const [documentID, setDocumentID] = useState<string>("");
+	const [fileName, setFileName] = useState<string>("");	
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
 	// Extract pdf url from search params
 	useEffect(() => {
 		const searchParamPdf = searchParams.get('pdf');
-		if (searchParamPdf) {
+		const searchParamDocId = searchParams.get('documentID');
+		const originalFileName = searchParams.get('fileName');
+		if (searchParamPdf && searchParamDocId && originalFileName) {
 			setPdfUrl(searchParamPdf);
+			setDocumentID(searchParamDocId);
+			setFileName(originalFileName);
 		}
 	}, [searchParams]);
 
@@ -118,6 +123,7 @@ export default function Editor() {
 
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
+				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
 				zoomIn={zoomIn}
 				zoomOut={zoomOut}
 				addRectangleToCanvas={addRectangleToCanvas}

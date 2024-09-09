@@ -7,6 +7,8 @@ import {
 	collection,
 	addDoc,
 	serverTimestamp,
+	doc, 
+	updateDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -28,7 +30,7 @@ export const useUploadPdf = () => {
 		return floorPlanName;
 	};
 
-	const uploadPdf = async (pdfFile: File | null): Promise<string | null> => {
+	const uploadPdf = async (pdfFile: File | null): Promise<{ pdfURL: string, documentId: string } | null> => {
 		if (!pdfFile) {
 			console.log("No file provided for upload.");
 			setError("No PDF file selected.");
@@ -40,18 +42,14 @@ export const useUploadPdf = () => {
 
 		try {
 			const userId = currentUser?.uid; // Get the authenticated user's ID
-			console.log(`Uploading PDF for user: ${userId}`);
-			console.log(currentUser?.email);
 			const filePath = `floorplans/${userId}/${pdfFile.name}`; // Construct the file path
 			const storageRef = ref(storage, filePath);
 
 			// Upload the PDF to Firebase Storage
 			const uploadResult = await uploadBytes(storageRef, pdfFile);
-			console.log("Upload result:", uploadResult);
 
 			// Get the download URL of the uploaded file
 			const pdfURL = await getDownloadURL(uploadResult.ref);
-			console.log("PDF URL:", pdfURL);
 
 			// Save the PDF metadata in Firestore
 			const floorPlanName = extractFloorPlanName(pdfFile); // Call the function to extract the name
@@ -64,9 +62,10 @@ export const useUploadPdf = () => {
 				pdfURL,
 				name: floorPlanName, 
 			});
+			const documentId = docRef.id;
 
 			setUploading(false);
-			return pdfURL; // Return the PDF URL after successful upload
+			return { pdfURL, documentId };
 		} catch (err) {
 			console.error("Error uploading PDF:", err);
 			setError("Error uploading PDF");
@@ -75,5 +74,20 @@ export const useUploadPdf = () => {
 		}
 	};
 
-	return { uploadPdf, uploading, error };
+	// Function to update an existing PDF URL in Firestore based on a provided PDF URL
+	const updatePdfUrl = async (documentId: string, newPdfUrl: string) => {
+		try {
+			const docRef = doc(firestore, "FloorPlans", documentId);
+			await updateDoc(docRef, {
+				pdfURL: newPdfUrl,
+				updatedAt: serverTimestamp(), // Update the timestamp
+			});
+			console.log("PDF URL updated successfully");
+		} catch (err) {
+			console.error("Error updating PDF URL:", err);
+			setError("Error updating PDF URL");
+		}
+	};
+
+	return { uploadPdf, updatePdfUrl, uploading, error };
 };
