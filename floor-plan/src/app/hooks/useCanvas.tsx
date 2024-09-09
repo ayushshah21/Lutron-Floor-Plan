@@ -5,21 +5,20 @@ import { ExtendedGroup } from '../utils/fabricUtil';
 import { useUploadPdf } from './useUploadPdf';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import {
-	getFirestore,
-	collection,
-	addDoc,
-	serverTimestamp,
-	doc, 
-	updateDoc,
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp,
+    doc, 
+    updateDoc,
 } from "firebase/firestore";
 
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
+    const [zoomLevel, setZoomLevel] = useState(1);
     const { updatePdfUrl } = useUploadPdf();
     const storage = getStorage();
 
-    // Track drawing or erasing mode
     const [isDrawing, setIsDrawing] = useState(false);
     const [isErasing, setIsErasing] = useState(false);
 
@@ -63,7 +62,124 @@ export const useCanvas = () => {
             selectable: true,
             isOriginal: isOriginal,
         });
-        group.isOriginal = true;
+
+        if (canvasRef.current) {
+            canvasRef.current.add(group);
+        }
+    };
+
+    const addFixtureIconToCanvas = (x: number, y: number, isOriginal = false) => {
+        const square = new fabric.Rect({
+            width: 40,
+            height: 40,
+            fill: "blue",
+            left: x,
+            top: y,
+            originX: "center",
+            originY: "center",
+        });
+
+        const circle = new fabric.Circle({
+            radius: 10,
+            fill: "white",
+            left: x,
+            top: y,
+            originX: "center",
+            originY: "center",
+        });
+
+        const group = new ExtendedGroup([square, circle], {
+            left: x,
+            top: y,
+            selectable: true,
+            isOriginal: isOriginal,
+        });
+
+        if (canvasRef.current) {
+            canvasRef.current.add(group);
+        }
+    };
+
+    const addDeviceIconToCanvas = (x: number, y: number, isOriginal = false) => {
+        const rect = new fabric.Rect({
+            width: 30,
+            height: 50,
+            fill: "green",
+            left: x,
+            top: y,
+            rx: 5,
+            ry: 5,
+            originX: "center",
+            originY: "center",
+        });
+
+        const screen = new fabric.Rect({
+            width: 20,
+            height: 30,
+            fill: "lightgreen",
+            left: x,
+            top: y - 5,
+            originX: "center",
+            originY: "center",
+        });
+
+        const button = new fabric.Circle({
+            radius: 5,
+            fill: "white",
+            left: x,
+            top: y + 20,
+            originX: "center",
+            originY: "center",
+        });
+
+        const group = new ExtendedGroup([rect, screen, button], {
+            left: x,
+            top: y,
+            selectable: true,
+            isOriginal: isOriginal,
+        });
+
+        if (canvasRef.current) {
+            canvasRef.current.add(group);
+        }
+    };
+
+    const addSensorIconToCanvas = (x: number, y: number, isOriginal = false) => {
+        const circle = new fabric.Circle({
+            radius: 20,
+            fill: "red",
+            left: x,
+            top: y,
+            originX: "center",
+            originY: "center",
+        });
+
+        const wave1 = new fabric.Path('M -15 0 Q 0 -20 15 0', {
+            fill: '',
+            stroke: 'white',
+            strokeWidth: 2,
+            left: x,
+            top: y,
+            originX: "center",
+            originY: "center",
+        });
+
+        const wave2 = new fabric.Path('M -10 -5 Q 0 -15 10 -5', {
+            fill: '',
+            stroke: 'white',
+            strokeWidth: 2,
+            left: x,
+            top: y,
+            originX: "center",
+            originY: "center",
+        });
+
+        const group = new ExtendedGroup([circle, wave1, wave2], {
+            left: x,
+            top: y,
+            selectable: true,
+            isOriginal: isOriginal,
+        });
 
         if (canvasRef.current) {
             canvasRef.current.add(group);
@@ -96,21 +212,18 @@ export const useCanvas = () => {
         }
     };
 
-    // Zoom into the floor plan
     const zoomIn = () => {
-        const newZoom = zoomLevel * 1.1; // Increase zoom by 10%
+        const newZoom = zoomLevel * 1.1;
         canvasRef.current?.setZoom(newZoom);
         setZoomLevel(newZoom);
     };
 
-    // Zoom out of the floor plan
     const zoomOut = () => {
-        const newZoom = zoomLevel * 0.9; // Decrease zoom by 10%
+        const newZoom = zoomLevel * 0.9;
         canvasRef.current?.setZoom(newZoom);
         setZoomLevel(newZoom);
     };
 
-    // Function to generate the PDF from the canvas
     const generatePdf = () => {
         const fabricCanvas = canvasRef.current;
         if (!fabricCanvas) {
@@ -118,17 +231,15 @@ export const useCanvas = () => {
             return null;
         }
 
-        // Set options for toDataURL
         const options = {
-            format: 'png',  // Specify the format as 'png'
-            quality: 1      // Optional: set the quality from 0 to 1
+            format: 'png',
+            quality: 1
         };
 
         const imgData = fabricCanvas.toDataURL(options);
 
-        // Check canvas dimensions are defined
-        const width = fabricCanvas.width || 800; // Provide default if undefined
-        const height = fabricCanvas.height || 600; // Provide default if undefined
+        const width = fabricCanvas.width || 800;
+        const height = fabricCanvas.height || 600;
 
         const pdf = new jsPDF({
             orientation: 'landscape',
@@ -141,12 +252,10 @@ export const useCanvas = () => {
         return pdf;
     };
 
-    // Export floor plan as a PDF for downloading
     const exportCanvasAsPDF = () => {
         const pdf = generatePdf();
         if (!pdf) return;
 
-        // Prompt user for file name
         const fileName = prompt('Enter the file name for the exported PDF:', 'annotated-floorplan');
         pdf.save(`${fileName || 'annotated-floorplan'}.pdf`);
     };
@@ -154,22 +263,13 @@ export const useCanvas = () => {
     const saveFloorPlanChanges = async (documentId: string, originalFileName: string) => {
         const pdf = generatePdf();
         if (pdf) {
-            // Convert the PDF to a Blob
             const pdfBlob = pdf.output('blob');
-            
-            // Create a reference to where the file should be stored in Firebase Storage
             const storageRef = ref(storage, `floorplans/${documentId}/${originalFileName}`);
 
             try {
-                // Upload the Blob to Firebase Storage
                 const uploadResult = await uploadBytes(storageRef, pdfBlob);
-                
-                // Get the download URL
                 const downloadURL = await getDownloadURL(uploadResult.ref);
-                
-                // Update the Firestore document with the download URL
                 await updatePdfUrl(documentId, downloadURL);
-                
                 alert("Changes successfully saved");
             } catch (err) {
                 console.error("Error uploading PDF to Firebase Storage:", err);
@@ -179,19 +279,17 @@ export const useCanvas = () => {
         }
     }
 
-    // Enable free drawing mode
     const enableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
             fabricCanvas.isDrawingMode = true;
-            fabricCanvas.freeDrawingBrush.color = 'black'; // Set drawing color
-            fabricCanvas.freeDrawingBrush.width = 5; // Set drawing width
+            fabricCanvas.freeDrawingBrush.color = 'black';
+            fabricCanvas.freeDrawingBrush.width = 5;
             setIsDrawing(true);
-            setIsErasing(false); // Disable erasing if it was active
+            setIsErasing(false);
         }
     };
 
-    // Disable free drawing mode
     const disableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
@@ -200,22 +298,19 @@ export const useCanvas = () => {
         }
     };
 
-    // Enable eraser mode
     const enableEraser = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
-            fabricCanvas.isDrawingMode = false; // Disable drawing mode
+            fabricCanvas.isDrawingMode = false;
             setIsErasing(true);
             setIsDrawing(false);
 
-            // Custom eraser functionality
             fabricCanvas.on('mouse:down', function (event) {
                 const pointer = fabricCanvas.getPointer(event.e);
-                const point = new fabric.Point(pointer.x, pointer.y); // Create a fabric.Point instance
+                const point = new fabric.Point(pointer.x, pointer.y);
 
                 const objects = fabricCanvas.getObjects();
 
-                // Loop through objects on canvas, and check if the object is a free drawing (black path)
                 for (let i = 0; i < objects.length; i++) {
                     const object = objects[i];
                     if (object.type === 'path' && object.stroke === 'black') {
@@ -228,7 +323,6 @@ export const useCanvas = () => {
         }
     };
 
-    // Disable eraser mode
     const disableEraser = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
@@ -241,6 +335,9 @@ export const useCanvas = () => {
         canvasRef,
         addImageToCanvas,
         addLightIconToCanvas,
+        addFixtureIconToCanvas,
+        addDeviceIconToCanvas,
+        addSensorIconToCanvas,
         addRectangleToCanvas,
         deleteSelectedObject,
         zoomIn,

@@ -1,6 +1,6 @@
 "use client";
 import { fabric } from "fabric";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { pdfjs } from "react-pdf";
 import { getDocument } from "pdfjs-dist";
@@ -10,16 +10,42 @@ import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
 
-// Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export default function Editor() {
-	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, saveFloorPlanChanges, enableFreeDrawing, disableFreeDrawing, enableEraser, disableEraser, isDrawing, isErasing } = useCanvas();
-	const [pdfUrl, setPdfUrl] = useState<string>("");
-	const [documentID, setDocumentID] = useState<string>("");
-	const [fileName, setFileName] = useState<string>("");	
-	const searchParams = useSearchParams();
-	const router = useRouter();
+  const { 
+    canvasRef, 
+    addRectangleToCanvas, 
+    addLightIconToCanvas, 
+    addFixtureIconToCanvas, 
+    addDeviceIconToCanvas, 
+    addSensorIconToCanvas,
+    deleteSelectedObject, 
+    zoomIn, 
+    zoomOut, 
+    exportCanvasAsPDF, 
+    saveFloorPlanChanges, 
+    enableFreeDrawing, 
+    disableFreeDrawing, 
+    enableEraser, 
+    disableEraser, 
+    isDrawing, 
+    isErasing 
+  } = useCanvas();
+  
+  const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [documentID, setDocumentID] = useState<string>("");
+  const [fileName, setFileName] = useState<string>("");	
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Function to add icons at a default position
+  const addIconAtDefaultPosition = (addIconFunction: (x: number, y: number) => void) => {
+    // You can adjust these default coordinates as needed
+    const defaultX = 450;
+    const defaultY = 300;
+    addIconFunction(defaultX, defaultY);
+  };
 
 	// Extract pdf url from search params
 	useEffect(() => {
@@ -113,35 +139,38 @@ export default function Editor() {
 	}, [pdfUrl]);
 
 	return (
-		<div>
-			<img
-				className="lutronLogo"
-				onClick={() => router.push('/home')}
-				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
-				alt="Lutron Electronics Logo"
-			/>
+    <div>
+      <img
+        className="lutronLogo"
+        onClick={() => router.push('/home')}
+        src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
+        alt="Lutron Electronics Logo"
+      />
 
-			<EditorToolbar
-				exportCanvasAsPDF={exportCanvasAsPDF}
-				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
-				zoomIn={zoomIn}
-				zoomOut={zoomOut}
-				addRectangleToCanvas={addRectangleToCanvas}
-				addLightIcon={() => addLightIconToCanvas(900, 600)}
-				deleteSelectedObject={deleteSelectedObject}
-				enableFreeDrawing={enableFreeDrawing}
-				disableFreeDrawing={disableFreeDrawing}
-				enableEraser={enableEraser}
-				disableEraser={disableEraser}
-				isDrawing={isDrawing}
-				isErasing={isErasing}
-			/>
+      <EditorToolbar
+        exportCanvasAsPDF={exportCanvasAsPDF}
+        saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
+        zoomIn={zoomIn}
+        zoomOut={zoomOut}
+        addRectangleToCanvas={addRectangleToCanvas}
+        addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
+        addFixtureIcon={() => addIconAtDefaultPosition(addFixtureIconToCanvas)}
+        addDeviceIcon={() => addIconAtDefaultPosition(addDeviceIconToCanvas)}
+        addSensorIcon={() => addIconAtDefaultPosition(addSensorIconToCanvas)}
+        deleteSelectedObject={deleteSelectedObject}
+        enableFreeDrawing={enableFreeDrawing}
+        disableFreeDrawing={disableFreeDrawing}
+        enableEraser={enableEraser}
+        disableEraser={disableEraser}
+        isDrawing={isDrawing}
+        isErasing={isErasing}
+      />
 
-			<div className="container">
-				<div className="canvas-container">
-					<canvas id="canvas"></canvas>
-				</div>
-			</div>
-		</div>
-	);
+      <div className="container">
+        <div className="canvas-container">
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+    </div>
+  );
 }

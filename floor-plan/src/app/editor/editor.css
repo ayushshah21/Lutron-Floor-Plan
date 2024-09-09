@@ -1,240 +1,189 @@
 .main {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	/* Center vertically */
-	padding: 6rem;
-	min-height: 100vh;
-	background-color: #d6dbe0;
-	color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem;
+    min-height: 100vh;
+    background-color: #d6dbe0;
+    color: black;
 }
 
 .canvasBox {
-	position: absolute;
-	height: 560px;
-	width: 900px;
-	border-radius: 8px;
-	background-color: #FFFFFF;
-	margin: auto;
-	left: 52%;
-	top: 55%;
-	transform: translate(-50%, -50%);
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	/* Center vertically */
-	font-family: "Helvetica";
-	background-color: #FFFFFF;
-	color: #515151;
-	padding: 10px;
+    position: absolute;
+    height: 560px;
+    width: 900px;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    margin: auto;
+    left: 52%;
+    top: 55%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: "Helvetica";
+    background-color: #FFFFFF;
+    color: #515151;
+    padding: 10px;
 }
 
-/* Controls height and width of the react pdf rendered */
 .react-pdf__Page__canvas {
-	margin: 0 auto;
-	width: 80% !important;
-	height: 100% !important;
+    margin: 0 auto;
+    width: 80% !important;
+    height: 100% !important;
 }
 
 .lutronLogo {
-	background-color: d6dbe0;
-	width: 15%;
+    background-color: d6dbe0;
+    width: 15%;
 }
 
 .button {
-	cursor: pointer;
-	font-size: 16px;
-	min-height: 30px;
-	min-width: 90px;
-	padding: 8px 16px;
-	width: 20%;
-	border-radius: 2px;
-	border: 1px solid;
-	background-color: #1E75BB;
+    cursor: pointer;
+    font-size: 16px;
+    min-height: 30px;
+    min-width: 90px;
+    padding: 8px 16px;
+    width: 20%;
+    border-radius: 2px;
+    border: 1px solid;
+    background-color: #1E75BB;
 }
 
 .navbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 20px;
-	position: fixed;
-	top: 0;
-	right: 0;
-	left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
 }
 
 .navbarBrand {
-	justify-self: center;
-	align-self: center;
-	margin-right: 15rem;
-	font-size: 1.5rem;
+    justify-self: center;
+    align-self: center;
+    margin-right: 15rem;
+    font-size: 1.5rem;
 }
 
 .navbarNav {
-	display: flex;
-	list-style: none;
-	margin: 0;
-	padding: 0;
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .navbarItem {
-	margin-left: 1rem;
+    margin-left: 1rem;
 }
 
 .sideToolBar {
-	position: fixed;
-	top: 130px;
-	left: 20px;
-	width: 11rem;
-	background-color: rgb(224, 221, 221);
-	border-right: 1px solid #ccc;
-	border-radius: 15px;
-	padding: 10px;
-}
-
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-	.card:hover {
-		background: rgba(var(--card-rgb), 0.1);
-		border: 1px solid rgba(var(--card-border-rgb), 0.15);
-	}
-
-	.card:hover span {
-		transform: translateX(4px);
-	}
-}
-
-@media (prefers-reduced-motion) {
-	.card:hover span {
-		transform: none;
-	}
-}
-
-/* Mobile */
-@media (max-width: 700px) {
-	.content {
-		padding: 4rem;
-	}
-
-	.center {
-		padding: 8rem 0 6rem;
-	}
-
-	.center::before {
-		transform: none;
-		height: 300px;
-	}
-
-}
-
-/* Tablet and Smaller Desktop */
-@media (min-width: 701px) and (max-width: 1120px) {
-	.grid {
-		grid-template-columns: repeat(2, 50%);
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	.vercelLogo {
-		filter: invert(1);
-	}
-}
-
-@keyframes rotate {
-	from {
-		transform: rotate(360deg);
-	}
-
-	to {
-		transform: rotate(0deg);
-	}
+    position: fixed;
+    top: 120px; /* Increased from 80px to 120px */
+    left: 20px;
+    width: 14rem;
+    background-color: rgb(224, 221, 221);
+    border-right: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 15px;
+    max-height: calc(100vh - 140px); /* Adjusted to account for new top position */
+    overflow-y: auto;
+    z-index: 999; /* Ensure sidebar stays below the logo */
 }
 
 .canvas-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 50px;
-	font-family: Arial, sans-serif;
-	margin-left: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    font-family: Arial, sans-serif;
+    margin-left: 200px;
 }
 
 .file-input {
-	margin: 20px 0;
-	padding: 10px;
-	font-size: 16px;
+    margin: 20px 0;
+    padding: 10px;
+    font-size: 16px;
 }
 
 .canvas-container {
-	border: 1px solid #ccc;
-	padding: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
 }
 
 .icon {
-	width: 50px;
-	height: 50px;
-	margin: 10px;
-	cursor: pointer;
+    width: 50px;
+    height: 50px;
+    margin: 10px;
+    cursor: pointer;
 }
 
 .lutronLogo {
-	position: fixed;
-	top: 0;
-	left: 0;
-	max-width: 80%;
-	margin: 1rem;
-	margin-bottom: 2rem;
-	align-self: center;
-	cursor: pointer;
+    position: fixed;
+    top: 0;
+    left: 0;
+    max-width: 80%;
+    margin: 1rem;
+    margin-bottom: 2rem;
+    align-self: center;
+    cursor: pointer;
 }
 
 .lutronLogo:hover {
-	transform: scale(1.05);
-	/* Slightly increase size */
+    transform: scale(1.05);
 }
 
-  .sideToolBar ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-  }
-  
-  .sideToolBar li {
-	margin-bottom: 1rem;
-  }
-  
-  .sideToolBar button {
-	background-color: whitesmoke; 
-	color: #0057B8; 
-	border: none;
-	padding: 10px 20px;
-	width: 100%;
-	border-radius: 5px;
-	text-align: left;
-	font-size: 1rem;
-	transition: background-color 0.3s ease, color 0.3s ease;
-	cursor: pointer;
-  }
-  
-  .sideToolBar button:hover {
-	background-color: #0057B8; 
-	color: white;
-  }
-  
-  .sideToolBar button i {
-	margin-right: 10px;
-  }
-  
-  .fa-icon {
-	margin-right: 8px;
-  }
+.sideToolBar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sideToolBar li {
+    margin-bottom: 1rem;
+}
+
+.sideToolBar button {
+    background-color: whitesmoke; 
+    color: #0057B8; 
+    border: none;
+    padding: 10px 20px;
+    width: 100%;
+    border-radius: 5px;
+    text-align: left;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+.sideToolBar button:hover {
+    background-color: #0057B8; 
+    color: white;
+}
+
+.sideToolBar button i {
+    margin-right: 10px;
+}
+
+.fa-icon {
+    margin-right: 8px;
+}
+
+/* Media query for smaller screens */
+@media (max-height: 800px) {
+    .sideToolBar {
+        top: 60px;
+        max-height: calc(100vh - 80px);
+    }
+}
