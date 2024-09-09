@@ -4,6 +4,7 @@ import { faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faTrashA
 
 interface ToolbarProps {
 	exportCanvasAsPDF: () => void;
+	saveFloorPlanChanges: () => void;
 	zoomIn: () => void;
 	zoomOut: () => void;
 	addRectangleToCanvas: () => void;
@@ -19,6 +20,7 @@ interface ToolbarProps {
 
 const EditorToolbar: React.FC<ToolbarProps> = ({
 	exportCanvasAsPDF,
+	saveFloorPlanChanges,
 	zoomIn,
 	zoomOut,
 	addRectangleToCanvas,
@@ -35,6 +37,7 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
 		<nav className="sideToolBar">
 			<ul>
 				<li><button onClick={exportCanvasAsPDF}><FontAwesomeIcon icon={faFilePdf} /> Export as PDF</button></li>
+				<li><button onClick={saveFloorPlanChanges}><FontAwesomeIcon icon={faFilePdf} /> Save Changes </button></li>
 				<li><button onClick={zoomIn}><FontAwesomeIcon icon={faSearchPlus} /> Zoom In</button></li>
 				<li><button onClick={zoomOut}><FontAwesomeIcon icon={faSearchMinus} /> Zoom Out</button></li>
 				<li><button onClick={addRectangleToCanvas}><FontAwesomeIcon icon={faSquare} /> Add Rectangle</button></li>
