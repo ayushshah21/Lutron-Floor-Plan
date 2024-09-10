@@ -8,7 +8,7 @@ import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 
 
 
-export const useUserFiles = () => {
+export const useUserFiles = (selectedFolder: string | null) => {
   const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

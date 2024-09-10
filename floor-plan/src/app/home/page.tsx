@@ -12,18 +12,24 @@ import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
 import { useFolders } from '../hooks/useFolders';
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase"; 
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
-	const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+	//const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+
+	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder); // Pass selected folder ID to hook
+
 	const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const [folderName, setFolderName] = useState('');
-	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const { folders, loading: loadingFolders, createFolder, deleteFolder } = useFolders();  
+	
 	const router = useRouter();
 
 	const [isRenaming, setIsRenaming] = useState(false);
@@ -44,7 +50,7 @@ export default function Home() {
 		const url = URL.createObjectURL(file);
 		if (file && file.type === "application/pdf") {
 			setPdfFile(file);
-			const pdfURL = await uploadPdf(file);
+			const pdfURL = await uploadPdf(file, selectedFolder || "0"); // Pass selected folder ID or default to '0'
 			if (pdfURL) {
 				router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
 			} else {
@@ -55,6 +61,45 @@ export default function Home() {
 		}
 	};
 
+	// Function to update the folderID of a file in Firestore
+	const updateFileFolder = async (fileId: string, folderID: string) => {
+		try {
+		const fileRef = doc(db, "FloorPlans", fileId); // Reference to the specific file document
+		await updateDoc(fileRef, { folderID }); // Update the folderID field in Firestore
+		console.log(`File ${fileId} moved to folder ${folderID}`);
+		} catch (error) {
+		console.error("Failed to update file folder:", error);
+		throw new Error("Failed to update file folder.");
+		}
+	};
+
+	const handleDrop = async (event: React.DragEvent<HTMLDivElement>, folderId: string) => {
+		event.preventDefault();
+		const fileId = event.dataTransfer.getData("fileId"); // Get the dragged file ID
+		if (fileId) {
+		  try {
+			// Call the updateFileFolder function to change the folderID in Firestore
+			await updateFileFolder(fileId, folderId);
+			fetchFloorPlans(); // Refresh the file list after moving the file
+		  } catch (err) {
+			console.error("Failed to move file:", err);
+			alert("Failed to move file.");
+		  }
+		}
+	};
+
+
+	const handleFolderClick = (folderId: string) => {
+		setSelectedFolder(folderId); // Set the selected folder ID to display its contents
+		fetchFloorPlans(); // Fetch files inside the selected folder
+	};
+	
+	const handleDragStart = (event: React.DragEvent<HTMLDivElement>, fileId: string) => {
+		event.dataTransfer.setData('fileId', fileId); // Set the dragged file ID
+	};
+	
+
+	  
 	const handleCreateFolder = async () => {
 		if (folderName.trim()) {
 		  await createFolder(folderName);
@@ -148,6 +193,8 @@ export default function Home() {
 		<div>Loading...</div>
 	) : (
 		<div className={styles.container}>
+
+			
 			<aside className={styles.sidebar}>
 				<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 				<nav className={styles.navigation} id="navSidebar">
@@ -191,6 +238,8 @@ export default function Home() {
 					)}
 				</div>
 			</aside>
+
+
 			<main className={styles.mainContent}>
 				<div className={styles.searchBar}>
 					<Search className={styles.searchIcon} />
@@ -220,43 +269,57 @@ export default function Home() {
 						{uploading ? "Uploading..." : "+ New"}
 					</button>
 				</form>
+
+
 				<div className={styles.fileList}>
-					{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
-						<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
-							<div className={styles.fileItemTopRow}>
-								<img
-									className={styles.floorPlanLogo}
-									src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-									alt="floor plan logo" />
-								<div className={styles.fileName}>
-									{truncateFloorPlanName(file.name)}
-									<div className={styles.fileNamePopup}>{file.name}</div>
-								</div>
-								<img
-									className={styles.threeDotLogo}
-									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-									alt="three-dots-icon"
-									onClick={() => handleThreeDotPopup(file.id)}
-								/>
+					{floorPlans.map((file: FloorPlanDocument) => (
+						<div
+						key={file.id}
+						className={styles.fileItem}
+						draggable
+						onDragStart={(e) => handleDragStart(e, file.id)}
+						>
+						<div className={styles.fileItemTopRow}>
+							<img
+							className={styles.floorPlanLogo}
+							src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
+							alt="floor plan logo"
+							/>
+							<div className={styles.fileName}>
+							{truncateFloorPlanName(file.name)}
+							<div className={styles.fileNamePopup}>{file.name}</div>
 							</div>
-							{showThreeDotPopup && selectedFileId === file.id && (
-								isRenaming && docToRename === file.id ? (
-									<>
-										<input value={newName} onChange={(e) => setNewName(e.target.value)} />
-										<button onClick={submitNewName}>Save</button>
-										<button onClick={cancelRenaming}>Cancel</button>
-									</>
-								) :
-									<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-										<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
-										<button onClick={() => handleDelete(file.id)}>Delete</button>
-										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-									</div>
-							)}
-							<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+							<img
+							className={styles.threeDotLogo}
+							src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+							alt="three-dots-icon"
+							onClick={() => handleThreeDotPopup(file.id)}
+							/>
+						</div>
+						{showThreeDotPopup && selectedFileId === file.id && (
+							isRenaming && docToRename === file.id ? (
+							<>
+								<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+								<button onClick={submitNewName}>Save</button>
+								<button onClick={cancelRenaming}>Cancel</button>
+							</>
+							) : (
+							<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+								<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+								<button onClick={() => handleDelete(file.id)}>Delete</button>
+								<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+							</div>
+							)
+						)}
+						<p>{"Creator: " + file.creatorEmail || "Unknown Creator"}</p>
 						</div>
 					))}
-				</div>
+					</div>
+
+
+
+
+
 				<div className={styles.prompt}>
 					Use the “New” button to upload a file
 				</div>

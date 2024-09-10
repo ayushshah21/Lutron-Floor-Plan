@@ -57,7 +57,7 @@ export const useFolders = () => {
   // Delete a folder from Firestore
   const deleteFolder = async (id: string) => {
     try {
-      await deleteDoc(doc(db, 'folders', id));
+      await deleteDoc(firestoreDoc(db, 'folders', id));
       fetchFolders(); // Refresh the folders after deletion
     } catch (err) {
       console.error('Error deleting folder:', err);
