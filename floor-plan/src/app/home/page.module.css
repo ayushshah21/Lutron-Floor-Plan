@@ -260,3 +260,22 @@
 .popupMenu button:hover {
   background-color: #f0f0f0;
 }
+
+.folderSection {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.foldersList {
+  display: flex;
+  flex-direction: column;
+}
+
+.folderItem {
+  margin-bottom: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

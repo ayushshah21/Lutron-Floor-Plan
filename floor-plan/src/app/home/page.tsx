@@ -11,6 +11,7 @@ import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
+import { useFolders } from '../hooks/useFolders';
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -20,6 +21,9 @@ export default function Home() {
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
+	const [folderName, setFolderName] = useState('');
+	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+	const { folders, loading: loadingFolders, createFolder, deleteFolder } = useFolders();  
 	const router = useRouter();
 
 	const [isRenaming, setIsRenaming] = useState(false);
@@ -51,12 +55,21 @@ export default function Home() {
 		}
 	};
 
+	const handleCreateFolder = async () => {
+		if (folderName.trim()) {
+		  await createFolder(folderName);
+		  setFolderName(''); 
+		} else {
+		  alert("Please enter a folder name.");
+		}
+	};
+
 	const handleUpload = async () => {
 		await uploadPdf(pdfFile);
 		if (error) {
-			alert(error);
+		  alert(error);
 		} else {
-			alert("PDF uploaded successfully!");
+		  alert("PDF uploaded successfully!");
 		}
 	};
 
@@ -151,6 +164,32 @@ export default function Home() {
 				<button className={styles.logoutButton} onClick={signOutWithGoogle}>
 					Logout
 				</button>
+				<div className={styles.folderSection}>
+					<input
+					type="text"
+					placeholder="New folder name"
+					value={folderName}
+					onChange={(e) => setFolderName(e.target.value)}
+					className={styles.input}
+					/>
+					<button onClick={handleCreateFolder} className={styles.button}>
+					Create Folder
+					</button>
+				</div>
+				<div className={styles.foldersList}>
+					{loadingFolders ? (
+					<div>Loading folders...</div>
+					) : (
+					folders.map((folder) => (
+						<div key={folder.id} className={styles.folderItem}>
+						<span onClick={() => setSelectedFolder(folder.id)}>
+							{folder.name}
+						</span>
+						<button onClick={() => deleteFolder(folder.id)}>Delete</button>
+						</div>
+					))
+					)}
+				</div>
 			</aside>
 			<main className={styles.mainContent}>
 				<div className={styles.searchBar}>
