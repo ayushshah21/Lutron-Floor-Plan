@@ -1,111 +1,112 @@
 .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* Center vertically */
-    padding: 6rem;
-    min-height: 100vh;
-    background-color: #1E75BB;
-    color: black;
-  }
-  
-  .loginBox {
-    position: absolute;
-    height: 560px;
-    width: 552px;
-    border-radius: 8px;
-    background-color: #FFFFFF;
-    margin: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    /* Center vertically */
-    font-family: "Helvetica";
-    background-color: #FFFFFF;
-    color: #515151;
-    padding: 10px;
-  }
-  
-  .lutronLogo {
-    background-color: white;
-    width: 50%;
-    padding: 20px;
-    align-content: center;
-  }
-  
-  .button {
-    cursor: pointer;
-    font-size: 16px;
-      min-height: 30px;
-      min-width: 90px;
-      padding: 8px 16px;
-      width: 20%;
-      margin-top: 24px;
-      border-radius: 2px;
-      border: 1px solid;
-      background-color: #1E75BB;
-  }
-  
-  
-  /* Enable hover only on non-touch devices */
-  @media (hover: hover) and (pointer: fine) {
-    .card:hover {
-      background: rgba(var(--card-rgb), 0.1);
-      border: 1px solid rgba(var(--card-border-rgb), 0.15);
-    }
-  
-    .card:hover span {
-      transform: translateX(4px);
-    }
-  }
-  
-  @media (prefers-reduced-motion) {
-    .card:hover span {
-      transform: none;
-    }
-  }
-  
-  /* Mobile */
-  @media (max-width: 700px) {
-    .content {
-      padding: 4rem;
-    }
-  
-    .center {
-      padding: 8rem 0 6rem;
-    }
-  
-    .center::before {
-      transform: none;
-      height: 300px;
-    }
-  
-  }
-  
-  /* Tablet and Smaller Desktop */
-  @media (min-width: 701px) and (max-width: 1120px) {
-    .grid {
-      grid-template-columns: repeat(2, 50%);
-    }
-  }
-  
-  @media (prefers-color-scheme: dark) {
-    .vercelLogo {
-      filter: invert(1);
-    }
-  }
-  
-  @keyframes rotate {
-    from {
-      transform: rotate(360deg);
-    }
-  
-    to {
-      transform: rotate(0deg);
-    }
-  }
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* Center vertically */
+	padding: 6rem;
+	min-height: 100vh;
+	background-color: #1E75BB;
+	color: black;
+}
+
+.loginBox {
+	position: absolute;
+	height: 560px;
+	width: 552px;
+	border-radius: 8px;
+	background-color: #FFFFFF;
+	margin: auto;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	/* Center vertically */
+	font-family: "Helvetica";
+	background-color: #FFFFFF;
+	color: #515151;
+	padding: 10px;
+}
+
+.lutronLogo {
+	background-color: white;
+	width: 50%;
+	padding: 20px;
+	align-content: center;
+}
+
+.button {
+	cursor: pointer;
+	font-size: 16px;
+	min-height: 30px;
+	min-width: 90px;
+	padding: 8px 16px;
+	width: 20%;
+	margin-top: 24px;
+	border-radius: 2px;
+	border: 1px solid;
+	background-color: #1E75BB;
+	color: white;
+}
+
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+	.card:hover {
+		background: rgba(var(--card-rgb), 0.1);
+		border: 1px solid rgba(var(--card-border-rgb), 0.15);
+	}
+
+	.card:hover span {
+		transform: translateX(4px);
+	}
+}
+
+@media (prefers-reduced-motion) {
+	.card:hover span {
+		transform: none;
+	}
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+	.content {
+		padding: 4rem;
+	}
+
+	.center {
+		padding: 8rem 0 6rem;
+	}
+
+	.center::before {
+		transform: none;
+		height: 300px;
+	}
+
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+	.grid {
+		grid-template-columns: repeat(2, 50%);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.vercelLogo {
+		filter: invert(1);
+	}
+}
+
+@keyframes rotate {
+	from {
+		transform: rotate(360deg);
+	}
+
+	to {
+		transform: rotate(0deg);
+	}
+}

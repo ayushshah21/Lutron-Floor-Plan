@@ -9,6 +9,7 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
+import Spinner from "../components/Spinner";
 
 // Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -17,9 +18,11 @@ export default function Editor() {
 	const { canvasRef, addRectangleToCanvas, addLightIconToCanvas, deleteSelectedObject, zoomIn, zoomOut, exportCanvasAsPDF, saveFloorPlanChanges, enableFreeDrawing, disableFreeDrawing, enableEraser, disableEraser, isDrawing, isErasing } = useCanvas();
 	const [pdfUrl, setPdfUrl] = useState<string>("");
 	const [documentID, setDocumentID] = useState<string>("");
-	const [fileName, setFileName] = useState<string>("");	
+	const [fileName, setFileName] = useState<string>("");
 	const searchParams = useSearchParams();
+	const [openSpinner, setOpeningSpinner] = useState(false);
 	const router = useRouter();
+
 
 	// Extract pdf url from search params
 	useEffect(() => {
@@ -37,6 +40,7 @@ export default function Editor() {
 	useEffect(() => {
 		if (pdfUrl) {
 			(async function renderPdf() {
+				setOpeningSpinner(true);
 				try {
 					// Fetch the PDF document
 					const pdf = await getDocument(pdfUrl).promise;
@@ -104,6 +108,7 @@ export default function Editor() {
 							o.lockMovementX = false;
 							o.lockMovementY = false;
 						});
+						setOpeningSpinner(false);
 					};
 				} catch (error) {
 					console.error("Error loading or rendering PDF:", error);
@@ -114,13 +119,13 @@ export default function Editor() {
 
 	return (
 		<div>
+			{openSpinner && <Spinner />}
 			<img
 				className="lutronLogo"
 				onClick={() => router.push('/home')}
 				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
 				alt="Lutron Electronics Logo"
 			/>
-
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
 				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
@@ -136,7 +141,6 @@ export default function Editor() {
 				isDrawing={isDrawing}
 				isErasing={isErasing}
 			/>
-
 			<div className="container">
 				<div className="canvas-container">
 					<canvas id="canvas"></canvas>
