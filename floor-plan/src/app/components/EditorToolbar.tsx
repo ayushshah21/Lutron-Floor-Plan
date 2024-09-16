@@ -40,26 +40,34 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
   isErasing,
 }) => {
   return (
-    <nav className="sideToolBar">
+    <nav className="sideToolBar" aria-label="Editor tools">
       <ul>
-        <li><button onClick={exportCanvasAsPDF}><FontAwesomeIcon icon={faFilePdf} /> Export as PDF</button></li>
-        <li><button onClick={saveFloorPlanChanges}><FontAwesomeIcon icon={faFilePdf} /> Save Changes </button></li>
-        <li><button onClick={zoomIn}><FontAwesomeIcon icon={faSearchPlus} /> Zoom In</button></li>
-        <li><button onClick={zoomOut}><FontAwesomeIcon icon={faSearchMinus} /> Zoom Out</button></li>
-        <li><button onClick={addRectangleToCanvas}><FontAwesomeIcon icon={faSquare} /> Add Rectangle</button></li>
-        <li><button onClick={addLightIcon}><FontAwesomeIcon icon={faLightbulb} /> Add Light Icon</button></li>
-        <li><button onClick={addFixtureIcon}><FontAwesomeIcon icon={faPlug} /> Add Fixture Icon</button></li>
-        <li><button onClick={addDeviceIcon}><FontAwesomeIcon icon={faMobile} /> Add Device Icon</button></li>
-        <li><button onClick={addSensorIcon}><FontAwesomeIcon icon={faWifi} /> Add Sensor Icon</button></li>
-        <li><button onClick={deleteSelectedObject}><FontAwesomeIcon icon={faTrashAlt} /> Delete Selected Object</button></li>
+        <li><button onClick={exportCanvasAsPDF} aria-label="Export as PDF"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Export as PDF</button></li>
+        <li><button onClick={saveFloorPlanChanges} aria-label="Save Changes"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Save Changes</button></li>
+        <li><button onClick={zoomIn} aria-label="Zoom In"><FontAwesomeIcon icon={faSearchPlus} aria-hidden="true" /> Zoom In</button></li>
+        <li><button onClick={zoomOut} aria-label="Zoom Out"><FontAwesomeIcon icon={faSearchMinus} aria-hidden="true" /> Zoom Out</button></li>
+        <li><button onClick={addRectangleToCanvas} aria-label="Add Rectangle"><FontAwesomeIcon icon={faSquare} aria-hidden="true" /> Add Rectangle</button></li>
+        <li><button onClick={addLightIcon} aria-label="Add Light Icon"><FontAwesomeIcon icon={faLightbulb} aria-hidden="true" /> Add Light Icon</button></li>
+        <li><button onClick={addFixtureIcon} aria-label="Add Fixture Icon"><FontAwesomeIcon icon={faPlug} aria-hidden="true" /> Add Fixture Icon</button></li>
+        <li><button onClick={addDeviceIcon} aria-label="Add Device Icon"><FontAwesomeIcon icon={faMobile} aria-hidden="true" /> Add Device Icon</button></li>
+        <li><button onClick={addSensorIcon} aria-label="Add Sensor Icon"><FontAwesomeIcon icon={faWifi} aria-hidden="true" /> Add Sensor Icon</button></li>
+        <li><button onClick={deleteSelectedObject} aria-label="Delete Selected Object"><FontAwesomeIcon icon={faTrashAlt} aria-hidden="true" /> Delete Selected Object</button></li>
         <li>
-          <button onClick={isDrawing ? disableFreeDrawing : enableFreeDrawing}>
-            <FontAwesomeIcon icon={faPencilAlt} /> {isDrawing ? 'Disable Drawing' : 'Enable Drawing'}
+          <button 
+            onClick={isDrawing ? disableFreeDrawing : enableFreeDrawing}
+            aria-label={isDrawing ? "Disable Drawing" : "Enable Drawing"}
+            aria-pressed={isDrawing}
+          >
+            <FontAwesomeIcon icon={faPencilAlt} aria-hidden="true" /> {isDrawing ? 'Disable Drawing' : 'Enable Drawing'}
           </button>
         </li>
         <li>
-          <button onClick={isErasing ? disableEraser : enableEraser}>
-            <FontAwesomeIcon icon={faEraser} /> {isErasing ? 'Disable Eraser' : 'Enable Eraser'}
+          <button 
+            onClick={isErasing ? disableEraser : enableEraser}
+            aria-label={isErasing ? "Disable Eraser" : "Enable Eraser"}
+            aria-pressed={isErasing}
+          >
+            <FontAwesomeIcon icon={faEraser} aria-hidden="true" /> {isErasing ? 'Disable Eraser' : 'Enable Eraser'}
           </button>
         </li>
       </ul>
