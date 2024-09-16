@@ -39,9 +39,9 @@ export const useCanvas = () => {
             const rect = new fabric.Rect({
                 left: canvasCenter.left,
                 top: canvasCenter.top,
-                fill: 'rgba(255, 99, 71, 0.5)', // Semi-transparent tomato color
-                width: 60,
-                height: 70,
+                fill: 'rgba(255, 99, 71, 0.5)', 
+                width: 50,
+                height: 60,
                 originX: 'center',
                 originY: 'center',
                 selectable: true,
