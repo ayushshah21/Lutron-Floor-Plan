@@ -1,23 +1,16 @@
 import { fabric } from 'fabric';
 import { useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ExtendedGroup } from '../utils/fabricUtil';
 import { useUploadPdf } from './useUploadPdf';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp,
-    doc, 
-    updateDoc,
-} from "firebase/firestore";
+import { app, db, auth } from "../../../firebase"; 
 
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1);
     const { updatePdfUrl } = useUploadPdf();
-    const storage = getStorage();
+    const storage = getStorage(app);
 
     const [isDrawing, setIsDrawing] = useState(false);
     const [isErasing, setIsErasing] = useState(false);
@@ -39,10 +32,31 @@ export const useCanvas = () => {
         });
     };
 
+    const addRectangleToCanvas = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas) {
+            const canvasCenter = fabricCanvas.getCenter();
+            const rect = new fabric.Rect({
+                left: canvasCenter.left,
+                top: canvasCenter.top,
+                fill: 'rgba(255, 99, 71, 0.5)', // Semi-transparent tomato color
+                width: 60,
+                height: 70,
+                originX: 'center',
+                originY: 'center',
+                selectable: true,
+                opacity: 0.9,
+            });
+            fabricCanvas.add(rect);
+            fabricCanvas.setActiveObject(rect);
+            fabricCanvas.renderAll();
+        }
+    };
+
     const addLightIconToCanvas = (x: number, y: number, isOriginal = false) => {
         const circle = new fabric.Circle({
             radius: 20,
-            fill: "yellow",
+            fill: "#FFA500", // Accessible orange color
             left: x,
             top: y,
             originX: "center",
@@ -50,7 +64,7 @@ export const useCanvas = () => {
         });
 
         const line = new fabric.Line([x, y + 20, x, y + 40], {
-            stroke: "yellow",
+            stroke: "#FFA500", // Matching orange color for the line
             strokeWidth: 5,
             originX: "center",
             originY: "center",
@@ -65,6 +79,8 @@ export const useCanvas = () => {
 
         if (canvasRef.current) {
             canvasRef.current.add(group);
+            canvasRef.current.setActiveObject(group);
+            canvasRef.current.renderAll();
         }
     };
 
@@ -183,22 +199,6 @@ export const useCanvas = () => {
 
         if (canvasRef.current) {
             canvasRef.current.add(group);
-        }
-    };
-
-    const addRectangleToCanvas = () => {
-        const fabricCanvas = canvasRef.current;
-        if (fabricCanvas) {
-            const rect = new fabric.Rect({
-                left: 900,
-                top: 600,
-                fill: 'pink',
-                width: 60,
-                height: 70,
-                selectable: true,
-                opacity: 0.9,
-            });
-            fabricCanvas.add(rect);
         }
     };
 
