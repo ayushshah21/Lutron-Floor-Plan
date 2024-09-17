@@ -9,6 +9,8 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
+import { Search, Users } from "lucide-react";
+
 
 // Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -20,6 +22,19 @@ export default function Editor() {
 	const [fileName, setFileName] = useState<string>("");	
 	const searchParams = useSearchParams();
 	const router = useRouter();
+
+	const [searchTerm, setSearchTerm] = useState<string>("");
+	// Handle search input change
+	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value);
+	};
+
+	// Handle search form submission
+	const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		// You can implement the logic for handling search submission here
+		console.log("Search term submitted:", searchTerm);
+	};
 
 	// Extract pdf url from search params
 	useEffect(() => {
@@ -114,13 +129,24 @@ export default function Editor() {
 
 	return (
 		<div>
+			<nav className="navbar">
 			<img
 				className="lutronLogo"
 				onClick={() => router.push('/home')}
 				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
 				alt="Lutron Electronics Logo"
 			/>
-
+			<form onSubmit={handleSearchSubmit}>
+				<input
+						type="text"
+						className="searchBar"
+						placeholder="Search..."
+						value={searchTerm}
+						onChange={handleSearchInputChange}
+					/>
+				</form>
+				<div className="navbarBrand"></div>
+			</nav>
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
 				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}

@@ -10,6 +10,32 @@
 	color: black;
 }
 
+/* Search bar at the top of the main content */
+.searchBar {
+	background-color: #FFFFFF;
+	border-radius: 20px;
+	width: 350px;
+	padding: 10px 15px;
+	margin-bottom: 10px;
+	left: 400px; 
+
+	/* Adjust the margin as needed */
+	display: flex;
+	justify-content: center;
+	position: fixed;  
+	align-items: center;
+	z-index: 1000;
+  }
+  
+  .searchInput {
+	border: none;
+	outline: none;
+	padding-left: 10px;
+	margin-right: 100px;
+	width: 100%;
+	/* Full width */
+  }
+
 .canvasBox {
 	position: absolute;
 	height: 560px;
@@ -63,7 +89,8 @@
 	position: fixed;
 	top: 0;
 	right: 0;
-	left: 0;
+	left: 0
+	;
 }
 
 .navbarBrand {
