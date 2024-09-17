@@ -290,3 +290,49 @@
   padding: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+/* Style for the new options section */
+.newOptionsSection {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+/* Style for the dropdown options */
+.newOptionsDropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10; /* Ensure dropdown is above other elements */
+}
+
+/* Style for the new folder input field */
+.newFolderInput {
+  margin-top: 10px;
+}
+
+/* Folder list styling */
+.folderList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* Folder item styling */
+.folderItem {
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 120px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.folderItem:hover {
+  background-color: #e2e2e2;
+}

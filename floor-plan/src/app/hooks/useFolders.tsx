@@ -43,6 +43,9 @@ export const useFolders = () => {
     }
 
     try {
+      const maxFolderId = folders.reduce((max, folder) => Math.max(max, parseInt(folder.id, 10)), 4); // Start from 4 for 'Home'
+      const newFolderId = (maxFolderId + 1).toString(); // Increment ID by 1
+
       await addDoc(collection(db, 'folders'), {
         name,
         userId: user.uid, // Associate folder with the authenticated user
