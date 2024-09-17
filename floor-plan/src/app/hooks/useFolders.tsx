@@ -40,6 +40,7 @@ const fetchFolders = async (parentFolderId: string = "4") => { // Default to "4"
 };
 
 
+
   // Create a new folder in Firestore
   const createFolder = async (name: string, parentFolderId: string) => {
     const user = auth.currentUser;
@@ -49,14 +50,16 @@ const fetchFolders = async (parentFolderId: string = "4") => { // Default to "4"
     }
 
     try {
-      const maxFolderId = folders.reduce((max, folder) => Math.max(max, parseInt(folder.id, 10)), 4); // Start from 4 for 'Home'
-      const newFolderId = (maxFolderId + 1).toString(); // Increment ID by 1
+      //const maxFolderId = folders.reduce((max, folder) => Math.max(max, parseInt(folder.id, 10)), 4); // Start from 4 for 'Home'
+      //const newFolderId = (maxFolderId + 1).toString(); // Increment ID by 1
   
+      const newFolderId = `${Date.now()}-${user.uid}`;
+
       await addDoc(collection(db, 'folders'), {
         id: newFolderId,  // Set unique folder ID
         name,
         userId: user.uid,  // Associate folder with the authenticated user
-        parentFolderId,  // Set the parent folder ID
+        parentFolderId: parentFolderId,  // Use the correct parent folder ID
       });
       fetchFolders(); // Refresh the folders after creation
     } catch (err) {
@@ -64,6 +67,7 @@ const fetchFolders = async (parentFolderId: string = "4") => { // Default to "4"
       setError('Failed to create folder.');
     }
   };
+
 
   // Delete a folder from Firestore
   const deleteFolder = async (id: string) => {

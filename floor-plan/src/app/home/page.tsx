@@ -41,7 +41,10 @@ export default function Home() {
 	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
 
 	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
-
+	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([
+		{ id: "4", name: "Home" },
+	  ]); // Keeps track of the folder path
+	  
 
 	const signOutWithGoogle = async () => {
 		try {
@@ -117,10 +120,21 @@ export default function Home() {
 	  */
 
 
-	const handleFolderClick = (folderId: string) => {
+	  const handleFolderClick = (folderId: string, folderName: string) => {
 		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
 		fetchFolders(folderId);  // Correctly call fetchFolders with the selected folder ID
-	  };
+		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
+	};
+	
+	
+	const handleBackClick = () => {
+		const newPath = [...folderPath];
+		newPath.pop(); // Remove the last folder from the path
+		const lastFolder = newPath[newPath.length - 1]; // Get the new last folder
+		setSelectedFolder(lastFolder.id); // Set the selected folder to the last one
+		fetchFolders(lastFolder.id); // Fetch the contents of the last folder
+		setFolderPath(newPath); // Update the folder path
+	};
 	  
 	  
 	
@@ -132,7 +146,6 @@ export default function Home() {
 	  
 	const handleCreateFolder = async () => {
 		if (folderName.trim()) {
-		  // Use the selectedFolder as the parent folder ID or default to "4"
 		  const parentFolderId = selectedFolder || "4";
 		  await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
 		  setFolderName(''); 
@@ -140,7 +153,8 @@ export default function Home() {
 		} else {
 		  alert("Please enter a folder name.");
 		}
-	  };
+	};
+	  
 
 	const handleUpload = async () => {
 		await uploadPdf(pdfFile);
@@ -251,119 +265,129 @@ export default function Home() {
 
 
 			<main className={styles.mainContent}>
-  {/* Search Bar */}
-  <div className={styles.searchBar}>
-    <Search className={styles.searchIcon} />
-    <input
-      type="text"
-      placeholder="Search floor plans"
-      className={styles.searchInput}
-    />
-  </div>
+				{/* Back Button and Folder Name Display */}
+				{folderPath.length > 1 && (
+				<div className={styles.folderNavigation}>
+					<button className={styles.backButton} onClick={handleBackClick}>
+					Back to {folderPath[folderPath.length - 2].name}
+					</button>
+					<span>Current Folder: {folderPath[folderPath.length - 1].name}</span>
+				</div>
+				)}
+				{/* Search Bar */}
+				<div className={styles.searchBar}>
+					<Search className={styles.searchIcon} />
+					<input
+					type="text"
+					placeholder="Search floor plans"
+					className={styles.searchInput}
+					/>
+				</div>
 
-  {/* New Folder and File Input Section */}
-{/* New Button and Dropdown Options */}
-<div className={styles.newOptionsSection}>
-  <button
-    className={styles.button}
-    onClick={() => setShowNewOptions(!showNewOptions)}
-  >
-    + New
-  </button>
+				{/* New Folder and File Input Section */}
+				{/* New Button and Dropdown Options */}
+				<div className={styles.newOptionsSection}>
+				<button
+					className={styles.button}
+					onClick={() => setShowNewOptions(!showNewOptions)}
+				>
+					+ New
+				</button>
 
-  {showNewOptions && (
-    <div className={styles.newOptionsDropdown}>
-      <button onClick={() => document.getElementById("fileInput")?.click()}>
-        New File
-      </button>
-      <button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
-        New Folder
-      </button>
-    </div>
-  )}
+				{showNewOptions && (
+					<div className={styles.newOptionsDropdown}>
+					<button onClick={() => document.getElementById("fileInput")?.click()}>
+						New File
+					</button>
+					<button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
+						New Folder
+					</button>
+					</div>
+				)}
 
-  {showNewFolderInput && (
-    <div className={styles.newFolderInput}>
-      <input
-        type="text"
-        placeholder="Enter folder name"
-        value={folderName}
-        onChange={(e) => setFolderName(e.target.value)}
-        className={styles.input}
-      />
-      <button onClick={handleCreateFolder} className={styles.button}>
-        Create Folder
-      </button>
-    </div>
-  )}
-</div>
+				{showNewFolderInput && (
+					<div className={styles.newFolderInput}>
+					<input
+						type="text"
+						placeholder="Enter folder name"
+						value={folderName}
+						onChange={(e) => setFolderName(e.target.value)}
+						className={styles.input}
+					/>
+					<button onClick={handleCreateFolder} className={styles.button}>
+						Create Folder
+					</button>
+					</div>
+				)}
+				</div>
 
 
-  {/* Folders Display */}
-  <div className={styles.folderList}>
-    {loadingFolders ? (
-      <div>Loading folders...</div>
-    ) : (
-      folders.map((folder) => (
-        <div
-          key={folder.id}
-          className={styles.folderItem}
-          onClick={() => handleFolderClick(folder.id)}
-          onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
-          onDragOver={(e) => e.preventDefault()}  // Allow drag over
-        >
-          {folder.name}
-        </div>
-      ))
-    )}
-  </div>
+				{/* Folders Display */}
+				<div className={styles.folderList}>
+				{loadingFolders ? (
+					<div>Loading folders...</div>
+				) : (
+					folders.map((folder) => (
+						<div
+						key={folder.id}
+						className={styles.folderItem}
+						onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both ID and Name
+						onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
+						onDragOver={(e) => e.preventDefault()} // Allow drag over
+						>
+						{folder.name}
+						</div>
+					))
+				)}
 
-  {/* Files Display */}
-  <div className={styles.fileList}>
-    {floorPlans.map((file: FloorPlanDocument) => (
-      <div
-        key={file.id}
-        className={styles.fileItem}
-        draggable
-        onDragStart={(e) => handleDragStart(e, file.id)} // Enable dragging files
-      >
-        <div className={styles.fileItemTopRow}>
-          <img
-            className={styles.floorPlanLogo}
-            src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-            alt="floor plan logo"
-          />
-          <div className={styles.fileName}>
-            {truncateFloorPlanName(file.name)}
-            <div className={styles.fileNamePopup}>{file.name}</div>
-          </div>
-          <img
-            className={styles.threeDotLogo}
-            src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-            alt="three-dots-icon"
-            onClick={() => handleThreeDotPopup(file.id)}
-          />
-        </div>
-        {showThreeDotPopup && selectedFileId === file.id && (
-          isRenaming && docToRename === file.id ? (
-          <>
-            <input value={newName} onChange={(e) => setNewName(e.target.value)} />
-            <button onClick={submitNewName}>Save</button>
-            <button onClick={cancelRenaming}>Cancel</button>
-          </>
-          ) : (
-          <div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-            <button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
-            <button onClick={() => handleDelete(file.id)}>Delete</button>
-            <button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-          </div>
-          )
-        )}
-        <p>{"Creator: " + file.creatorEmail || "Unknown Creator"}</p>
-      </div>
-    ))}
-  </div>
-</main>
+				</div>
+
+				{/* Files Display */}
+				<div className={styles.fileList}>
+					{floorPlans.map((file: FloorPlanDocument) => (
+					<div
+						key={file.id}
+						className={styles.fileItem}
+						draggable
+						onDragStart={(e) => handleDragStart(e, file.id)} // Enable dragging files
+					>
+						<div className={styles.fileItemTopRow}>
+						<img
+							className={styles.floorPlanLogo}
+							src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
+							alt="floor plan logo"
+						/>
+						<div className={styles.fileName}>
+							{truncateFloorPlanName(file.name)}
+							<div className={styles.fileNamePopup}>{file.name}</div>
+						</div>
+						<img
+							className={styles.threeDotLogo}
+							src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+							alt="three-dots-icon"
+							onClick={() => handleThreeDotPopup(file.id)}
+						/>
+						</div>
+						{showThreeDotPopup && selectedFileId === file.id && (
+						isRenaming && docToRename === file.id ? (
+						<>
+							<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+							<button onClick={submitNewName}>Save</button>
+							<button onClick={cancelRenaming}>Cancel</button>
+						</>
+						) : (
+						<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+							<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+							<button onClick={() => handleDelete(file.id)}>Delete</button>
+							<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+						</div>
+						)
+						)}
+						<p>{"Creator: " + file.creatorEmail || "Unknown Creator"}</p>
+					</div>
+					))}
+				</div>
+			</main>
 
 		</div>
 	);
