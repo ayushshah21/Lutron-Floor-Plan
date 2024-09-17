@@ -28,8 +28,9 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const [folderName, setFolderName] = useState('');
-	const { folders, loading: loadingFolders, createFolder, deleteFolder } = useFolders();  
-	
+	//const { folders, loading: loadingFolders, createFolder, deleteFolder } = useFolders();  
+	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
+
 	const router = useRouter();
 
 	const [isRenaming, setIsRenaming] = useState(false);
@@ -94,6 +95,7 @@ export default function Home() {
 	};
 
 
+	/*
 	const handleFolderClick = (folderId: string) => {
 		setSelectedFolder(folderId); // Set the selected folder ID to display its contents
 		if (folderId === "1") {
@@ -112,6 +114,14 @@ export default function Home() {
 		  fetchFloorPlans(); // Fetch files inside the selected folder
 		}
 	  };
+	  */
+
+
+	const handleFolderClick = (folderId: string) => {
+		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
+		fetchFolders(folderId);  // Correctly call fetchFolders with the selected folder ID
+	  };
+	  
 	  
 	
 	const handleDragStart = (event: React.DragEvent<HTMLDivElement>, fileId: string) => {
@@ -122,12 +132,15 @@ export default function Home() {
 	  
 	const handleCreateFolder = async () => {
 		if (folderName.trim()) {
-		  await createFolder(folderName);
+		  // Use the selectedFolder as the parent folder ID or default to "4"
+		  const parentFolderId = selectedFolder || "4";
+		  await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
 		  setFolderName(''); 
+		  setShowNewFolderInput(false);  // Hide the new folder input after creation
 		} else {
 		  alert("Please enter a folder name.");
 		}
-	};
+	  };
 
 	const handleUpload = async () => {
 		await uploadPdf(pdfFile);

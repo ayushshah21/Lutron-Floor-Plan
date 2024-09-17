@@ -11,31 +11,37 @@ export const useFolders = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch folders from Firestore
-  const fetchFolders = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        // Query folders where the owner is the authenticated user
-        const q = query(collection(db, 'folders'), where('userId', '==', user.uid));
-        const querySnapshot = await getDocs(q);
-        const fetchedFolders: Folder[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        } as Folder));
-        setFolders(fetchedFolders);
-      }
-    } catch (err) {
-      console.error('Error fetching folders:', err);
-      setError('Failed to fetch folders.');
-    } finally {
-      setLoading(false);
+// Update the fetchFolders function to accept parentFolderId
+const fetchFolders = async (parentFolderId: string = "4") => { // Default to "4" for "Home" folder
+  setLoading(true);
+  setError(null);
+  try {
+    const user = auth.currentUser;
+    if (user) {
+      // Query folders where the owner is the authenticated user and match the parent folder ID
+      const q = query(
+        collection(db, 'folders'),
+        where('userId', '==', user.uid),
+        where('parentFolderId', '==', parentFolderId)  // Filter by parent folder ID
+      );
+      const querySnapshot = await getDocs(q);
+      const fetchedFolders: Folder[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      } as Folder));
+      setFolders(fetchedFolders);
     }
-  };
+  } catch (err) {
+    console.error('Error fetching folders:', err);
+    setError('Failed to fetch folders.');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Create a new folder in Firestore
-  const createFolder = async (name: string) => {
+  const createFolder = async (name: string, parentFolderId: string) => {
     const user = auth.currentUser;
     if (!user) {
       setError('User is not authenticated.');
@@ -45,10 +51,12 @@ export const useFolders = () => {
     try {
       const maxFolderId = folders.reduce((max, folder) => Math.max(max, parseInt(folder.id, 10)), 4); // Start from 4 for 'Home'
       const newFolderId = (maxFolderId + 1).toString(); // Increment ID by 1
-
+  
       await addDoc(collection(db, 'folders'), {
+        id: newFolderId,  // Set unique folder ID
         name,
-        userId: user.uid, // Associate folder with the authenticated user
+        userId: user.uid,  // Associate folder with the authenticated user
+        parentFolderId,  // Set the parent folder ID
       });
       fetchFolders(); // Refresh the folders after creation
     } catch (err) {
@@ -71,7 +79,7 @@ export const useFolders = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        fetchFolders();
+        fetchFolders("4"); // Default to "4" for the Home folder
       }
     });
     return () => unsubscribe();
