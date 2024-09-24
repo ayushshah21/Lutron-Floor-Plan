@@ -155,7 +155,7 @@ export default function Home() {
 		fetchFloorPlans(); // Fetch files inside the selected folder
 		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
 	  };
-	  
+	
 	
 	
 	/*
@@ -184,6 +184,19 @@ export default function Home() {
 		event.dataTransfer.setData('fileId', fileId); // Set the dragged file ID
 	};
 	
+	const handleBreadcrumbClick = (folderId: string) => {
+		// Find the folder's index in the folderPath array
+		const clickedFolderIndex = folderPath.findIndex(folder => folder.id === folderId);
+	  
+		// Remove all folders after the clicked folder
+		const newFolderPath = folderPath.slice(0, clickedFolderIndex + 1);
+	  
+		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
+		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+		fetchFloorPlans(); // Fetch files inside the selected folder
+		setFolderPath(newFolderPath);  // Update the folder path to only include folders up to this one
+	  };
+	  
 
 	  
 	const handleCreateFolder = async () => {
@@ -307,15 +320,29 @@ export default function Home() {
 
 
 			<main className={styles.mainContent}>
-				{/* Back Button and Folder Name Display */}
-				{folderPath.length > 1 && (
-				<div className={styles.folderNavigation}>
-					<button className={styles.backButton} onClick={handleBackClick}>
-					Back to {folderPath[folderPath.length - 2].name}
+			<div className={styles.breadcrumb}>
+				{folderPath.map((folder, index) => (
+					<span key={folder.id}>
+					<button
+						className={styles.breadcrumbButton}
+						onClick={() => handleBreadcrumbClick(folder.id)}
+					>
+						{folder.name}
 					</button>
-					<span>Current Folder: {folderPath[folderPath.length - 1].name}</span>
+					{index < folderPath.length - 1 && ' / '} {/* Display a separator between items */}
+					</span>
+				))}
 				</div>
-				)}
+
+			{/* Back Button and Folder Name Display */}
+			{folderPath.length > 1 && (
+				<div className={styles.folderNavigation}>
+				<button className={styles.backButton} onClick={handleBackClick}>
+					Back to {folderPath[folderPath.length - 2].name}
+				</button>
+				<span>Current Folder: {folderPath[folderPath.length - 1].name}</span>
+				</div>
+			)}
 				{/* Search Bar */}
 				<div className={styles.searchBar}>
 					<Search className={styles.searchIcon} />

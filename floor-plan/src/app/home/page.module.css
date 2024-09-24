@@ -356,3 +356,20 @@
 .backButton:hover {
   background-color: #0056b3;
 }
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.breadcrumbButton {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.breadcrumbButton:hover {
+  text-decoration: underline;
+}
