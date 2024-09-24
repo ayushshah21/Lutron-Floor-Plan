@@ -338,12 +338,19 @@ export default function Home() {
 
 				{showNewOptions && (
 					<div className={styles.newOptionsDropdown}>
-					<button onClick={() => document.getElementById("fileInput")?.click()}>
-						New File
-					</button>
+						<button onClick={() => document.getElementById("fileInput")?.click()}>
+							New File
+						</button>
 					<button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
 						New Folder
 					</button>
+					  {/* Hidden input field for file selection */}
+						<input
+							type="file"
+							id="fileInput"
+							style={{ display: 'none' }}  // Hide the default input
+							onChange={handleFileChange}  // Trigger file change logic
+						/>
 					</div>
 				)}
 
