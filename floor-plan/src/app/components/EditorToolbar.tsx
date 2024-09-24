@@ -1,6 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faPlug, faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faPlug, 
+  faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser, faVideo, faBorderAll, faDoorOpen 
+} from '@fortawesome/free-solid-svg-icons';
 
 interface ToolbarProps {
   exportCanvasAsPDF: () => void;
@@ -19,6 +22,9 @@ interface ToolbarProps {
   disableEraser: () => void;
   isDrawing: boolean;
   isErasing: boolean;
+  addSecurityCameraIcon: () => void;
+  addWallIcon: () => void;
+  addDoorIcon: () => void;
 }
 
 const EditorToolbar: React.FC<ToolbarProps> = ({
@@ -38,6 +44,9 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
   disableEraser,
   isDrawing,
   isErasing,
+  addSecurityCameraIcon,
+  addWallIcon,
+  addDoorIcon,
 }) => {
   return (
     <nav className="sideToolBar" aria-label="Editor tools">
@@ -70,6 +79,9 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
             <FontAwesomeIcon icon={faEraser} aria-hidden="true" /> {isErasing ? 'Disable Eraser' : 'Enable Eraser'}
           </button>
         </li>
+        <li><button onClick={addSecurityCameraIcon} aria-label="Add Security Camera Icon"><FontAwesomeIcon icon={faVideo} aria-hidden="true" /> Add Security Camera</button></li>
+        <li><button onClick={addWallIcon} aria-label="Add Wall Icon"><FontAwesomeIcon icon={faBorderAll} aria-hidden="true" /> Add Wall</button></li>
+        <li><button onClick={addDoorIcon} aria-label="Add Door Icon"><FontAwesomeIcon icon={faDoorOpen} aria-hidden="true" /> Add Door</button></li>
       </ul>
     </nav>
   );

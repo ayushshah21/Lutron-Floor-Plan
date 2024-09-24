@@ -30,7 +30,10 @@ export default function Editor() {
     enableEraser, 
     disableEraser, 
     isDrawing, 
-    isErasing 
+    isErasing,
+    addSecurityCameraIconToCanvas,
+    addWallIconToCanvas,
+    addDoorIconToCanvas
   } = useCanvas();
   
   const [pdfUrl, setPdfUrl] = useState<string>("");
@@ -164,6 +167,9 @@ export default function Editor() {
         disableEraser={disableEraser}
         isDrawing={isDrawing}
         isErasing={isErasing}
+        addSecurityCameraIcon={() => addIconAtDefaultPosition(addSecurityCameraIconToCanvas)}
+        addWallIcon={() => addIconAtDefaultPosition(addWallIconToCanvas)}
+        addDoorIcon={() => addIconAtDefaultPosition(addDoorIconToCanvas)}
       />
 
       <div className="container">

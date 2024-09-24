@@ -223,6 +223,18 @@ export const useCanvas = () => {
     }
   };
 
+  const addSecurityCameraIconToCanvas = (x: number, y: number, isOriginal = false) => {
+    addIconToCanvas("/security-camera.jpg", x, y, isOriginal);
+  };
+
+  const addWallIconToCanvas = (x: number, y: number, isOriginal = false) => {
+    addIconToCanvas("/wall.png", x, y, isOriginal);
+  };
+
+  const addDoorIconToCanvas = (x: number, y: number, isOriginal = false) => {
+    addIconToCanvas("/door.jpg", x, y, isOriginal);
+  };
+
   return {
     canvasRef,
     addLightIconToCanvas,
@@ -241,5 +253,8 @@ export const useCanvas = () => {
     disableEraser,
     isDrawing,
     isErasing,
+    addSecurityCameraIconToCanvas,
+    addWallIconToCanvas,
+    addDoorIconToCanvas,
   };
 };
