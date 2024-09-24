@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -11,7 +11,13 @@ import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
+<<<<<<< HEAD
+import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
+import 'pdfjs-dist/build/pdf.worker.entry';
+
+=======
 import Spinner from "../components/Spinner";
+>>>>>>> main
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -22,12 +28,65 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
+<<<<<<< HEAD
+	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+
+=======
 	const [openSpinner, setOpeningSpinner] = useState(false);
+>>>>>>> main
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
+
+	// Function to render PDF thumbnail
+	const renderThumbnail = async (pdfUrl: string) => {
+		try {
+			const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+			const page = await pdf.getPage(1); // Get the first page
+			const scale = 0.5;
+			const viewport = page.getViewport({ scale });
+
+			// Create canvas and draw the page as an image
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('2d');
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
+
+			const renderContext = {
+				canvasContext: context!,
+				viewport,
+			};
+
+			await page.render(renderContext).promise;
+
+			// Convert canvas to image URL
+			const thumbnailUrl = canvas.toDataURL();
+			return thumbnailUrl;
+		} catch (error) {
+			console.error('Error rendering PDF thumbnail:', error);
+			return null;
+		}
+	};
+
+	useEffect(() => {
+		const generateThumbnails = async () => {
+			const thumbnailsData: { [key: string]: string } = {};
+			for (const file of floorPlans) {
+				if (file.pdfURL) {
+					const thumbnailUrl = await renderThumbnail(file.pdfURL);
+					if (thumbnailUrl) {
+						thumbnailsData[file.id] = thumbnailUrl;
+					}
+				}
+			}
+			setThumbnails(thumbnailsData);
+		};
+
+		generateThumbnails();
+	}, [floorPlans]);
+
 
 	const signOutWithGoogle = async () => {
 		try {
@@ -121,6 +180,103 @@ export default function Home() {
 
 	return (
 		<div className={styles.container}>
+<<<<<<< HEAD
+			<aside className={styles.sidebar}>
+				<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
+				<nav className={styles.navigation} id="navSidebar">
+					<button className={`${styles.navButton} ${styles.iconButton}`}>
+						< Users size={22} /> Shared with me
+					</button>
+					<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<Clock color="black" size={22} /> Recent
+					</button>
+					<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<Star size={22} /> Starred
+					</button>
+				</nav>
+				<button className={styles.logoutButton} onClick={signOutWithGoogle}>
+					Logout
+				</button>
+			</aside>
+			<main className={styles.mainContent}>
+				<div className={styles.searchBar}>
+					<Search className={styles.searchIcon} />
+					<input
+						type="text"
+						placeholder="Search floor plans"
+						className={styles.searchInput}
+					/>
+				</div>
+				<form>
+					<input
+						type="file"
+						onChange={uploadFloorplan}
+						accept="application/pdf"
+						id="fileInput"
+						style={{ display: "none" }} // Hide the default file input
+					/>
+					<button
+						className={styles.button}
+						id="importButton"
+						onClick={(e) => {
+							e.preventDefault(); // Prevent form submission
+							document.getElementById("fileInput")?.click(); // Programmatically click the file input
+						}}
+						disabled={uploading}
+					>
+						{uploading ? "Uploading..." : "+ New"}
+					</button>
+				</form>
+				<div className={styles.fileList}>
+					{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
+						<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
+							<div className={styles.fileItemTopRow}>
+
+								<img
+									src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
+									alt="PDF Thumbnail"
+									className={styles.thumbnail}
+								/*
+									className={styles.threeDotLogo}
+									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									alt="three-dots-icon"
+									onClick={() => handleThreeDotPopup(file.id)}
+									*/
+
+								/>
+								<img
+									className={styles.threeDotLogo}
+									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									alt="three-dots-icon"
+									onClick={() => handleThreeDotPopup(file.id)}
+								/>
+							</div>
+							{showThreeDotPopup && selectedFileId === file.id && (
+								isRenaming && docToRename === file.id ? (
+									<>
+										<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+										<button onClick={submitNewName}>Save</button>
+										<button onClick={cancelRenaming}>Cancel</button>
+									</>
+								) :
+									<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+										<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
+										<button onClick={() => handleDelete(file.id)}>Delete</button>
+										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+									</div>
+							)}
+							<p>{file.name 
+							//+ " Creator: " + file.creatorEmail || 'Unknown Creator'
+							}</p>
+
+						</div>
+					))}
+				</div>
+				<div className={styles.prompt}>
+					Use the “New” button to upload a file
+				</div>
+			</main>
+=======
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
 			<>
 				<aside className={styles.sidebar}>
@@ -213,6 +369,7 @@ export default function Home() {
 				</main>
 			</>
 			)
+>>>>>>> main
 		</div>
 	);
 }	
