@@ -54,6 +54,7 @@ export default function Home() {
 		}
 	};
 
+	/*
 	const handleFileChange = async (event: any) => {
 		const file = event.target.files[0];
 		const url = URL.createObjectURL(file);
@@ -69,6 +70,26 @@ export default function Home() {
 			alert("Please select a valid PDF file.");
 		}
 	};
+	*/
+	const handleFileChange = async (event: any) => {
+		const file = event.target.files[0];
+		const url = URL.createObjectURL(file);
+		if (file && file.type === "application/pdf") {
+		  setPdfFile(file);
+	  
+		  const folderId = selectedFolder || "4"; // Default to "4" (Home folder) if no folder is selected
+	  
+		  const pdfURL = await uploadPdf(file, folderId); // Pass folderId here
+		  if (pdfURL) {
+			router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
+		  } else {
+			alert("Failed to upload PDF.");
+		  }
+		} else {
+		  alert("Please select a valid PDF file.");
+		}
+	  };
+	  
 
 	// Function to update the folderID of a file in Firestore
 	const updateFileFolder = async (fileId: string, folderID: string) => {
@@ -120,13 +141,24 @@ export default function Home() {
 	  */
 
 
+	  /*
 	  const handleFolderClick = (folderId: string, folderName: string) => {
 		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
 		fetchFolders(folderId);  // Correctly call fetchFolders with the selected folder ID
 		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
 	};
+	*/
+
+	const handleFolderClick = (folderId: string, folderName: string) => {
+		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
+		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+		fetchFloorPlans(); // Fetch files inside the selected folder
+		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
+	  };
+	  
 	
 	
+	/*
 	const handleBackClick = () => {
 		const newPath = [...folderPath];
 		newPath.pop(); // Remove the last folder from the path
@@ -135,6 +167,16 @@ export default function Home() {
 		fetchFolders(lastFolder.id); // Fetch the contents of the last folder
 		setFolderPath(newPath); // Update the folder path
 	};
+	*/
+	const handleBackClick = () => {
+		const newPath = [...folderPath];
+		newPath.pop(); // Remove the last folder from the path
+		const lastFolder = newPath[newPath.length - 1]; // Get the new last folder
+		setSelectedFolder(lastFolder.id); // Set the selected folder to the last one
+		fetchFolders(lastFolder.id); // Fetch the contents of the last folder
+		setFolderPath(newPath); // Update the folder path
+	  };
+	  
 	  
 	  
 	
@@ -324,69 +366,73 @@ export default function Home() {
 
 				{/* Folders Display */}
 				<div className={styles.folderList}>
-				{loadingFolders ? (
-					<div>Loading folders...</div>
-				) : (
-					folders.map((folder) => (
+					{loadingFolders ? (
+						<div>Loading folders...</div>
+					) : (
+						folders.map((folder) => (
 						<div
-						key={folder.id}
-						className={styles.folderItem}
-						onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both ID and Name
-						onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
-						onDragOver={(e) => e.preventDefault()} // Allow drag over
+							key={folder.id}
+							className={styles.folderItem}
+							onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both folder ID and Name
+							onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
+							onDragOver={(e) => e.preventDefault()} // Allow drag over
 						>
-						{folder.name}
+							{folder.name}
 						</div>
-					))
-				)}
-
+						))
+					)}
 				</div>
+
 
 				{/* Files Display */}
 				<div className={styles.fileList}>
 					{floorPlans.map((file: FloorPlanDocument) => (
-					<div
+						<div
 						key={file.id}
 						className={styles.fileItem}
 						draggable
 						onDragStart={(e) => handleDragStart(e, file.id)} // Enable dragging files
-					>
+						>
 						<div className={styles.fileItemTopRow}>
-						<img
+							<img
 							className={styles.floorPlanLogo}
 							src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
 							alt="floor plan logo"
-						/>
-						<div className={styles.fileName}>
+							/>
+							<div className={styles.fileName}>
 							{truncateFloorPlanName(file.name)}
 							<div className={styles.fileNamePopup}>{file.name}</div>
-						</div>
-						<img
+							</div>
+							<img
 							className={styles.threeDotLogo}
 							src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
 							alt="three-dots-icon"
 							onClick={() => handleThreeDotPopup(file.id)}
-						/>
+							/>
 						</div>
 						{showThreeDotPopup && selectedFileId === file.id && (
-						isRenaming && docToRename === file.id ? (
-						<>
+							isRenaming && docToRename === file.id ? (
+							<>
 							<input value={newName} onChange={(e) => setNewName(e.target.value)} />
 							<button onClick={submitNewName}>Save</button>
 							<button onClick={cancelRenaming}>Cancel</button>
-						</>
-						) : (
-						<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+							</>
+							) : (
+							<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
 							<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
 							<button onClick={() => handleDelete(file.id)}>Delete</button>
 							<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-						</div>
-						)
+							</div>
+							)
 						)}
 						<p>{"Creator: " + file.creatorEmail || "Unknown Creator"}</p>
-					</div>
+						</div>
 					))}
 				</div>
+
+
+
+
 			</main>
 
 		</div>

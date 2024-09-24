@@ -40,22 +40,23 @@ export const useUploadPdf = () => {
 
     try {
       const userId = currentUser?.uid; // Get the authenticated user's ID
-      console.log(`Uploading PDF for user: ${userId}`);
-      console.log(currentUser?.email);
+      //console.log(`Uploading PDF for user: ${userId}`);
+      //console.log(currentUser?.email);
       const filePath = `floorplans/${userId}/${pdfFile.name}`; // Construct the file path
       const storageRef = ref(storage, filePath);
 
       // Upload the PDF to Firebase Storage
       const uploadResult = await uploadBytes(storageRef, pdfFile);
-      console.log("Upload result:", uploadResult);
+      //console.log("Upload result:", uploadResult);
 
       // Get the download URL of the uploaded file
       const pdfURL = await getDownloadURL(uploadResult.ref);
-      console.log("PDF URL:", pdfURL);
+      //console.log("PDF URL:", pdfURL);
 
       // Save the PDF metadata in Firestore
       const floorPlanName = extractFloorPlanName(pdfFile); // Call the function to extract the name
-      const docRef = await addDoc(collection(firestore, "FloorPlans"), {
+      //const docRef = await addDoc(collection(firestore, "FloorPlans"), {
+      await addDoc(collection(firestore, "FloorPlans"), {
         originalCreator: userId,
         creatorEmail: currentUser?.email,
         contributors: [userId],

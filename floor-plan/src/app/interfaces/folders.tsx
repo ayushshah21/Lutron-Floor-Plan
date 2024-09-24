@@ -3,4 +3,4 @@ export interface Folder {
     name: string;
     userId: string; // User who owns the folder
     parentFolderId?: string; // For nested folders -- only if needed
-  }
+}

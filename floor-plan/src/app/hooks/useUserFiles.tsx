@@ -7,7 +7,41 @@ import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 // hooks/useUserFiles.ts
 
 
+export const useUserFiles = (selectedFolder: string | null) => {
+  const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // Allow `string` or `null`
 
+  const fetchFloorPlans = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // Filter floor plans by `originalCreator` and `folderID`
+      const q = query(
+        collection(db, 'FloorPlans'),
+        where('originalCreator', '==', auth.currentUser?.uid),
+        where('folderID', '==', selectedFolder || "4") // Use `selectedFolder` or default to "4" (Home)
+      );
+      const querySnapshot = await getDocs(q);
+      setFloorPlans(querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data() as Omit<FloorPlanDocument, 'id'>
+      })));
+    } catch (error) {
+      setError("Error fetching files");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchFloorPlans(); // Fetch files whenever `selectedFolder` changes
+  }, [selectedFolder]);
+
+  return { floorPlans, loading, fetchFloorPlans, error };
+};
+
+
+/*
 export const useUserFiles = (selectedFolder: string | null) => {
   const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
   const [loading, setLoading] = useState(false);
@@ -38,6 +72,7 @@ export const useUserFiles = (selectedFolder: string | null) => {
 
   return { floorPlans, loading, fetchFloorPlans, error };
 };
+*/
 
 /*
 export const useUserFiles = () => {
