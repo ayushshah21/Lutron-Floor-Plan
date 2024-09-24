@@ -177,13 +177,13 @@ export default function Home() {
 				<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 				<nav className={styles.navigation} id="navSidebar">
 					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						< Users />Shared with me
+						< Users size={22} /> Shared with me
 					</button>
 					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						<Clock color="black" /> Recent
+						<Clock color="black" size={22} /> Recent
 					</button>
 					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						<Star /> Starred
+						<Star size={22} /> Starred
 					</button>
 				</nav>
 				<button className={styles.logoutButton} onClick={signOutWithGoogle}>
@@ -257,7 +257,10 @@ export default function Home() {
 										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 									</div>
 							)}
-							<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+							<p>{file.name 
+							//+ " Creator: " + file.creatorEmail || 'Unknown Creator'
+							}</p>
+
 						</div>
 					))}
 				</div>
