@@ -195,10 +195,28 @@ export default function Home() {
 		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
 		fetchFloorPlans(); // Fetch files inside the selected folder
 		setFolderPath(newFolderPath);  // Update the folder path to only include folders up to this one
-	  };
+	};
+
+	const handleDropOnBreadcrumb = async (event: React.DragEvent, targetFolderId: string) => {
+		event.preventDefault();
+		const fileId = event.dataTransfer.getData("fileId");  // Get the file ID from the drag event
+	  
+		if (fileId) {
+		  try {
+			// Update the file's folderID to the target folder in Firestore
+			await updateFileFolder(fileId, targetFolderId);
+			fetchFloorPlans();  // Refresh the file list after moving the file
+		  } catch (err) {
+			console.error("Failed to move file:", err);
+			alert("Failed to move file.");
+		  }
+		}
+	};
+	  
 	  
 
-	  
+	
+
 	const handleCreateFolder = async () => {
 		if (folderName.trim()) {
 		  const parentFolderId = selectedFolder || "4";
@@ -320,12 +338,15 @@ export default function Home() {
 
 
 			<main className={styles.mainContent}>
-			<div className={styles.breadcrumb}>
+				{/* Breadcrumb Navigation with Drag-and-Drop */}
+				<div className={styles.breadcrumb}>
 				{folderPath.map((folder, index) => (
 					<span key={folder.id}>
 					<button
 						className={styles.breadcrumbButton}
 						onClick={() => handleBreadcrumbClick(folder.id)}
+						onDragOver={(e) => e.preventDefault()}  
+						onDrop={(e) => handleDropOnBreadcrumb(e, folder.id)}  
 					>
 						{folder.name}
 					</button>
@@ -333,6 +354,7 @@ export default function Home() {
 					</span>
 				))}
 				</div>
+
 
 			{/* Back Button and Folder Name Display */}
 			{folderPath.length > 1 && (
