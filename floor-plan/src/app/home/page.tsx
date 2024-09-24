@@ -11,9 +11,13 @@ import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
+<<<<<<< HEAD
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
 
+=======
+import Spinner from "../components/Spinner";
+>>>>>>> main
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -24,8 +28,12 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
+<<<<<<< HEAD
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 
+=======
+	const [openSpinner, setOpeningSpinner] = useState(false);
+>>>>>>> main
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [docToRename, setDocToRename] = useState<string | null>(null);
@@ -108,6 +116,7 @@ export default function Home() {
 
 	// Opening existing floor plans
 	const openFloorplan = (pdfURL: string, documentID: string, fileName: string) => {
+		setOpeningSpinner(true);
 		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}`);
 	};
 
@@ -169,10 +178,9 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
-	return isLoading ? (
-		<div>Loading...</div>
-	) : (
+	return (
 		<div className={styles.container}>
+<<<<<<< HEAD
 			<aside className={styles.sidebar}>
 				<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 				<nav className={styles.navigation} id="navSidebar">
@@ -268,6 +276,100 @@ export default function Home() {
 					Use the “New” button to upload a file
 				</div>
 			</main>
+=======
+			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
+			<>
+				<aside className={styles.sidebar}>
+					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
+					<nav className={styles.navigation} id="navSidebar">
+						<button className={`${styles.navButton} ${styles.iconButton}`}>
+							<Users />Shared with me
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`}>
+							<Clock color="black" /> Recent
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`}>
+							<Star /> Starred
+						</button>
+					</nav>
+					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
+						Logout
+					</button>
+				</aside>
+				<main className={styles.mainContent}>
+					<div className={styles.searchBar}>
+						<Search className={styles.searchIcon} />
+						<input
+							type="text"
+							placeholder="Search floor plans"
+							className={styles.searchInput}
+						/>
+					</div>
+					<form>
+						<input
+							type="file"
+							onChange={uploadFloorplan}
+							accept="application/pdf"
+							id="fileInput"
+							style={{ display: "none" }} // Hide the default file input
+						/>
+						<button
+							className={styles.button}
+							id="importButton"
+							onClick={(e) => {
+								e.preventDefault(); // Prevent form submission
+								document.getElementById("fileInput")?.click(); // Programmatically click the file input
+							}}
+							disabled={uploading}
+						>
+							{uploading ? "Uploading..." : "+ New"}
+						</button>
+					</form>
+					<div className={styles.fileList}>
+						{floorPlans.map((file: FloorPlanDocument) => (
+							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
+								<div className={styles.fileItemTopRow}>
+									<img
+										className={styles.floorPlanLogo}
+										src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
+										alt="floor plan logo" />
+									<div className={styles.fileName}>
+										{truncateFloorPlanName(file.name)}
+										<div className={styles.fileNamePopup}>{file.name}</div>
+									</div>
+									<img
+										className={styles.threeDotLogo}
+										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+										alt="three-dots-icon"
+										onClick={() => handleThreeDotPopup(file.id)}
+									/>
+								</div>
+								{showThreeDotPopup && selectedFileId === file.id && (
+									isRenaming && docToRename === file.id ? (
+										<>
+											<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+											<button onClick={submitNewName}>Save</button>
+											<button onClick={cancelRenaming}>Cancel</button>
+										</>
+									) : (
+										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+											<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
+											<button onClick={() => handleDelete(file.id)}>Delete</button>
+											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+										</div>
+									)
+								)}
+								<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+							</div>
+						))}
+					</div>
+					<div className={styles.prompt}>
+						Use the “New” button to upload a file
+					</div>
+				</main>
+			</>
+			)
+>>>>>>> main
 		</div>
 	);
-}
+}	

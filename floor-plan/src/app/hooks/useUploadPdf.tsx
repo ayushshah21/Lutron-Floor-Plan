@@ -11,8 +11,8 @@ import {
 	updateDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { storage } from "../../../firebase";
 
-const storage = getStorage();
 const firestore = getFirestore();
 
 export const useUploadPdf = () => {
