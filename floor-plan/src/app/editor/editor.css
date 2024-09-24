@@ -10,30 +10,118 @@
 	color: black;
 }
 
-/* Search bar at the top of the main content */
-.searchBar {
-	background-color: #FFFFFF;
-	border-radius: 20px;
-	width: 350px;
-	padding: 10px 15px;
-	margin-bottom: 10px;
-	left: 400px; 
-
-	/* Adjust the margin as needed */
-	display: flex;
-	justify-content: center;
-	position: fixed;  
-	align-items: center;
+.search-bar-container {
+	position: fixed;
+	top: 10px;
+	/* Distance from the top */
+	left: 50%;
+	/* Center horizontally */
+	transform: translateX(-50%);
+	/* Align center horizontally */
 	z-index: 1000;
+	/* Keep on top of other elements */
+}
+
+/* Search form */
+.search-form {
+	display: flex;
+	align-items: center;
+}
+
+/* Search input field */
+.search-input {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 16px;
+	width: 250px;
+	/* Set a width for the search bar */
+}
+
+/* Search button */
+.search-button {
+	padding: 8px 12px;
+	margin-left: 8px;
+	background-color:#0057B8;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+}
+
+.search-button:hover {
+	background-color:#144a75;
+}
+
+.search-button:focus {
+	outline: none;
+}
+
+
+.toolbar {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	display: flex;
+	gap: 15px;
+	/* Adds space between the buttons */
+	z-index: 1000;
+	/* Ensures it stays on top of other elements */
+}
+
+
+.toolbar-button {
+	background: none;
+	border: none;
+	padding: 8px;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+	border-radius: 50%;
+}
+
+.toolbar-button:hover {
+	background-color: #144a75;
+}
+
+.toolbar-button svg {
+	margin-right: 4px;
+	/* Add space between icon and text */
+	color: #333;
+	/* Dark color for icons */
+}
+
+.toolbar-button:focus {
+	outline: none;
+	box-shadow: 0 0 0 2px #0057B8;
+	/* Focus outline similar to accessibility */
+}
+
+.fullscreen-bar {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	/*width: 100%;*/
+	background-color: #f8f9fa;
+	padding: 10px;
+	box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+	z-index: 1000; /* Keeps it on top of other elements */
   }
   
-  .searchInput {
+  /* Fullscreen button */
+  .fullscreen-button {
+	padding: 10px 20px;
+	font-size: 16px;
+	background-color:#0056b3;
+	color: white;
 	border: none;
-	outline: none;
-	padding-left: 10px;
-	margin-right: 100px;
-	width: 100%;
-	/* Full width */
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+  }
+  
+  .fullscreen-button:hover {
+	background-color:#144a75;
   }
 
 .canvasBox {
@@ -41,7 +129,7 @@
 	height: 560px;
 	width: 900px;
 	border-radius: 8px;
-	background-color: #FFFFFF;
+	background-color: #ffffff;
 	margin: auto;
 	left: 52%;
 	top: 55%;
@@ -89,8 +177,7 @@
 	position: fixed;
 	top: 0;
 	right: 0;
-	left: 0
-	;
+	left: 0;
 }
 
 .navbarBrand {
@@ -230,19 +317,19 @@
 	/* Slightly increase size */
 }
 
-  .sideToolBar ul {
+.sideToolBar ul {
 	list-style: none;
 	padding: 0;
 	margin: 0;
-  }
-  
-  .sideToolBar li {
+}
+
+.sideToolBar li {
 	margin-bottom: 1rem;
-  }
-  
-  .sideToolBar button {
-	background-color: whitesmoke; 
-	color: #0057B8; 
+}
+
+.sideToolBar button {
+	background-color: whitesmoke;
+	color: #0057B8;
 	border: none;
 	padding: 10px 20px;
 	width: 100%;
@@ -251,17 +338,17 @@
 	font-size: 1rem;
 	transition: background-color 0.3s ease, color 0.3s ease;
 	cursor: pointer;
-  }
-  
-  .sideToolBar button:hover {
-	background-color: #0057B8; 
+}
+
+.sideToolBar button:hover {
+	background-color: #0057B8;
 	color: white;
-  }
-  
-  .sideToolBar button i {
+}
+
+.sideToolBar button i {
 	margin-right: 10px;
-  }
-  
-  .fa-icon {
+}
+
+.fa-icon {
 	margin-right: 8px;
-  }
+}
