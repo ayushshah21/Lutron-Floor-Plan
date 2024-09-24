@@ -7,6 +7,13 @@
   /* Take full height of the viewport */
 }
 
+.thumbnail {
+  width: 100px;
+  height: auto;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
 /* The sidebar styles */
 .sidebar {
   background: #FFFFFF;

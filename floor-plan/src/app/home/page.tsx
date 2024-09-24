@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -11,6 +11,9 @@ import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
+import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
+import 'pdfjs-dist/build/pdf.worker.entry';
+
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -21,11 +24,61 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
+	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
+
+	// Function to render PDF thumbnail
+	const renderThumbnail = async (pdfUrl: string) => {
+		try {
+			const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+			const page = await pdf.getPage(1); // Get the first page
+			const scale = 0.5;
+			const viewport = page.getViewport({ scale });
+
+			// Create canvas and draw the page as an image
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('2d');
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
+
+			const renderContext = {
+				canvasContext: context!,
+				viewport,
+			};
+
+			await page.render(renderContext).promise;
+
+			// Convert canvas to image URL
+			const thumbnailUrl = canvas.toDataURL();
+			return thumbnailUrl;
+		} catch (error) {
+			console.error('Error rendering PDF thumbnail:', error);
+			return null;
+		}
+	};
+
+	useEffect(() => {
+		const generateThumbnails = async () => {
+			const thumbnailsData: { [key: string]: string } = {};
+			for (const file of floorPlans) {
+				if (file.pdfURL) {
+					const thumbnailUrl = await renderThumbnail(file.pdfURL);
+					if (thumbnailUrl) {
+						thumbnailsData[file.id] = thumbnailUrl;
+					}
+				}
+			}
+			setThumbnails(thumbnailsData);
+		};
+
+		generateThumbnails();
+	}, [floorPlans]);
+
 
 	const signOutWithGoogle = async () => {
 		try {
@@ -170,14 +223,19 @@ export default function Home() {
 					{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
 						<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
 							<div className={styles.fileItemTopRow}>
+
 								<img
-									className={styles.floorPlanLogo}
-									src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-									alt="floor plan logo" />
-								<div className={styles.fileName}>
-									{truncateFloorPlanName(file.name)}
-									<div className={styles.fileNamePopup}>{file.name}</div>
-								</div>
+									src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
+									alt="PDF Thumbnail"
+									className={styles.thumbnail}
+								/*
+									className={styles.threeDotLogo}
+									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									alt="three-dots-icon"
+									onClick={() => handleThreeDotPopup(file.id)}
+									*/
+
+								/>
 								<img
 									className={styles.threeDotLogo}
 									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
