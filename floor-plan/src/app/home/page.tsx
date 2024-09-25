@@ -12,22 +12,35 @@ import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users } from "lucide-react";
 import Spinner from "../components/Spinner";
+import { useFolders } from '../hooks/useFolders';
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase"; 
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
-	const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+		//const { floorPlans, loading, fetchFloorPlans } = useUserFiles();
+	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder); // Pass selected folder ID to hook
 	const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
 	const [openSpinner, setOpeningSpinner] = useState(false);
+	const [folderName, setFolderName] = useState('');
+	//const { folders, loading: loadingFolders, createFolder, deleteFolder } = useFolders();  
+	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
+
+	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
+
+	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
+	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([ { id: "4", name: "Home" }, ]); // Keeps track of the folder path
 
 	const signOutWithGoogle = async () => {
 		try {
@@ -59,6 +72,111 @@ export default function Home() {
 	const openFloorplan = (pdfURL: string, documentID: string, fileName: string) => {
 		setOpeningSpinner(true);
 		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}`);
+	};
+
+	const handleFileChange = async (event: any) => {
+		const file = event.target.files[0];
+		const url = URL.createObjectURL(file);
+		if (file && file.type === "application/pdf") {
+		  setPdfFile(file);
+
+		  const folderId = selectedFolder || "4"; // Default to "4" (Home folder) if no folder is selected
+
+		  const pdfURL = await uploadPdf(file, folderId); // Pass folderId here
+		  if (pdfURL) {
+			router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
+		  } else {
+			alert("Failed to upload PDF.");
+		  }
+		} else {
+		  alert("Please select a valid PDF file.");
+		}
+	};
+
+	const updateFileFolder = async (fileId: string, folderID: string) => {
+		try {
+		const fileRef = doc(db, "FloorPlans", fileId); // Reference to the specific file document
+		await updateDoc(fileRef, { folderID }); // Update the folderID field in Firestore
+		console.log(`File ${fileId} moved to folder ${folderID}`);
+		} catch (error) {
+		console.error("Failed to update file folder:", error);
+		throw new Error("Failed to update file folder.");
+		}
+	};
+
+	const handleDrop = async (event: React.DragEvent<HTMLDivElement>, folderId: string) => {
+		event.preventDefault();
+		const fileId = event.dataTransfer.getData("fileId"); // Get the dragged file ID
+		if (fileId) {
+		  try {
+			// Call the updateFileFolder function to change the folderID in Firestore
+			await updateFileFolder(fileId, folderId);
+			fetchFloorPlans(); // Refresh the file list after moving the file
+		  } catch (err) {
+			console.error("Failed to move file:", err);
+			alert("Failed to move file.");
+		  }
+		}
+	};
+
+	const handleFolderClick = (folderId: string, folderName: string) => {
+		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
+		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+		fetchFloorPlans(); // Fetch files inside the selected folder
+		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
+	};
+
+	const handleBackClick = () => {
+		const newPath = [...folderPath];
+		newPath.pop(); // Remove the last folder from the path
+		const lastFolder = newPath[newPath.length - 1]; // Get the new last folder
+		setSelectedFolder(lastFolder.id); // Set the selected folder to the last one
+		fetchFolders(lastFolder.id); // Fetch the contents of the last folder
+		setFolderPath(newPath); // Update the folder path
+	};
+
+	const handleDragStart = (event: React.DragEvent<HTMLDivElement>, fileId: string) => {
+		event.dataTransfer.setData('fileId', fileId); // Set the dragged file ID
+	};
+
+	const handleBreadcrumbClick = (folderId: string) => {
+		// Find the folder's index in the folderPath array
+		const clickedFolderIndex = folderPath.findIndex(folder => folder.id === folderId);
+
+		// Remove all folders after the clicked folder
+		const newFolderPath = folderPath.slice(0, clickedFolderIndex + 1);
+
+		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
+		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+		fetchFloorPlans(); // Fetch files inside the selected folder
+		setFolderPath(newFolderPath);  // Update the folder path to only include folders up to this one
+	};
+
+	const handleDropOnBreadcrumb = async (event: React.DragEvent, targetFolderId: string) => {
+		event.preventDefault();
+		const fileId = event.dataTransfer.getData("fileId");  // Get the file ID from the drag event
+
+		if (fileId) {
+		  try {
+			// Update the file's folderID to the target folder in Firestore
+			await updateFileFolder(fileId, targetFolderId);
+			fetchFloorPlans();  // Refresh the file list after moving the file
+		  } catch (err) {
+			console.error("Failed to move file:", err);
+			alert("Failed to move file.");
+		  }
+		}
+	};
+
+	const handleCreateFolder = async () => {
+		if (folderName.trim()) {
+		  const parentFolderId = selectedFolder || "4";
+		  await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
+		  setFolderName(''); 
+		  setShowNewFolderInput(false);  // Hide the new folder input after creation
+		} else {
+		  alert("Please enter a folder name.");
+		}
 	};
 
 	// Creates a pop up when user tries to delete a floor plan
@@ -141,6 +259,34 @@ export default function Home() {
 					</button>
 				</aside>
 				<main className={styles.mainContent}>
+					{/* Breadcrumb Navigation with Drag-and-Drop */}
+					<div className={styles.breadcrumb}>
+					{folderPath.map((folder, index) => (
+						<span key={folder.id}>
+						<button
+							className={styles.breadcrumbButton}
+							onClick={() => handleBreadcrumbClick(folder.id)}
+							onDragOver={(e) => e.preventDefault()}  
+							onDrop={(e) => handleDropOnBreadcrumb(e, folder.id)}  
+						>
+							{folder.name}
+						</button>
+						{index < folderPath.length - 1 && ' / '} {/* Display a separator between items */}
+						</span>
+					))}
+					</div>
+
+
+					{/* Back Button and Folder Name Display */}
+					{folderPath.length > 1 && (
+						<div className={styles.folderNavigation}>
+						<button className={styles.backButton} onClick={handleBackClick}>
+							Back to {folderPath[folderPath.length - 2].name}
+						</button>
+						<span>Current Folder: {folderPath[folderPath.length - 1].name}</span>
+						</div>
+					)}
+					
 					<div className={styles.searchBar}>
 						<Search className={styles.searchIcon} />
 						<input
@@ -149,6 +295,54 @@ export default function Home() {
 							className={styles.searchInput}
 						/>
 					</div>
+					
+						
+					{/* New Folder and File Input Section */}
+					{/* New Button and Dropdown Options */}
+					<div className={styles.newOptionsSection}>
+					<button
+						className={styles.button}
+						onClick={() => setShowNewOptions(!showNewOptions)}
+					>
+						+ New
+					</button>
+
+					{showNewOptions && (
+						<div className={styles.newOptionsDropdown}>
+							<button onClick={() => document.getElementById("fileInput")?.click()}>
+								New File
+							</button>
+						<button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
+							New Folder
+						</button>
+						{/* Hidden input field for file selection */}
+							<input
+								type="file"
+								id="fileInput"
+								style={{ display: 'none' }}  // Hide the default input
+								onChange={handleFileChange}  // Trigger file change logic
+							/>
+						</div>
+					)}
+
+					{showNewFolderInput && (
+						<div className={styles.newFolderInput}>
+						<input
+							type="text"
+							placeholder="Enter folder name"
+							value={folderName}
+							onChange={(e) => setFolderName(e.target.value)}
+							className={styles.input}
+						/>
+						<button onClick={handleCreateFolder} className={styles.button}>
+							Create Folder
+						</button>
+						</div>
+					)}
+					</div>
+
+
+
 					<form>
 						<input
 							type="file"
@@ -169,50 +363,77 @@ export default function Home() {
 							{uploading ? "Uploading..." : "+ New"}
 						</button>
 					</form>
-					<div className={styles.fileList}>
-						{floorPlans.map((file: FloorPlanDocument) => (
-							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
-								<div className={styles.fileItemTopRow}>
-									<img
-										className={styles.floorPlanLogo}
-										src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-										alt="floor plan logo" />
-									<div className={styles.fileName}>
-										{truncateFloorPlanName(file.name)}
-										<div className={styles.fileNamePopup}>{file.name}</div>
-									</div>
-									<img
-										className={styles.threeDotLogo}
-										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-										alt="three-dots-icon"
-										onClick={() => handleThreeDotPopup(file.id)}
-									/>
-								</div>
-								{showThreeDotPopup && selectedFileId === file.id && (
-									isRenaming && docToRename === file.id ? (
-										<>
-											<input value={newName} onChange={(e) => setNewName(e.target.value)} />
-											<button onClick={submitNewName}>Save</button>
-											<button onClick={cancelRenaming}>Cancel</button>
-										</>
-									) : (
-										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
-											<button onClick={() => handleDelete(file.id)}>Delete</button>
-											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-										</div>
-									)
-								)}
-								<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+
+
+					{/* Folders Display */}
+					<div className={styles.folderList}>
+						{loadingFolders ? (
+							<div>Loading folders...</div>
+						) : (
+							folders.map((folder) => (
+							<div
+								key={folder.id}
+								className={styles.folderItem}
+								onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both folder ID and Name
+								onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
+								onDragOver={(e) => e.preventDefault()} // Allow drag over
+							>
+								{folder.name}
 							</div>
-						))}
+							))
+						)}
 					</div>
-					<div className={styles.prompt}>
-						Use the “New” button to upload a file
-					</div>
-				</main>
-			</>
-			)
+				{/* Files Display */}
+				<div className={styles.fileList}>
+					{floorPlans.map((file: FloorPlanDocument) => (
+						<div
+						key={file.id}
+						className={styles.fileItem}
+						draggable
+						onDragStart={(e) => handleDragStart(e, file.id)} // Enable dragging files
+						>
+						<div className={styles.fileItemTopRow}>
+							<img
+							className={styles.floorPlanLogo}
+							src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
+							alt="floor plan logo"
+							/>
+							<div className={styles.fileName}>
+							{truncateFloorPlanName(file.name)}
+							<div className={styles.fileNamePopup}>{file.name}</div>
+							</div>
+							<img
+							className={styles.threeDotLogo}
+							src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+							alt="three-dots-icon"
+							onClick={() => handleThreeDotPopup(file.id)}
+							/>
+						</div>
+						{showThreeDotPopup && selectedFileId === file.id && (
+							isRenaming && docToRename === file.id ? (
+							<>
+							<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+							<button onClick={submitNewName}>Save</button>
+							<button onClick={cancelRenaming}>Cancel</button>
+							</>
+							) : (
+							<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+							<button onClick={() => handleFileOpen(file.pdfURL)}>Open</button>
+							<button onClick={() => handleDelete(file.id)}>Delete</button>
+							<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+							</div>
+							)
+						)}
+						<p>{"Creator: " + file.creatorEmail || "Unknown Creator"}</p>
+						</div>
+					))}
+				</div>
+
+
+
+
+			</main>
+
 		</div>
 	);
-}	
+}
