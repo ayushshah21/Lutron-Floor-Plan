@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import { ExtendedGroup } from '../utils/fabricUtil';
 import { useUploadPdf } from './useUploadPdf';
@@ -12,6 +12,7 @@ import {
 	doc, 
 	updateDoc,
 } from "firebase/firestore";
+import socket from "../../socket";
 
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
@@ -22,6 +23,46 @@ export const useCanvas = () => {
     // Track drawing or erasing mode
     const [isDrawing, setIsDrawing] = useState(false);
     const [isErasing, setIsErasing] = useState(false);
+
+    useEffect(() => {
+        // Check if WebSocket connection is established
+        socket.on('connect', () => {
+          console.log('Connected to WebSocket server with ID:', socket.id);
+        });
+
+        // Listen for the test event from the server
+        socket.on('test', (message) => {
+            console.log('Message from server:', message);  // Should log 'Hello from the server!'
+        });
+    
+        // Clean up the connection when the component unmounts
+        return () => {
+          socket.off('connect');
+        };
+      }, []);
+
+      useEffect(() => {
+        // Initialize fabric canvas
+        canvasRef.current = new fabric.Canvas('c', {
+            isDrawingMode: false,
+        });
+
+        // Handle drawing data from other clients
+        socket.on('drawing', (data) => {
+            const fabricCanvas = canvasRef.current;
+            if (fabricCanvas) {
+                // Create a new path from the received drawing data
+                fabric.Path.fromObject(data, function (path: fabric.Path) {
+                    fabricCanvas.add(path);  // Add the received path to the canvas
+                    fabricCanvas.renderAll(); // Render the canvas
+                });
+            }
+        });
+
+        return () => {
+            socket.off('drawing');
+        };
+    }, []);
 
     const addImageToCanvas = (imageUrl: string, x: number, y: number) => {
         fabric.Image.fromURL(imageUrl, function (img) {
@@ -179,7 +220,6 @@ export const useCanvas = () => {
         }
     }
 
-    // Enable free drawing mode
     const enableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
@@ -188,6 +228,15 @@ export const useCanvas = () => {
             fabricCanvas.freeDrawingBrush.width = 5; // Set drawing width
             setIsDrawing(true);
             setIsErasing(false); // Disable erasing if it was active
+
+            // Emit drawing data on path created
+            fabricCanvas.on('path:created', function (event: fabric.IEvent) {
+                const path = event.target as fabric.Path;
+                if (path) {
+                    const serializedPath = path.toObject(['path', 'left', 'top', 'width', 'height', 'fill', 'stroke']);
+                    socket.emit('drawing', serializedPath);  // Emit the path data to the server
+                }
+            });
         }
     };
 
