@@ -8,5 +8,6 @@ export interface FloorPlanDocument {
     pdfURL: string;
     updatedAt: Date;
     name?: string;
+    folderID?: string;
   }
   

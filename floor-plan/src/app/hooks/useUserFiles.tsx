@@ -8,33 +8,35 @@ import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 
 
 
-export const useUserFiles = () => {
+export const useUserFiles = (selectedFolder: string | null) => {
   const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null); // Allow `string` or `null`
 
   const fetchFloorPlans = async () => {
     setLoading(true);
     setError(null);
     try {
-      const q = query(collection(db, 'FloorPlans'), where('originalCreator', '==', auth.currentUser?.uid));
+      // Filter floor plans by `originalCreator` and `folderID`
+      const q = query(
+        collection(db, 'FloorPlans'),
+        where('originalCreator', '==', auth.currentUser?.uid),
+        where('folderID', '==', selectedFolder || "4") // Use `selectedFolder` or default to "4" (Home)
+      );
       const querySnapshot = await getDocs(q);
-      setFloorPlans(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as Omit<FloorPlanDocument, 'id'> })));
+      setFloorPlans(querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data() as Omit<FloorPlanDocument, 'id'>
+      })));
     } catch (error) {
-      const errorMessage = (error as Error).message;  // Cast the error to the Error type to access the message property
-      // console.error("Failed to fetch the files: ", errorMessage);     // Now you are passing a string to setError
-      // alert("Failed to fetch the files: " + errorMessage);
+      setError("Error fetching files");
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchFloorPlans();
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) fetchFloorPlans();
-    });
-    return () => unsubscribe();
-  }, []);
+    fetchFloorPlans(); // Fetch files whenever `selectedFolder` changes
+  }, [selectedFolder]);
 
   return { floorPlans, loading, fetchFloorPlans, error };
 };
