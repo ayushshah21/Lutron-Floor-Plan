@@ -11,28 +11,30 @@ app.prepare().then(() => {
 	const server = express();
 	const httpServer = createServer(server);
 	const io = new Server(httpServer, {
-		cors: {
-		  origin: '*',  // Allow all origins for testing purposes
-		  methods: ['GET', 'POST']
-		}
+		cors: "http://localhost:3000/"
 	});
 	  
 	io.on('connection', (socket) => {
-		console.log(`Client connected: ${socket.id}`);
-
-		// Emit a basic test event
-  		socket.emit('test', 'Hello from the server!');
-
 		// Listen for 'drawing' event from clients
 		socket.on('drawing', (data) => {
 			// Broadcast drawing data to all other clients
-			console.log('Received drawing data:', data);
 			socket.broadcast.emit('drawing', data);
 		});
 
 		socket.on('disconnect', () => {
 			console.log(`${socket.id} has disconnected`);
 		});
+
+		socket.on('addObject', (data) => {
+			console.log('Received object to add');
+			socket.broadcast.emit('addObject', data);  
+		});
+
+		socket.on('deleteObject', (data) => {
+			console.log('Received delete object event');
+			socket.broadcast.emit('deleteObject', data); 
+		});
+		
 	});
 
 	server.all('*', (req, res) => {

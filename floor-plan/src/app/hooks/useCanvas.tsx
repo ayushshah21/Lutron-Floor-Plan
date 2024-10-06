@@ -4,19 +4,11 @@ import { jsPDF } from 'jspdf';
 import { ExtendedGroup } from '../utils/fabricUtil';
 import { useUploadPdf } from './useUploadPdf';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import {
-	getFirestore,
-	collection,
-	addDoc,
-	serverTimestamp,
-	doc, 
-	updateDoc,
-} from "firebase/firestore";
 import socket from "../../socket";
 
 export const useCanvas = () => {
     const canvasRef = useRef<fabric.Canvas | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(1); // Manages zoom level, initial zoom level set to 1 (100%)
+    const [zoomLevel, setZoomLevel] = useState(1); // Initial zoom level set to 1 (100%)
     const { updatePdfUrl } = useUploadPdf();
     const storage = getStorage();
 
@@ -27,42 +19,40 @@ export const useCanvas = () => {
     useEffect(() => {
         // Check if WebSocket connection is established
         socket.on('connect', () => {
-          console.log('Connected to WebSocket server with ID:', socket.id);
+            console.log('Connected to WebSocket server with ID:', socket.id);
         });
 
-        // Listen for the test event from the server
-        socket.on('test', (message) => {
-            console.log('Message from server:', message);  // Should log 'Hello from the server!'
-        });
-    
         // Clean up the connection when the component unmounts
         return () => {
-          socket.off('connect');
-        };
-      }, []);
-
-      useEffect(() => {
-        // Initialize fabric canvas
-        canvasRef.current = new fabric.Canvas('c', {
-            isDrawingMode: false,
-        });
-
-        // Handle drawing data from other clients
-        socket.on('drawing', (data) => {
-            const fabricCanvas = canvasRef.current;
-            if (fabricCanvas) {
-                // Create a new path from the received drawing data
-                fabric.Path.fromObject(data, function (path: fabric.Path) {
-                    fabricCanvas.add(path);  // Add the received path to the canvas
-                    fabricCanvas.renderAll(); // Render the canvas
-                });
-            }
-        });
-
-        return () => {
-            socket.off('drawing');
+            socket.off('connect');
         };
     }, []);
+
+    useEffect(() => {
+        if (!canvasRef.current) {
+            canvasRef.current = new fabric.Canvas('c', {
+                isDrawingMode: false,
+            });
+        }
+
+        if (socket) {
+            socket.on('drawing', (data) => {
+                const fabricCanvas = canvasRef.current;
+                if (fabricCanvas) {
+                    // Recreate the path from the received data
+                    fabric.Path.fromObject(data, (path: fabric.Path) => {
+                        fabricCanvas.add(path);  // Add the path to the canvas
+                        fabricCanvas.renderAll(); // Re-render the canvas
+                    });
+                }
+            });
+        }
+
+        return () => {
+            if (socket) socket.off('drawing');
+        };
+    }, [socket]);
+
 
     const addImageToCanvas = (imageUrl: string, x: number, y: number) => {
         fabric.Image.fromURL(imageUrl, function (img) {
@@ -81,6 +71,7 @@ export const useCanvas = () => {
         });
     };
 
+    // Icons
     const addLightIconToCanvas = (x: number, y: number, isOriginal = false) => {
         const circle = new fabric.Circle({
             radius: 20,
@@ -133,6 +124,7 @@ export const useCanvas = () => {
             const activeObject = fabricCanvas.getActiveObject();
             if (activeObject) {
                 fabricCanvas.remove(activeObject);
+
             }
         }
     };
@@ -197,29 +189,30 @@ export const useCanvas = () => {
         if (pdf) {
             // Convert the PDF to a Blob
             const pdfBlob = pdf.output('blob');
-            
+
             // Create a reference to where the file should be stored in Firebase Storage
             const storageRef = ref(storage, `floorplans/${documentId}/${originalFileName}`);
 
             try {
                 // Upload the Blob to Firebase Storage
                 const uploadResult = await uploadBytes(storageRef, pdfBlob);
-                
+
                 // Get the download URL
                 const downloadURL = await getDownloadURL(uploadResult.ref);
-                
+
                 // Update the Firestore document with the download URL
                 await updatePdfUrl(documentId, downloadURL);
-                
+
                 alert("Changes successfully saved");
             } catch (err) {
                 console.error("Error uploading PDF to Firebase Storage:", err);
-            }    
+            }
         } else {
             console.error("Failed to generate PDF");
         }
     }
 
+    // Drawing and erasing methods
     const enableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
@@ -227,25 +220,39 @@ export const useCanvas = () => {
             fabricCanvas.freeDrawingBrush.color = 'black'; // Set drawing color
             fabricCanvas.freeDrawingBrush.width = 5; // Set drawing width
             setIsDrawing(true);
-            setIsErasing(false); // Disable erasing if it was active
+            setIsErasing(false);
 
-            // Emit drawing data on path created
-            fabricCanvas.on('path:created', function (event: fabric.IEvent) {
-                const path = event.target as fabric.Path;
-                if (path) {
-                    const serializedPath = path.toObject(['path', 'left', 'top', 'width', 'height', 'fill', 'stroke']);
-                    socket.emit('drawing', serializedPath);  // Emit the path data to the server
-                }
+            // Listen for the end of drawing stroke
+            fabricCanvas.on('mouse:up', () => {
+                endDrawing();  // Call endDrawing when drawing stroke ends
             });
         }
+
     };
 
-    // Disable free drawing mode
     const disableFreeDrawing = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
             fabricCanvas.isDrawingMode = false;
-            setIsDrawing(false);
+        }
+    };
+
+    const endDrawing = () => {
+        const fabricCanvas = canvasRef.current;
+        if (fabricCanvas && socket) {
+            // Get the last drawn path
+            const objects = fabricCanvas.getObjects();
+            const lastObject = objects[objects.length - 1];
+
+            if (lastObject && lastObject instanceof fabric.Path) {
+                // Convert the path to an object format to be sent to the server
+                const serializedPath = lastObject.toObject(['path', 'left', 'top', 'width', 'height', 'fill', 'stroke']);
+
+                // Emit the serialized path data to the server
+                socket.emit('drawing', serializedPath);
+                fabricCanvas.isDrawingMode = false;
+                console.log('Drawing ended, path data sent to socket');
+            }
         }
     };
 
