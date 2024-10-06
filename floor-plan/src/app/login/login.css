@@ -1,141 +1,129 @@
-/* page.module.css */
-
-/* Main container of your app, which includes the sidebar and main content */
-.container {
-  display: flex;
-  height: 100vh; /* Take full height of the viewport */
+html,
+body {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-/* The sidebar styles */
-.sidebar {
-  background: #FFFFFF;
-  padding: 1rem;
-  width: 240px;
-  height: 100vh;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-}
-.sidebar nav {
-  margin-top: 20px; /* Spacing at the top inside the sidebar */
-}
-.navItem {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-.navItem:not(:last-child) {
-  margin-bottom: 10px; /* Spacing between nav items */
+.main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	background: radial-gradient(circle, #1E75BB 0%, #00457C 100%);
 }
 
-.navItem:hover {
-  background-color: #ececec; /* Light grey background on hover */
+.loginBox {
+	background-color: white;
+	border-radius: 12px;
+	padding: 40px 30px;
+	width: 400px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	text-align: center;
 }
-/* Logo style, adjust as necessary */
+
 .lutronLogo {
-  max-width: 80%; /* Adjust the size of the logo */
-  margin-bottom: 2rem;
-  align-self: center; /* Center the logo in the sidebar */
+	margin-bottom: 20px;
 }
 
-/* Navigation buttons within the sidebar */
-.navButton {
-  background: none;
-  border: none;
-  padding: 0.5rem 1rem;
-  margin: 0.5rem 0;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.3s;
+h3 {
+	font-size: 24px;
+	font-weight: 600;
+	margin-bottom: 10px;
 }
 
-.navButton:hover {
-  background-color: #e4e4e4; /* A light grey for hover state */
+p {
+	font-size: 14px;
+	color: #6c6c6c;
+	margin-bottom: 30px;
 }
 
-/* Logout button at the bottom of the sidebar */
-.logoutButton {
-  background: none;
-  border: none;
-  color: #1E75BB;
-  padding: 10px 20px;
-  text-align: left;
-  cursor: pointer;
-}
-
-
-.logoutButton:hover {
-  background-color: #e4e4e4;
-}
-
-/* Main content area */
-.mainContent {
-  flex-grow: 1;
-  padding: 2rem;
-  background-color: #F9F9F9;
-}
-
-/* Search bar at the top of the main content */
-.searchBar {
-  background-color: #FFFFFF;
-  border-radius: 20px;
-  padding: 10px 15px;
-  margin-bottom: 20px; /* Adjust the margin as needed */
-  display: flex;
-  align-items: center;
-}
-
-.searchInput {
-  border: none;
-  outline: none;
-  padding-left: 10px;
-  margin-right: 10px;
-  width: 100%; /* Full width */
-}
-
-/* Button used in your main content area, like the "New" button */
 .button {
-  background-color: #1E75BB; /* Brand color for the button background */
-  color: white; /* White text color */
-  border: none;
-  padding: 0.5rem 1rem;
-  margin-left: 1rem; /* Space it out from other elements */
-  cursor: pointer;
-  border-radius: var(--border-radius);
-  transition: background-color 0.3s;
+	background-color: #1E75BB;
+	color: white;
+	padding: 10px 20px;
+	font-size: 16px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	width: 100%;
 }
 
 .button:hover {
-  background-color: darken(#1E75BB, 10%); /* Darken the button on hover */
+	background-color: #00457C;
 }
 
-/* Specific styles for your prompt text */
-.prompt {
-  color: #7A7A7A; /* Light gray color for the text */
-  margin-left: 20px; /* Give some space from the left */
+.footer {
+	margin-top: 20px;
+	font-size: 12px;
+	color: #6c6c6c;
 }
 
-.newButton {
-  background-color: #1E75BB; /* Assuming you want the button to have the brand color */
-  color: white; /* Text color */
-  border: none; /* No border */
-  box-shadow: none; /* No box-shadow */
-  padding: 10px 20px;
-  font-weight: bold;
-  font-size: 0.875rem;
-  cursor: pointer;
-  border-radius: 22px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  outline: none;
-  transition: background-color 0.3s ease;
+.footer a {
+	color: #00457C;
+	text-decoration: none;
+	margin: 0 10px;
 }
-.newButton:hover {
-  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1); /* larger box-shadow on hover */
-  transform: translateY(-2px); /* slight move up effect on hover */
+
+.footer a:hover {
+	text-decoration: underline;
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+	.card:hover {
+		background: rgba(var(--card-rgb), 0.1);
+		border: 1px solid rgba(var(--card-border-rgb), 0.15);
+	}
+
+	.card:hover span {
+		transform: translateX(4px);
+	}
+}
+
+@media (prefers-reduced-motion) {
+	.card:hover span {
+		transform: none;
+	}
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+	.content {
+		padding: 4rem;
+	}
+
+	.center {
+		padding: 8rem 0 6rem;
+	}
+
+	.center::before {
+		transform: none;
+		height: 300px;
+	}
+
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+	.grid {
+		grid-template-columns: repeat(2, 50%);
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	.vercelLogo {
+		filter: invert(1);
+	}
+}
+
+@keyframes rotate {
+	from {
+		transform: rotate(360deg);
+	}
+
+	to {
+		transform: rotate(0deg);
+	}
 }

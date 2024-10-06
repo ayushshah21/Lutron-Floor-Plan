@@ -16,6 +16,7 @@ import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; 
 
+
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
@@ -417,7 +418,6 @@ export default function Home() {
 					</div>
 				</main>
 			</>
-			)
 		</div>
 	);
 }
