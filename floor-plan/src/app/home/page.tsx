@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
@@ -10,7 +10,11 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Clock, Search, Star, Users } from "lucide-react";
+import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
+
+import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
+import 'pdfjs-dist/build/pdf.worker.entry';
+
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
@@ -29,6 +33,8 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
+	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+
 	const [openSpinner, setOpeningSpinner] = useState(false);
 
 	const [isRenaming, setIsRenaming] = useState(false);
@@ -38,6 +44,55 @@ export default function Home() {
 	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
 	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([ { id: "4", name: "Home" }, ]); // Keeps track of the folder path
+
+
+	// Function to render PDF thumbnail
+	const renderThumbnail = async (pdfUrl: string) => {
+		try {
+			const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+			const page = await pdf.getPage(1); // Get the first page
+			const scale = 0.5;
+			const viewport = page.getViewport({ scale });
+
+			// Create canvas and draw the page as an image
+			const canvas = document.createElement('canvas');
+			const context = canvas.getContext('2d');
+			canvas.height = viewport.height;
+			canvas.width = viewport.width;
+
+			const renderContext = {
+				canvasContext: context!,
+				viewport,
+			};
+
+			await page.render(renderContext).promise;
+
+			// Convert canvas to image URL
+			const thumbnailUrl = canvas.toDataURL();
+			return thumbnailUrl;
+		} catch (error) {
+			console.error('Error rendering PDF thumbnail:', error);
+			return null;
+		}
+	};
+
+	useEffect(() => {
+		const generateThumbnails = async () => {
+			const thumbnailsData: { [key: string]: string } = {};
+			for (const file of floorPlans) {
+				if (file.pdfURL) {
+					const thumbnailUrl = await renderThumbnail(file.pdfURL);
+					if (thumbnailUrl) {
+						thumbnailsData[file.id] = thumbnailUrl;
+					}
+				}
+			}
+			setThumbnails(thumbnailsData);
+		};
+
+		generateThumbnails();
+	}, [floorPlans]);
+
 
 	const signOutWithGoogle = async () => {
 		try {
@@ -213,6 +268,28 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
+	const toggleStar = async (fileId: string) => {
+		const updatedFile = floorPlans.find((file) => file.id === fileId);
+		if (updatedFile) {
+			updatedFile.isStarred = !updatedFile.isStarred; // Toggle starred status
+			await updateFileStatus(fileId, { isStarred: updatedFile.isStarred }); // Update the file's status
+			await fetchFloorPlans(); // Re-fetch the floor plans to update the UI
+		}
+	};
+
+	// Function to update the file's status in Firebase or another database
+	const updateFileStatus = async (fileId: string, updateData: { isStarred: boolean }) => {
+		try {
+			// Assuming you have a Firebase function to update the file metadata
+			await firebase.firestore().collection('floorPlans').doc(fileId).update(updateData);
+		} catch (error) {
+			console.error("Error updating file status:", error);
+		}
+	};
+
+	const starredFiles = floorPlans.filter(file => file.isStarred);
+
+
 	return (
 		<div className={styles.container}>
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
@@ -221,13 +298,19 @@ export default function Home() {
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 					<nav className={styles.navigation} id="navSidebar">
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Users />Shared with me
+							<HomeIcon size={22} /> Home
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Clock color="black" /> Recent
+							< Users size={22} /> Shared with me
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Star /> Starred
+							<Clock color="black" size={22} /> Recent
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
+							<Star size={22} /> Starred
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
+							<Trash2 size={22} /> Recently Deleted
 						</button>
 					</nav>
 					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
@@ -353,24 +436,36 @@ export default function Home() {
 					</form>
 				*/}
 					<div className={styles.fileList}>
-						{floorPlans.map((file: FloorPlanDocument) => (
+						{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
 							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
 								<div className={styles.fileItemTopRow}>
 									<img
-										className={styles.floorPlanLogo}
-										src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-										alt="floor plan logo" />
-									<div className={styles.fileName}>
-										{truncateFloorPlanName(file.name)}
-										<div className={styles.fileNamePopup}>{file.name}</div>
-									</div>
-									<img
-										className={styles.threeDotLogo}
-										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-										alt="three-dots-icon"
-										onClick={() => handleThreeDotPopup(file.id)}
+										src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
+										alt="PDF Thumbnail"
+										className={styles.thumbnail}
+									/*
+									className={styles.threeDotLogo}
+									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									alt="three-dots-icon"
+									onClick={() => handleThreeDotPopup(file.id)}
+									*/
 									/>
+									<div className={styles.fileOptions}>
+										{/* Star Button */}
+										<button className={styles.starButton} onClick={() => toggleStar(file.id)}>
+											<Star color={file.isStarred ? "yellow" : "grey"} />
+										</button>
+										<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
+											<img
+												className={styles.threeDotLogo}
+												src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+												alt="three-dots-icon"
+												onClick={() => handleThreeDotPopup(file.id)}
+											/>
+										</button>
+									</div>
 								</div>
+
 								{showThreeDotPopup && selectedFileId === file.id && (
 									isRenaming && docToRename === file.id ? (
 										<>
@@ -386,7 +481,18 @@ export default function Home() {
 										</div>
 									)
 								)}
-								<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+
+								<p
+									className={styles.fileInfo}>
+									<span className={styles.fileName}>
+										{file.name}
+									</span>
+									<br />
+									{/* Display creator name in a smaller font */}
+									<span className={styles.creatorInfo}>
+										{file.creatorEmail || 'Unknown Creator'}
+									</span>
+								</p>
 							</div>
 						))}
 					</div>
