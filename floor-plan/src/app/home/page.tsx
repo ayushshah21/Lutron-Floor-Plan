@@ -10,14 +10,12 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Clock, Search, Star, Users } from "lucide-react";
-<<<<<<< HEAD
+import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
+
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
 
-=======
 import Spinner from "../components/Spinner";
->>>>>>> main
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -28,17 +26,15 @@ export default function Home() {
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
 	const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
-<<<<<<< HEAD
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 
-=======
 	const [openSpinner, setOpeningSpinner] = useState(false);
->>>>>>> main
 
 	const [isRenaming, setIsRenaming] = useState(false);
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
+
 
 	// Function to render PDF thumbnail
 	const renderThumbnail = async (pdfUrl: string) => {
@@ -178,118 +174,49 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
+	const toggleStar = async (fileId: string) => {
+		const updatedFile = floorPlans.find((file) => file.id === fileId);
+		if (updatedFile) {
+			updatedFile.isStarred = !updatedFile.isStarred; // Toggle starred status
+			await updateFileStatus(fileId, { isStarred: updatedFile.isStarred }); // Update the file's status
+			await fetchFloorPlans(); // Re-fetch the floor plans to update the UI
+		}
+	};
+
+	// Function to update the file's status in Firebase or another database
+	const updateFileStatus = async (fileId: string, updateData: { isStarred: boolean }) => {
+		try {
+			// Assuming you have a Firebase function to update the file metadata
+			await firebase.firestore().collection('floorPlans').doc(fileId).update(updateData);
+		} catch (error) {
+			console.error("Error updating file status:", error);
+		}
+	};
+
+	const starredFiles = floorPlans.filter(file => file.isStarred);
+
+
 	return (
 		<div className={styles.container}>
-<<<<<<< HEAD
-			<aside className={styles.sidebar}>
-				<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
-				<nav className={styles.navigation} id="navSidebar">
-					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						< Users size={22} /> Shared with me
-					</button>
-					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						<Clock color="black" size={22} /> Recent
-					</button>
-					<button className={`${styles.navButton} ${styles.iconButton}`}>
-						<Star size={22} /> Starred
-					</button>
-				</nav>
-				<button className={styles.logoutButton} onClick={signOutWithGoogle}>
-					Logout
-				</button>
-			</aside>
-			<main className={styles.mainContent}>
-				<div className={styles.searchBar}>
-					<Search className={styles.searchIcon} />
-					<input
-						type="text"
-						placeholder="Search floor plans"
-						className={styles.searchInput}
-					/>
-				</div>
-				<form>
-					<input
-						type="file"
-						onChange={uploadFloorplan}
-						accept="application/pdf"
-						id="fileInput"
-						style={{ display: "none" }} // Hide the default file input
-					/>
-					<button
-						className={styles.button}
-						id="importButton"
-						onClick={(e) => {
-							e.preventDefault(); // Prevent form submission
-							document.getElementById("fileInput")?.click(); // Programmatically click the file input
-						}}
-						disabled={uploading}
-					>
-						{uploading ? "Uploading..." : "+ New"}
-					</button>
-				</form>
-				<div className={styles.fileList}>
-					{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
-						<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
-							<div className={styles.fileItemTopRow}>
-
-								<img
-									src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
-									alt="PDF Thumbnail"
-									className={styles.thumbnail}
-								/*
-									className={styles.threeDotLogo}
-									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-									alt="three-dots-icon"
-									onClick={() => handleThreeDotPopup(file.id)}
-									*/
-
-								/>
-								<img
-									className={styles.threeDotLogo}
-									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-									alt="three-dots-icon"
-									onClick={() => handleThreeDotPopup(file.id)}
-								/>
-							</div>
-							{showThreeDotPopup && selectedFileId === file.id && (
-								isRenaming && docToRename === file.id ? (
-									<>
-										<input value={newName} onChange={(e) => setNewName(e.target.value)} />
-										<button onClick={submitNewName}>Save</button>
-										<button onClick={cancelRenaming}>Cancel</button>
-									</>
-								) :
-									<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-										<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
-										<button onClick={() => handleDelete(file.id)}>Delete</button>
-										<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-									</div>
-							)}
-							<p>{file.name 
-							//+ " Creator: " + file.creatorEmail || 'Unknown Creator'
-							}</p>
-
-						</div>
-					))}
-				</div>
-				<div className={styles.prompt}>
-					Use the “New” button to upload a file
-				</div>
-			</main>
-=======
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
 			<>
 				<aside className={styles.sidebar}>
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 					<nav className={styles.navigation} id="navSidebar">
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Users />Shared with me
+							<HomeIcon size={22} /> Home
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Clock color="black" /> Recent
+							< Users size={22} /> Shared with me
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
-							<Star /> Starred
+							<Clock color="black" size={22} /> Recent
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
+							<Star size={22} /> Starred
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
+							<Trash2 size={22} /> Recently Deleted
 						</button>
 					</nav>
 					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
@@ -326,24 +253,36 @@ export default function Home() {
 						</button>
 					</form>
 					<div className={styles.fileList}>
-						{floorPlans.map((file: FloorPlanDocument) => (
+						{floorPlans.map((file: FloorPlanDocument) => ( // Corrected to use 'FloorPlanDocument' from the state
 							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
 								<div className={styles.fileItemTopRow}>
 									<img
-										className={styles.floorPlanLogo}
-										src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
-										alt="floor plan logo" />
-									<div className={styles.fileName}>
-										{truncateFloorPlanName(file.name)}
-										<div className={styles.fileNamePopup}>{file.name}</div>
-									</div>
-									<img
-										className={styles.threeDotLogo}
-										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-										alt="three-dots-icon"
-										onClick={() => handleThreeDotPopup(file.id)}
+										src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
+										alt="PDF Thumbnail"
+										className={styles.thumbnail}
+									/*
+									className={styles.threeDotLogo}
+									src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									alt="three-dots-icon"
+									onClick={() => handleThreeDotPopup(file.id)}
+									*/
 									/>
+									<div className={styles.fileOptions}>
+										{/* Star Button */}
+										<button className={styles.starButton} onClick={() => toggleStar(file.id)}>
+											<Star color={file.isStarred ? "yellow" : "grey"} />
+										</button>
+										<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
+											<img
+												className={styles.threeDotLogo}
+												src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+												alt="three-dots-icon"
+												onClick={() => handleThreeDotPopup(file.id)}
+											/>
+										</button>
+									</div>
 								</div>
+
 								{showThreeDotPopup && selectedFileId === file.id && (
 									isRenaming && docToRename === file.id ? (
 										<>
@@ -359,7 +298,18 @@ export default function Home() {
 										</div>
 									)
 								)}
-								<p>{"Creator: " + file.creatorEmail || 'Unknown Creator'}</p>
+
+								<p
+									className={styles.fileInfo}>
+									<span className={styles.fileName}>
+										{file.name}
+									</span>
+									<br />
+									{/* Display creator name in a smaller font */}
+									<span className={styles.creatorInfo}>
+										{file.creatorEmail || 'Unknown Creator'}
+									</span>
+								</p>
 							</div>
 						))}
 					</div>
@@ -368,8 +318,6 @@ export default function Home() {
 					</div>
 				</main>
 			</>
-			)
->>>>>>> main
-		</div>
+		</div >
 	);
 }	

@@ -9,12 +9,9 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
-<<<<<<< HEAD
 import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen } from "lucide-react";
 
-=======
 import Spinner from "../components/Spinner";
->>>>>>> main
 
 // Needed for pdfjs to work
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -190,7 +187,6 @@ export default function Editor() {
 
 	return (
 		<div>
-<<<<<<< HEAD
 			<div className="toolbar">
 				<button className="toolbar-button" onClick={handleShare} aria-label="Share">
 					<Share2 size={24} />
@@ -222,7 +218,6 @@ export default function Editor() {
 				/>
 				<div className="navbarBrand"></div>
 			</nav>
-=======
 			{openSpinner && <Spinner />}
 			<img
 				className="lutronLogo"
@@ -230,7 +225,6 @@ export default function Editor() {
 				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
 				alt="Lutron Electronics Logo"
 			/>
->>>>>>> main
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
 				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
