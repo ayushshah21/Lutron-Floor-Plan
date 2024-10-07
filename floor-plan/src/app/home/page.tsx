@@ -49,20 +49,18 @@ export default function Home() {
 
 	const handleFileChange = async (event: any) => {
 		const file = event.target.files[0];
-		const url = URL.createObjectURL(file);
 		if (file && file.type === "application/pdf") {
 			setPdfFile(file);
-			const pdfURL = await uploadPdf(file, selectedFolder || "0"); // Pass selected folder ID or default to '0'
-			if (pdfURL) {
-				router.push(`/editor?pdf=${(url)}`); // Redirect to the editor page with the PDF URL
+			const result = await uploadPdf(file); // Upload the PDF and get both pdfURL and documentId
+			if (result) {
+				const { pdfURL, documentId } = result;
+				// Redirect to the editor page, passing the PDF URL and documentId
+				router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentId}&fileName=${encodeURIComponent(file.name)}`);
 			} else {
 				alert("Failed to upload PDF.");
 			}
-		} else {
-			alert("Please select a valid PDF file.");
 		}
 	};
-
 	
 	// Opening existing floor plans
 	const openFloorplan = (pdfURL: string, documentID: string, fileName: string) => {
@@ -70,7 +68,7 @@ export default function Home() {
 		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}`);
 	};
 
-		// Function to update the folderID of a file in Firestore
+	// Function to update the folderID of a file in Firestore
 	const updateFileFolder = async (fileId: string, folderID: string) => {
 		try {
 			const fileRef = doc(db, "FloorPlans", fileId); // Reference to the specific file document
@@ -117,7 +115,6 @@ export default function Home() {
 		event.dataTransfer.setData('fileId', fileId); // Set the dragged file ID
 	};
 
-
 	const handleBreadcrumbClick = (folderId: string) => {
 		// Find the folder's index in the folderPath array
 		const clickedFolderIndex = folderPath.findIndex(folder => folder.id === folderId);
@@ -147,7 +144,6 @@ export default function Home() {
 		}
 	};
 
-
 	const handleCreateFolder = async () => {
 		if (folderName.trim()) {
 		  const parentFolderId = selectedFolder || "4";
@@ -159,25 +155,6 @@ export default function Home() {
 		}
 	};
 	  
-	const handleUpload = async () => {
-		await uploadPdf(pdfFile);
-		if (error) {
-		  alert(error);
-		} else {
-		  alert("PDF uploaded successfully!");
-		}
-	};
-
-
-	const handleFileOpen = (pdfURL: string) => {
-		//window.open(pdfURL, '_blank');
-		//router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
-
-		window.open(`/editor?pdf=${encodeURIComponent(pdfURL)}`, '_blank');
-		// router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}`);
-	};
-
-
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
 	const handleDelete = async (id: string) => {
