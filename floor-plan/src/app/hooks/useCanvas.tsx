@@ -235,6 +235,10 @@ export const useCanvas = () => {
     addIconToCanvas("/door.jpg", x, y, isOriginal);
   };
 
+  const addRightArrowIconToCanvas = (x: number, y: number, isOriginal = false) => {
+    addIconToCanvas("/right-arrow.png", x, y, isOriginal);
+  };
+
   return {
     canvasRef,
     addLightIconToCanvas,
@@ -256,5 +260,6 @@ export const useCanvas = () => {
     addSecurityCameraIconToCanvas,
     addWallIconToCanvas,
     addDoorIconToCanvas,
+    addRightArrowIconToCanvas,
   };
 };
