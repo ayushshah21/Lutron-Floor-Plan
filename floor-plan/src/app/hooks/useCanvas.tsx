@@ -239,6 +239,26 @@ export const useCanvas = () => {
     addIconToCanvas("/right-arrow.png", x, y, isOriginal);
   };
 
+  const addTextbox = () => {
+    const fabricCanvas = canvasRef.current;
+    if (fabricCanvas) {
+      const canvasCenter = fabricCanvas.getCenter();
+      const text = new fabric.IText('Edit this text', {
+        left: canvasCenter.left,
+        top: canvasCenter.top,
+        fontFamily: 'Arial',
+        fill: '#000000',
+        fontSize: 20,
+        originX: 'center',
+        originY: 'center',
+        selectable: true,
+      });
+      fabricCanvas.add(text);
+      fabricCanvas.setActiveObject(text);
+      fabricCanvas.renderAll();
+    }
+  };
+
   return {
     canvasRef,
     addLightIconToCanvas,
@@ -261,5 +281,6 @@ export const useCanvas = () => {
     addWallIconToCanvas,
     addDoorIconToCanvas,
     addRightArrowIconToCanvas,
+    addTextbox,
   };
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faPlug, 
-  faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser, faVideo, faBorderAll, faDoorOpen, faArrowRight 
+  faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser, faVideo, faBorderAll, faDoorOpen, faArrowRight, faFont 
 } from '@fortawesome/free-solid-svg-icons';
 
 interface ToolbarProps {
@@ -26,6 +26,7 @@ interface ToolbarProps {
   addWallIcon: () => void;
   addDoorIcon: () => void;
   addRightArrowIcon: () => void;
+  addTextbox: () => void;
 }
 
 const EditorToolbar: React.FC<ToolbarProps> = ({
@@ -49,6 +50,7 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
   addWallIcon,
   addDoorIcon,
   addRightArrowIcon,
+  addTextbox,
 }) => {
   return (
     <nav className="sideToolBar" aria-label="Editor tools">
@@ -85,6 +87,7 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
         <li><button onClick={addWallIcon} aria-label="Add Wall Icon"><FontAwesomeIcon icon={faBorderAll} aria-hidden="true" /> Add Wall</button></li>
         <li><button onClick={addDoorIcon} aria-label="Add Door Icon"><FontAwesomeIcon icon={faDoorOpen} aria-hidden="true" /> Add Door</button></li>
         <li><button onClick={addRightArrowIcon} aria-label="Add Right Arrow Icon"><FontAwesomeIcon icon={faArrowRight} aria-hidden="true" /> Add Right Arrow</button></li>
+        <li><button onClick={addTextbox} aria-label="Add Textbox"><FontAwesomeIcon icon={faFont} aria-hidden="true" /> Add Textbox</button></li>
       </ul>
     </nav>
   );

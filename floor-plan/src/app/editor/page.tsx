@@ -34,7 +34,8 @@ export default function Editor() {
     addSecurityCameraIconToCanvas,
     addWallIconToCanvas,
     addDoorIconToCanvas,
-    addRightArrowIconToCanvas
+    addRightArrowIconToCanvas,
+    addTextbox
   } = useCanvas();
   
   const [pdfUrl, setPdfUrl] = useState<string>("");
@@ -45,7 +46,6 @@ export default function Editor() {
 
   // Function to add icons at a default position
   const addIconAtDefaultPosition = (addIconFunction: (x: number, y: number) => void) => {
-    // You can adjust these default coordinates as needed
     const defaultX = 450;
     const defaultY = 300;
     addIconFunction(defaultX, defaultY);
@@ -172,6 +172,7 @@ export default function Editor() {
         addWallIcon={() => addIconAtDefaultPosition(addWallIconToCanvas)}
         addDoorIcon={() => addIconAtDefaultPosition(addDoorIconToCanvas)}
         addRightArrowIcon={() => addIconAtDefaultPosition(addRightArrowIconToCanvas)}
+        addTextbox={addTextbox}
       />
 
       <div className="container">
