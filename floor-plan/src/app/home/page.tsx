@@ -16,6 +16,9 @@ import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; 
 
+/*
+Back B
+*/
 
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
