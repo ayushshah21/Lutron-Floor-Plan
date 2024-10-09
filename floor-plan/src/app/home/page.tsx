@@ -18,6 +18,7 @@ import { db } from "../../../firebase";
 
 /*
 Back B
+Delete
 */
 
 export default function Home() {
