@@ -358,18 +358,32 @@
 }
 
 .breadcrumb {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  font-size: 18px; /* Increase the size */
+  padding: 0px; /* Add padding */
+  font-weight: bold;
+  margin-bottom: 20px; /* Adds space below the breadcrumb */
+  font-family: 'Arial', sans-serif; /* Set a common font family */}
 
 .breadcrumbButton {
   background: none;
   border: none;
-  color: #007bff;
+  color: #1E75BB; /* Same color as your "New" button */
+
+  font-size: 18px; /* Make buttons larger */
+  padding: 5px 10px;
   cursor: pointer;
+  font-weight: bold; /* Ensure all buttons have the same weight */
+  font-family: 'Arial', sans-serif; /* Match font family */
+}
+.breadcrumbLast {
+  font-size: 18px;
+  padding: 5px 10px;
+  font-weight: bold; /* Make sure the last item is bold too */
+  font-family: 'Arial', sans-serif; /* Use the same font family */
+  cursor: default;
 }
 
 .breadcrumbButton:hover {
   text-decoration: underline;
+  color: #2378B5; /* Darker blue on hover, same as button hover */
 }
