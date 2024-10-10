@@ -244,25 +244,26 @@ export default function Home() {
 					<div className={styles.breadcrumb}>
 						{folderPath.map((folder, index) => (
 							<span key={folder.id}>
-							<button
+							{index < folderPath.length - 1 ? (
+								<button
 								className={styles.breadcrumbButton}
 								onClick={() => handleBreadcrumbClick(folder.id)}
 								onDragOver={(e) => e.preventDefault()}  
 								onDrop={(e) => handleDropOnBreadcrumb(e, folder.id)}  
-							>
+								>
 								{folder.name}
-							</button>
+								</button>
+							) : (
+								<span className={styles.breadcrumbLast}>{folder.name}</span>
+							)}
 							{index < folderPath.length - 1 && ' / '} {/* Display a separator between items */}
 							</span>
 						))}
 					</div>
+
 						{/* Back Button and Folder Name Display */}
 						{folderPath.length > 1 && (
 							<div className={styles.folderNavigation}>
-							<button className={styles.backButton} onClick={handleBackClick}>
-								Back to {folderPath[folderPath.length - 2].name}
-							</button>
-							<span>Current Folder: {folderPath[folderPath.length - 1].name}</span>
 							</div>
 						)}
 					<div className={styles.searchBar}>
