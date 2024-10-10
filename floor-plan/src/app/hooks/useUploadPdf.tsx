@@ -30,7 +30,7 @@ export const useUploadPdf = () => {
 		return floorPlanName;
 	};
 
-	const uploadPdf = async (pdfFile: File | null): Promise<{ pdfURL: string, documentId: string } | null> => {
+	const uploadPdf = async (pdfFile: File | null, folderID: string = "0"): Promise<{ pdfURL: string, documentId: string } | null> => {
 		if (!pdfFile) {
 			console.log("No file provided for upload.");
 			setError("No PDF file selected.");
@@ -61,6 +61,7 @@ export const useUploadPdf = () => {
 				updatedAt: serverTimestamp(),
 				pdfURL,
 				name: floorPlanName, 
+				folderID,
 			});
 			const documentId = docRef.id;
 
