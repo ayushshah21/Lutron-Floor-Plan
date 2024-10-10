@@ -51,7 +51,9 @@ export default function Home() {
 		const file = event.target.files[0];
 		if (file && file.type === "application/pdf") {
 			setPdfFile(file);
-			const result = await uploadPdf(file); // Upload the PDF and get both pdfURL and documentId
+
+			const folderId = selectedFolder || "4"; // Default to "4" (Home folder) if no folder is selected
+			const result = await uploadPdf(file, folderId); // Upload the PDF and get both pdfURL and documentId
 			if (result) {
 				const { pdfURL, documentId } = result;
 				// Redirect to the editor page, passing the PDF URL and documentId
