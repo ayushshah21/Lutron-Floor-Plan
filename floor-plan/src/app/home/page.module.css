@@ -7,6 +7,45 @@
   /* Take full height of the viewport */
 }
 
+.thumbnail {
+  width: 100px;
+  height: auto;
+  object-fit:cover;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+
+.fileInfo {
+  text-align:left;
+  margin-top: 10px; /* Adjust margin as needed */
+}
+
+.fileName {
+  font-weight: bold;
+  font-size: 16px; /* Adjust size as needed */
+}
+
+.creatorInfo {
+  font-size: 12px;
+  color: #666; /* Light grey color */
+}
+
+.fileOptions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+
+.starButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 8px; /* Space between star and three-dot button */
+}
+
 /* The sidebar styles */
 .sidebar {
   background: #FFFFFF;
@@ -49,6 +88,12 @@
   margin-bottom: 2rem;
   align-self: center;
   /* Center the logo in the sidebar */
+}
+
+.threeDotButton {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .threeDotLogo {
