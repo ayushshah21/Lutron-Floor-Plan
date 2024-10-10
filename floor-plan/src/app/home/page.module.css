@@ -291,6 +291,23 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.cancelButton {
+  background-color: #f44336; /* Red color for cancel button */
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  margin-left: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cancelButton:hover {
+  background-color: #d32f2f;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 /* Style for the new options section */
 .newOptionsSection {
   margin-bottom: 20px;

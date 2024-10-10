@@ -156,11 +156,20 @@ export default function Home() {
 		  await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
 		  setFolderName(''); 
 		  setShowNewFolderInput(false);  // Hide the new folder input after creation
+		  setShowNewOptions(false);      // Ensure the dropdown is also hidden
 		} else {
 		  alert("Please enter a folder name.");
 		}
 	};
 	  
+    // Function to cancel folder creation
+    const handleCancelFolder = () => {
+        setFolderName(''); // Reset folder name input
+        setShowNewFolderInput(false); // Hide the folder input
+        setShowNewOptions(false); // Also hide the dropdown menu if necessary
+    };
+
+
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
 	const handleDelete = async (id: string) => {
@@ -289,7 +298,12 @@ export default function Home() {
 								<button onClick={() => document.getElementById("fileInput")?.click()}>
 									New File
 								</button>
-							<button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
+							<button 
+								onClick={() => {
+									setShowNewOptions(false); // Close the dropdown
+									setShowNewFolderInput(true); // Show the folder input after closing dropdown
+								}}
+								>
 								New Folder
 							</button>
 					  			{/* Hidden input field for file selection */}
@@ -304,18 +318,22 @@ export default function Home() {
 
 						{showNewFolderInput && (
 							<div className={styles.newFolderInput}>
-							<input
-								type="text"
-								placeholder="Enter folder name"
-								value={folderName}
-								onChange={(e) => setFolderName(e.target.value)}
-								className={styles.input}
-							/>
-							<button onClick={handleCreateFolder} className={styles.button}>
-								Create Folder
-							</button>
+								<input
+									type="text"
+									placeholder="Enter folder name"
+									value={folderName}
+									onChange={(e) => setFolderName(e.target.value)}
+									className={styles.input}
+								/>
+								<button onClick={handleCreateFolder} className={styles.button}>
+									Create Folder
+								</button>
+								<button onClick={handleCancelFolder} className={styles.cancelButton}>
+									Cancel
+								</button>
 							</div>
 						)}
+
 						</div>
 
 						
