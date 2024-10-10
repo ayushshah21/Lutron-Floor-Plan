@@ -1,6 +1,6 @@
 "use client";
 import { fabric } from "fabric";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { pdfjs } from "react-pdf";
 import { getDocument } from "pdfjs-dist";
@@ -9,47 +9,95 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
+import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen } from "lucide-react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 export default function Editor() {
-  const { 
-    canvasRef, 
-    addRectangleToCanvas, 
-    addLightIconToCanvas, 
-    addFixtureIconToCanvas, 
-    addDeviceIconToCanvas, 
-    addSensorIconToCanvas,
-    deleteSelectedObject, 
-    zoomIn, 
-    zoomOut, 
-    exportCanvasAsPDF, 
-    saveFloorPlanChanges, 
-    enableFreeDrawing, 
-    disableFreeDrawing, 
-    enableEraser, 
-    disableEraser, 
-    isDrawing, 
-    isErasing,
-    addSecurityCameraIconToCanvas,
-    addWallIconToCanvas,
-    addDoorIconToCanvas,
-    addRightArrowIconToCanvas,
-    addTextbox
-  } = useCanvas();
-  
-  const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [documentID, setDocumentID] = useState<string>("");
-  const [fileName, setFileName] = useState<string>("");	
-  const searchParams = useSearchParams();
-  const router = useRouter();
+	const {
+		canvasRef,
+		addRectangleToCanvas,
+		addLightIconToCanvas,
+		addFixtureIconToCanvas,
+		addDeviceIconToCanvas,
+		addSensorIconToCanvas,
+		deleteSelectedObject,
+		zoomIn,
+		zoomOut,
+		exportCanvasAsPDF,
+		saveFloorPlanChanges,
+		enableFreeDrawing,
+		disableFreeDrawing,
+		enableEraser,
+		disableEraser,
+		isDrawing,
+		isErasing,
+		addSecurityCameraIconToCanvas,
+		addWallIconToCanvas,
+		addDoorIconToCanvas,
+		addRightArrowIconToCanvas,
+		addTextbox
+	} = useCanvas();
+	const [pdfUrl, setPdfUrl] = useState<string>("");
+	const [documentID, setDocumentID] = useState<string>("");
+	const [fileName, setFileName] = useState<string>("");
+	const searchParams = useSearchParams();
+	const router = useRouter();
+	const [isCollaboratorsOpen, setCollaboratorsOpen] = useState(false);
+	const pdfContainerRef = useRef<HTMLDivElement>(null);
 
-  // Function to add icons at a default position
-  const addIconAtDefaultPosition = (addIconFunction: (x: number, y: number) => void) => {
-    const defaultX = 450;
-    const defaultY = 300;
-    addIconFunction(defaultX, defaultY);
-  };
+	const handleShare = () => {
+		const shareData = {
+			title: 'Editor page',
+			text: 'Check out this floor plan!',
+			url: window.location.href,
+		};
+
+		if (navigator.share) {
+			navigator.share(shareData)
+				.then(() => console.log('Shared sucessfully'))
+				.catch((error) => console.log('Error sharing', error));
+
+		} else {
+			alert('wed share API is not supported in this browser')
+		}
+	};
+
+	const handleUserMenu = () => {
+		console.log("User Profile clicked");
+		// Logic to open user profile or user settings dropdown menu
+	};
+
+	const handleSearchSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		// Handle the search submission here
+		console.log("Search submitted");
+	};
+
+	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// Handle the input change here
+		console.log(e.target.value);
+	};
+
+	const handleFullscreen = () => {
+		const pdfContainer = pdfContainerRef.current;
+		if (!document.fullscreenElement && pdfContainer) {
+			pdfContainer.requestFullscreen().catch((err) => {
+				console.log(`Error attempting to enable fullscreen mode: ${err.message}`);
+			});
+		} else {
+			if (document.exitFullscreen) {
+				document.exitFullscreen();
+			}
+		}
+	};
+
+	// Function to add icons at a default position
+	const addIconAtDefaultPosition = (addIconFunction: (x: number, y: number) => void) => {
+		const defaultX = 450;
+		const defaultY = 300;
+		addIconFunction(defaultX, defaultY);
+	};
 
 	// Extract pdf url from search params
 	useEffect(() => {
@@ -143,43 +191,69 @@ export default function Editor() {
 	}, [pdfUrl]);
 
 	return (
-    <div>
-      <img
-        className="lutronLogo"
-        onClick={() => router.push('/home')}
-        src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
-        alt="Lutron Electronics Logo"
-      />
+		<div>
+			<div className="toolbar">
+				<button className="toolbar-button" onClick={handleShare} aria-label="Share">
+					<Share2 size={24} />
+					Share
+				</button>
+				<button className="toolbar-button" onClick={handleUserMenu} aria-label="User Profile">
+					<User size={24} />
+				</button>
+			</div>
+			<div className="search-bar-container">
+				<form className="search-form" onSubmit={handleSearchSubmit}>
+					<input
+						type="text"
+						className="search-input"
+						placeholder="Search..."
+						onChange={handleSearchInputChange}
+					/>
+					<button className="search-button">
+						<Search size={17} />
+					</button>
+				</form>
+			</div>
+			<img
+				className="lutronLogo"
+				onClick={() => router.push('/home')}
+				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
+				alt="Lutron Electronics Logo"
+			/>
+			<EditorToolbar
+				exportCanvasAsPDF={exportCanvasAsPDF}
+				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
+				zoomIn={zoomIn}
+				zoomOut={zoomOut}
+				addRectangleToCanvas={addRectangleToCanvas}
+				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
+				addFixtureIcon={() => addIconAtDefaultPosition(addFixtureIconToCanvas)}
+				addDeviceIcon={() => addIconAtDefaultPosition(addDeviceIconToCanvas)}
+				addSensorIcon={() => addIconAtDefaultPosition(addSensorIconToCanvas)}
+				deleteSelectedObject={deleteSelectedObject}
+				enableFreeDrawing={enableFreeDrawing}
+				disableFreeDrawing={disableFreeDrawing}
+				enableEraser={enableEraser}
+				disableEraser={disableEraser}
+				isDrawing={isDrawing}
+				isErasing={isErasing}
+				addSecurityCameraIcon={() => addIconAtDefaultPosition(addSecurityCameraIconToCanvas)}
+				addWallIcon={() => addIconAtDefaultPosition(addWallIconToCanvas)}
+				addDoorIcon={() => addIconAtDefaultPosition(addDoorIconToCanvas)}
+				addRightArrowIcon={() => addIconAtDefaultPosition(addRightArrowIconToCanvas)}
+				addTextbox={addTextbox}
+			/>
 
-      <EditorToolbar
-        exportCanvasAsPDF={exportCanvasAsPDF}
-        saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
-        zoomIn={zoomIn}
-        zoomOut={zoomOut}
-        addRectangleToCanvas={addRectangleToCanvas}
-        addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
-        addFixtureIcon={() => addIconAtDefaultPosition(addFixtureIconToCanvas)}
-        addDeviceIcon={() => addIconAtDefaultPosition(addDeviceIconToCanvas)}
-        addSensorIcon={() => addIconAtDefaultPosition(addSensorIconToCanvas)}
-        deleteSelectedObject={deleteSelectedObject}
-        enableFreeDrawing={enableFreeDrawing}
-        disableFreeDrawing={disableFreeDrawing}
-        enableEraser={enableEraser}
-        disableEraser={disableEraser}
-        isDrawing={isDrawing}
-        isErasing={isErasing}
-        addSecurityCameraIcon={() => addIconAtDefaultPosition(addSecurityCameraIconToCanvas)}
-        addWallIcon={() => addIconAtDefaultPosition(addWallIconToCanvas)}
-        addDoorIcon={() => addIconAtDefaultPosition(addDoorIconToCanvas)}
-        addRightArrowIcon={() => addIconAtDefaultPosition(addRightArrowIconToCanvas)}
-        addTextbox={addTextbox}
-      />
-
-      <div className="container">
-        <div className="canvas-container">
-          <canvas id="canvas"></canvas>
-        </div>
-      </div>
-    </div>
-  );
+			<div className="container">
+				<div className="canvas-container">
+					<canvas id="canvas"></canvas>
+				</div>
+			</div>
+			<div className="fullscreen-bar">
+				<button onClick={handleFullscreen} className="fullscreen-button">
+					<Fullscreen size={24}/>
+				</button>
+			</div>
+		</div>
+	);
 }
