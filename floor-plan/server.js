@@ -15,12 +15,6 @@ app.prepare().then(() => {
 	});
 	  
 	io.on('connection', (socket) => {
-		// Listen for 'drawing' event from clients
-		socket.on('drawing', (data) => {
-			// Broadcast drawing data to all other clients
-			socket.broadcast.emit('drawing', data);
-		});
-
 		socket.on('disconnect', () => {
 			console.log(`${socket.id} has disconnected`);
 		});

@@ -36,20 +36,21 @@ export const useCanvas = () => {
         }
 
         if (socket) {
-            socket.on('drawing', (data) => {
+            socket.on('addObject', (data) => {
                 const fabricCanvas = canvasRef.current;
                 if (fabricCanvas) {
-                    // Recreate the path from the received data
-                    fabric.Path.fromObject(data, (path: fabric.Path) => {
-                        fabricCanvas.add(path);  // Add the path to the canvas
-                        fabricCanvas.renderAll(); // Re-render the canvas
-                    });
+                    fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
+                        objects.forEach((obj) => {
+                            fabricCanvas.add(obj);  // Add the object to the canvas
+                            fabricCanvas.renderAll(); // Re-render the canvas
+                        });
+                    }, '');  // Pass an empty string for now as the reviver
                 }
             });
         }
-
+        
         return () => {
-            if (socket) socket.off('drawing');
+            if (socket) socket.off('addObject');
         };
     }, [socket]);
 
@@ -99,6 +100,9 @@ export const useCanvas = () => {
 
         if (canvasRef.current) {
             canvasRef.current.add(group);
+            // Emit the object addition to the server
+            const serializedGroup = group.toObject();
+            socket.emit('addObject', serializedGroup);
         }
     };
 
@@ -115,6 +119,9 @@ export const useCanvas = () => {
                 opacity: 0.9,
             });
             fabricCanvas.add(rect);
+             // Emit the object addition to the server
+            const serializedRect = rect.toObject();
+            socket.emit('addObject', serializedRect);
         }
     };
 
@@ -249,7 +256,7 @@ export const useCanvas = () => {
                 const serializedPath = lastObject.toObject(['path', 'left', 'top', 'width', 'height', 'fill', 'stroke']);
 
                 // Emit the serialized path data to the server
-                socket.emit('drawing', serializedPath);
+                socket.emit('addObject', serializedPath);
                 fabricCanvas.isDrawingMode = false;
                 console.log('Drawing ended, path data sent to socket');
             }
