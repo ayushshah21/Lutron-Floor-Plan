@@ -225,13 +225,15 @@
   margin: 10px;
   border-radius: 12px;
   background-color: #FFFFFF;
+  border: 2px solid rgb(82, 157, 242, .3);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .fileItem:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.19);
-  /* Add shadow for depth */
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.19);
   transform: scale(1.05);
-  /* Slightly increase size */
+  border-color: rgba(0, 87, 184, 0.3); 
 }
 
 .fileIcon {
@@ -244,7 +246,6 @@
 
 .fileName {
   text-align: center;
-  /* Center-align the file name */
 }
 
 .fileNamePopup {
