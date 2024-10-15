@@ -17,8 +17,8 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; 
 
 /*
-Back B
-Delete
+Drag and drop
+Folder buttons
 */
 
 export default function Home() {
@@ -379,8 +379,14 @@ export default function Home() {
 				*/}
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
-							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
-								<div className={styles.fileItemTopRow}>
+							<div 
+								key={file.id} 
+								className={styles.fileItem} 
+								draggable
+								onDragStart={(e) => handleDragStart(e, file.id)}  // Call handleDragStart when dragging starts
+								onMouseLeave={handleMouseLeave}
+								>
+							<div className={styles.fileItemTopRow}>
 									<img
 										className={styles.floorPlanLogo}
 										src="https://t4.ftcdn.net/jpg/02/48/67/69/360_F_248676911_NFIOCDSZuImzKaFVsml79S0ooEnyyIUB.jpg"
