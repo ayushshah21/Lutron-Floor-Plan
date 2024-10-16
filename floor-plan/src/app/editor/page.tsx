@@ -9,7 +9,7 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
-import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen } from "lucide-react";
+import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen, ZoomIn, ZoomOut } from "lucide-react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -223,8 +223,6 @@ export default function Editor() {
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
 				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
-				zoomIn={zoomIn}
-				zoomOut={zoomOut}
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
 				addFixtureIcon={() => addIconAtDefaultPosition(addFixtureIconToCanvas)}
@@ -249,8 +247,14 @@ export default function Editor() {
 					<canvas id="canvas"></canvas>
 				</div>
 			</div>
-			<div className="fullscreen-bar">
-				<button onClick={handleFullscreen} className="fullscreen-button">
+			<div className="bottom-right-controls">
+				<button onClick={zoomIn} className="control-button" aria-label="Zoom In">
+					<ZoomIn size={24}/>
+				</button>
+				<button onClick={zoomOut} className="control-button" aria-label="Zoom Out">
+					<ZoomOut size={24}/>
+				</button>
+				<button onClick={handleFullscreen} className="control-button" aria-label="Toggle Fullscreen">
 					<Fullscreen size={24}/>
 				</button>
 			</div>

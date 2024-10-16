@@ -95,33 +95,52 @@
     /* Focus outline similar to accessibility */
 }
 
-.fullscreen-bar {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    /*width: 100%;*/
-    background-color: #f8f9fa;
-    padding: 10px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    /* Keeps it on top of other elements */
+.bottom-right-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
 }
 
-/* Fullscreen button */
+.control-button {
+  background-color: #ffffff;
+  border: 2px solid #0057B8;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.control-button svg {
+  color: #0057B8;
+  transition: color 0.3s ease;
+}
+
+.control-button:hover {
+  background-color: #0057B8;
+}
+
+.control-button:hover svg {
+  color: #ffffff;
+}
+
+.control-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #0057B8;
+}
+
+/* Remove the previous fullscreen-bar styles */
+.fullscreen-bar,
 .fullscreen-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #0056b3;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  display: none;
 }
 
-.fullscreen-button:hover {
-    background-color: #144a75;
-}
 .canvasBox {
     position: absolute;
     height: 560px;

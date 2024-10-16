@@ -8,8 +8,6 @@ import {
 interface ToolbarProps {
   exportCanvasAsPDF: () => void;
   saveFloorPlanChanges: () => void;
-  zoomIn: () => void;
-  zoomOut: () => void;
   addRectangleToCanvas: () => void;
   addLightIcon: () => void;
   addFixtureIcon: () => void;
@@ -32,8 +30,6 @@ interface ToolbarProps {
 const EditorToolbar: React.FC<ToolbarProps> = ({
   exportCanvasAsPDF,
   saveFloorPlanChanges,
-  zoomIn,
-  zoomOut,
   addRectangleToCanvas,
   addLightIcon,
   addFixtureIcon,
@@ -57,8 +53,6 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
       <ul>
         <li><button onClick={exportCanvasAsPDF} aria-label="Export as PDF"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Export as PDF</button></li>
         <li><button onClick={saveFloorPlanChanges} aria-label="Save Changes"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Save Changes</button></li>
-        <li><button onClick={zoomIn} aria-label="Zoom In"><FontAwesomeIcon icon={faSearchPlus} aria-hidden="true" /> Zoom In</button></li>
-        <li><button onClick={zoomOut} aria-label="Zoom Out"><FontAwesomeIcon icon={faSearchMinus} aria-hidden="true" /> Zoom Out</button></li>
         <li><button onClick={addRectangleToCanvas} aria-label="Add Rectangle"><FontAwesomeIcon icon={faSquare} aria-hidden="true" /> Add Rectangle</button></li>
         <li><button onClick={addLightIcon} aria-label="Add Light Icon"><FontAwesomeIcon icon={faLightbulb} aria-hidden="true" /> Add Light Icon</button></li>
         <li><button onClick={addFixtureIcon} aria-label="Add Fixture Icon"><FontAwesomeIcon icon={faPlug} aria-hidden="true" /> Add Fixture Icon</button></li>
