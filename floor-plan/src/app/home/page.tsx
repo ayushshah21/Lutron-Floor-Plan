@@ -439,7 +439,7 @@ export default function Home() {
 				*/}
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
-							<div key={file.id} className={styles.fileItem} onMouseLeave={handleMouseLeave}>
+							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
 								<div className={styles.fileItemTopRow}>
 									<img
 										src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
@@ -483,7 +483,6 @@ export default function Home() {
 										</>
 									) : (
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<button onClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}>Open</button>
 											<button onClick={() => handleDelete(file.id)}>Delete</button>
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 										</div>
