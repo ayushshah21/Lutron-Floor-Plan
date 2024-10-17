@@ -218,7 +218,7 @@ export default function Editor() {
 				className="lutronLogo"
 				onClick={() => router.push('/home')}
 				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
-				alt="Lutron Electronics Logo"
+				alt="Lutron Electronics Logo - click to go back to home page"
 			/>
 			<EditorToolbar
 				exportCanvasAsPDF={exportCanvasAsPDF}
