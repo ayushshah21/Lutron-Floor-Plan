@@ -8,6 +8,7 @@ import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
+import { useShareFile } from '../hooks/useShareFile';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
@@ -22,6 +23,7 @@ import 'pdfjs-dist/build/pdf.worker.entry';
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
+	const { addContributor } =useShareFile();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
@@ -289,6 +291,13 @@ export default function Home() {
 
 	const starredFiles = floorPlans.filter(file => file.isStarred);
 
+	// Share floor plan
+	// To do: bring up pop up component asking for an email input
+	// Confirm and cancel button in this component 
+	const shareFloorplan = async (floorPlanID: string, email: string) => {
+		await addContributor(floorPlanID, email)
+	}	
+
 
 	return (
 		<div className={styles.container}>
@@ -414,29 +423,6 @@ export default function Home() {
 							))
 						)}
 					</div>
-
-
-					{/*	<form>
-						<input
-							type="file"
-							onChange={uploadFloorplan}
-							accept="application/pdf"
-							id="fileInput"
-							style={{ display: "none" }} // Hide the default file input
-						/>
-						<button
-							className={styles.button}
-							id="importButton"
-							onClick={(e) => {
-								e.preventDefault(); // Prevent form submission
-								document.getElementById("fileInput")?.click(); // Programmatically click the file input
-							}}
-							disabled={uploading}
-						>
-							{uploading ? "Uploading..." : "+ New"}
-						</button>
-					</form>
-				*/}
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
@@ -483,8 +469,9 @@ export default function Home() {
 										</>
 									) : (
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<button onClick={() => handleDelete(file.id)}>Delete</button>
+											<button onClick={() => shareFloorplan(file.id, "ivz325@lehigh.edu")}>Share</button>
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+											<button onClick={() => handleDelete(file.id)}>Delete</button>
 										</div>
 									)
 								)}
