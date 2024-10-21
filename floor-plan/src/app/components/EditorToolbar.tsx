@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
-  faFilePdf, faSearchPlus, faSearchMinus, faSquare, faLightbulb, faPlug, 
-  faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser, faVideo, faBorderAll, faDoorOpen, faArrowRight, faFont 
+  faSquare, faLightbulb, faPlug, faMobile, faWifi, faTrashAlt, faPencilAlt, faEraser, 
+  faVideo, faBorderAll, faDoorOpen, faArrowRight, faFont, faChevronDown, faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
 
 interface ToolbarProps {
@@ -44,38 +44,80 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
   addRightArrowIcon,
   addTextbox,
 }) => {
+  const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set());
+
+  const toggleSubmenu = (submenu: string) => {
+    setOpenSubmenus(prevOpenSubmenus => {
+      const newOpenSubmenus = new Set(prevOpenSubmenus);
+      if (newOpenSubmenus.has(submenu)) {
+        newOpenSubmenus.delete(submenu);
+      } else {
+        newOpenSubmenus.add(submenu);
+      }
+      return newOpenSubmenus;
+    });
+  };
+
+  const renderSubmenu = (title: string, items: JSX.Element[]) => (
+    <li className="submenu">
+      <button onClick={() => toggleSubmenu(title)} className="submenu-toggle">
+        {title}
+        <FontAwesomeIcon icon={openSubmenus.has(title) ? faChevronUp : faChevronDown} className="submenu-icon" />
+      </button>
+      {openSubmenus.has(title) && (
+        <ul className="submenu-items">
+          {items}
+        </ul>
+      )}
+    </li>
+  );
+
   return (
-    <nav className="sideToolBar" aria-label="Editor tools">
-      <ul>
-        <li><button onClick={addRectangleToCanvas} aria-label="Add Rectangle"><FontAwesomeIcon icon={faSquare} aria-hidden="true" /> Add Rectangle</button></li>
-        <li><button onClick={addLightIcon} aria-label="Add Light Icon"><FontAwesomeIcon icon={faLightbulb} aria-hidden="true" /> Add Light Icon</button></li>
-        <li><button onClick={addFixtureIcon} aria-label="Add Fixture Icon"><FontAwesomeIcon icon={faPlug} aria-hidden="true" /> Add Fixture Icon</button></li>
-        <li><button onClick={addDeviceIcon} aria-label="Add Device Icon"><FontAwesomeIcon icon={faMobile} aria-hidden="true" /> Add Device Icon</button></li>
-        <li><button onClick={addSensorIcon} aria-label="Add Sensor Icon"><FontAwesomeIcon icon={faWifi} aria-hidden="true" /> Add Sensor Icon</button></li>
-        <li><button onClick={deleteSelectedObject} aria-label="Delete Selected Object"><FontAwesomeIcon icon={faTrashAlt} aria-hidden="true" /> Delete Selected Object</button></li>
+    <nav className="editor-toolbar" aria-label="Editor tools">
+      <ul className="toolbar-menu">
+        {renderSubmenu("Shapes", [
+          <li key="rectangle"><button onClick={addRectangleToCanvas}><FontAwesomeIcon icon={faSquare} /> Rectangle</button></li>,
+        ])}
+        
+        {renderSubmenu("Icons", [
+          <li key="light"><button onClick={addLightIcon}><FontAwesomeIcon icon={faLightbulb} /> Light</button></li>,
+          <li key="fixture"><button onClick={addFixtureIcon}><FontAwesomeIcon icon={faPlug} /> Fixture</button></li>,
+          <li key="device"><button onClick={addDeviceIcon}><FontAwesomeIcon icon={faMobile} /> Device</button></li>,
+          <li key="sensor"><button onClick={addSensorIcon}><FontAwesomeIcon icon={faWifi} /> Sensor</button></li>,
+          <li key="camera"><button onClick={addSecurityCameraIcon}><FontAwesomeIcon icon={faVideo} /> Security Camera</button></li>,
+        ])}
+        
+        {renderSubmenu("Architectural", [
+          <li key="wall"><button onClick={addWallIcon}><FontAwesomeIcon icon={faBorderAll} /> Wall</button></li>,
+          <li key="door"><button onClick={addDoorIcon}><FontAwesomeIcon icon={faDoorOpen} /> Door</button></li>,
+          <li key="arrow"><button onClick={addRightArrowIcon}><FontAwesomeIcon icon={faArrowRight} /> Arrow</button></li>,
+        ])}
+        
+        {renderSubmenu("Annotations", [
+          <li key="draw">
+            <button 
+              onClick={isDrawing ? disableFreeDrawing : enableFreeDrawing}
+              className={isDrawing ? 'active' : ''}
+            >
+              <FontAwesomeIcon icon={faPencilAlt} /> {isDrawing ? 'Stop Drawing' : 'Draw'}
+            </button>
+          </li>,
+          <li key="erase">
+            <button 
+              onClick={isErasing ? disableEraser : enableEraser}
+              className={isErasing ? 'active' : ''}
+            >
+              <FontAwesomeIcon icon={faEraser} /> {isErasing ? 'Stop Erasing' : 'Erase'}
+            </button>
+          </li>,
+          <li key="text"><button onClick={addTextbox}><FontAwesomeIcon icon={faFont} /> Add Text</button></li>,
+        ])}
+        
         <li>
-          <button 
-            onClick={isDrawing ? disableFreeDrawing : enableFreeDrawing}
-            aria-label={isDrawing ? "Disable Drawing" : "Enable Drawing"}
-            aria-pressed={isDrawing}
-          >
-            <FontAwesomeIcon icon={faPencilAlt} aria-hidden="true" /> {isDrawing ? 'Disable Drawing' : 'Enable Drawing'}
+          <button onClick={deleteSelectedObject} className="delete-button">
+            <FontAwesomeIcon icon={faTrashAlt} /> Delete Selected
           </button>
         </li>
-        <li>
-          <button 
-            onClick={isErasing ? disableEraser : enableEraser}
-            aria-label={isErasing ? "Disable Eraser" : "Enable Eraser"}
-            aria-pressed={isErasing}
-          >
-            <FontAwesomeIcon icon={faEraser} aria-hidden="true" /> {isErasing ? 'Disable Eraser' : 'Enable Eraser'}
-          </button>
-        </li>
-        <li><button onClick={addSecurityCameraIcon} aria-label="Add Security Camera Icon"><FontAwesomeIcon icon={faVideo} aria-hidden="true" /> Add Security Camera</button></li>
-        <li><button onClick={addWallIcon} aria-label="Add Wall Icon"><FontAwesomeIcon icon={faBorderAll} aria-hidden="true" /> Add Wall</button></li>
-        <li><button onClick={addDoorIcon} aria-label="Add Door Icon"><FontAwesomeIcon icon={faDoorOpen} aria-hidden="true" /> Add Door</button></li>
-        <li><button onClick={addRightArrowIcon} aria-label="Add Right Arrow Icon"><FontAwesomeIcon icon={faArrowRight} aria-hidden="true" /> Add Right Arrow</button></li>
-        <li><button onClick={addTextbox} aria-label="Add Textbox"><FontAwesomeIcon icon={faFont} aria-hidden="true" /> Add Textbox</button></li>
       </ul>
     </nav>
   );

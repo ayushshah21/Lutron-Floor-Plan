@@ -406,3 +406,130 @@
         color: HighlightText;
     }
 }
+
+/* Add these styles to your existing CSS file */
+
+.editor-toolbar {
+  position: fixed;
+  top: 120px;
+  left: 20px;
+  width: 280px; /* Increased width to accommodate larger text */
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  z-index: 999;
+}
+
+.toolbar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.submenu {
+  margin-bottom: 15px; /* Increased margin for better spacing */
+}
+
+.submenu-toggle {
+  width: 100%;
+  background-color: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 12px 15px; /* Increased padding */
+  text-align: left;
+  font-size: 18px; /* Increased font size */
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.submenu-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.submenu-icon {
+  font-size: 16px; /* Increased icon size */
+}
+
+.submenu-items {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.submenu-items button {
+  width: 100%;
+  background-color: #ffffff;
+  color: #333;
+  border: none;
+  padding: 8px 15px;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.submenu-items button:hover {
+  background-color: #f0f0f0;
+}
+
+.submenu-items button.active {
+  background-color: #e6f7ff;
+  color: #0057B8;
+}
+
+.submenu-items button svg {
+  margin-right: 10px;
+  width: 16px;
+}
+
+.delete-button {
+  width: 100%;
+  background-color: #ff4d4f;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.delete-button svg {
+  margin-right: 10px;
+}
+
+/* Scrollbar styles */
+.editor-toolbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-toolbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.editor-toolbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.editor-toolbar::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
