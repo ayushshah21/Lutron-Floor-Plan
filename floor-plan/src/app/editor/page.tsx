@@ -9,7 +9,7 @@ import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
-import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen, ZoomIn, ZoomOut } from "lucide-react";
+import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -193,12 +193,20 @@ export default function Editor() {
 	return (
 		<div>
 			<div className="toolbar">
+				<button className="toolbar-button" onClick={exportCanvasAsPDF} aria-label="Export as PDF">
+					<FileText size={18} />
+					Export PDF
+				</button>
+				<button className="toolbar-button" onClick={() => saveFloorPlanChanges(documentID, fileName)} aria-label="Save Changes">
+					<Save size={18} />
+					Save Changes
+				</button>
 				<button className="toolbar-button" onClick={handleShare} aria-label="Share">
-					<Share2 size={24} />
+					<Share2 size={18} />
 					Share
 				</button>
 				<button className="toolbar-button" onClick={handleUserMenu} aria-label="User Profile">
-					<User size={24} />
+					<User size={18} />
 				</button>
 			</div>
 			<div className="search-bar-container">
@@ -221,8 +229,6 @@ export default function Editor() {
 				alt="Lutron Electronics Logo - click to go back to home page"
 			/>
 			<EditorToolbar
-				exportCanvasAsPDF={exportCanvasAsPDF}
-				saveFloorPlanChanges={() => saveFloorPlanChanges(documentID, fileName)}
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
 				addFixtureIcon={() => addIconAtDefaultPosition(addFixtureIconToCanvas)}

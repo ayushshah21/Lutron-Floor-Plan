@@ -6,8 +6,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 interface ToolbarProps {
-  exportCanvasAsPDF: () => void;
-  saveFloorPlanChanges: () => void;
   addRectangleToCanvas: () => void;
   addLightIcon: () => void;
   addFixtureIcon: () => void;
@@ -28,8 +26,6 @@ interface ToolbarProps {
 }
 
 const EditorToolbar: React.FC<ToolbarProps> = ({
-  exportCanvasAsPDF,
-  saveFloorPlanChanges,
   addRectangleToCanvas,
   addLightIcon,
   addFixtureIcon,
@@ -51,8 +47,6 @@ const EditorToolbar: React.FC<ToolbarProps> = ({
   return (
     <nav className="sideToolBar" aria-label="Editor tools">
       <ul>
-        <li><button onClick={exportCanvasAsPDF} aria-label="Export as PDF"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Export as PDF</button></li>
-        <li><button onClick={saveFloorPlanChanges} aria-label="Save Changes"><FontAwesomeIcon icon={faFilePdf} aria-hidden="true" /> Save Changes</button></li>
         <li><button onClick={addRectangleToCanvas} aria-label="Add Rectangle"><FontAwesomeIcon icon={faSquare} aria-hidden="true" /> Add Rectangle</button></li>
         <li><button onClick={addLightIcon} aria-label="Add Light Icon"><FontAwesomeIcon icon={faLightbulb} aria-hidden="true" /> Add Light Icon</button></li>
         <li><button onClick={addFixtureIcon} aria-label="Add Fixture Icon"><FontAwesomeIcon icon={faPlug} aria-hidden="true" /> Add Fixture Icon</button></li>
