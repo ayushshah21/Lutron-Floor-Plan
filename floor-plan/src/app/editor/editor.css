@@ -436,11 +436,11 @@
 .submenu-toggle {
   width: 100%;
   background-color: #f0f0f0;
-  color: #333;
+  color: #0057B8;
   border: none;
-  padding: 12px 15px; /* Increased padding */
+  padding: 12px 15px; 
   text-align: left;
-  font-size: 18px; /* Increased font size */
+  font-size: 18px; 
   font-weight: bold;
   cursor: pointer;
   display: flex;
@@ -455,7 +455,7 @@
 }
 
 .submenu-icon {
-  font-size: 16px; /* Increased icon size */
+  font-size: 16px; 
 }
 
 .submenu-items {
@@ -467,11 +467,11 @@
 .submenu-items button {
   width: 100%;
   background-color: #ffffff;
-  color: #333;
+  color: #0057B8;
   border: none;
-  padding: 8px 15px;
+  padding: 10px 15px; 
   text-align: left;
-  font-size: 14px;
+  font-size: 16px; 
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -489,8 +489,9 @@
 }
 
 .submenu-items button svg {
-  margin-right: 10px;
-  width: 16px;
+  margin-right: 12px; 
+  width: 20px; 
+  height: 20px; 
 }
 
 .delete-button {
@@ -498,13 +499,13 @@
   background-color: #ff4d4f;
   color: #ffffff;
   border: none;
-  padding: 10px 15px;
+  padding: 12px 15px; /* Increased padding */
   text-align: center;
-  font-size: 16px;
+  font-size: 18px; /* Increased font size */
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.3s ease;
-  margin-top: 15px;
+  margin-top: 20px; /* Increased top margin */
 }
 
 .delete-button:hover {
@@ -512,10 +513,12 @@
 }
 
 .delete-button svg {
-  margin-right: 10px;
+  margin-right: 12px; /* Increased margin */
+  width: 20px; /* Increased icon size */
+  height: 20px; /* Increased icon size */
 }
 
-/* Scrollbar styles */
+
 .editor-toolbar::-webkit-scrollbar {
   width: 8px;
 }
