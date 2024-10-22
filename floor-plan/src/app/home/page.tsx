@@ -27,7 +27,8 @@ export default function Home() {
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
-	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder); // Pass selected folder ID to hook
+	const [filterByContributors, setFilterByContributors] = useState(false);
+	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder, filterByContributors);
 	const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
@@ -44,6 +45,22 @@ export default function Home() {
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+
+	// Functions for switching between home and shared with me
+	const handleClickHome = () => {
+		setFilterByContributors(false); 
+		setSelectedFolder(null); 
+	};
+
+	const handleClickSharedWithMe = () => {
+		setFilterByContributors(true); 
+		setSelectedFolder(null); 
+	};
+
+	// Ensure `fetchFloorPlans` is called whenever `filterByContributors` or `selectedFolder` changes
+	useEffect(() => {
+		fetchFloorPlans(); // Fetch files when the filter or folder changes
+	}, [filterByContributors, selectedFolder]);
 
 	// Function to render PDF thumbnail
 	const renderThumbnail = async (pdfUrl: string) => {
@@ -269,27 +286,27 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
-	//starred stuff 
-	const toggleStar = async (fileId: string) => {
-		const updatedFile = floorPlans.find((file) => file.id === fileId);
-		if (updatedFile) {
-			updatedFile.isStarred = !updatedFile.isStarred; // Toggle starred status
-			await updateFileStatus(fileId, { isStarred: updatedFile.isStarred }); // Update the file's status
-			await fetchFloorPlans(); // Re-fetch the floor plans to update the UI
-		}
-	};
+	// //starred stuff 
+	// const toggleStar = async (fileId: string) => {
+	// 	const updatedFile = floorPlans.find((file) => file.id === fileId);
+	// 	if (updatedFile) {
+	// 		updatedFile.isStarred = !updatedFile.isStarred; // Toggle starred status
+	// 		await updateFileStatus(fileId, { isStarred: updatedFile.isStarred }); // Update the file's status
+	// 		await fetchFloorPlans(); // Re-fetch the floor plans to update the UI
+	// 	}
+	// };
 
 	// Function to update the file's status in Firebase or another database
-	const updateFileStatus = async (fileId: string, updateData: { isStarred: boolean }) => {
-		try {
-			// Assuming you have a Firebase function to update the file metadata
-			await firebase.firestore().collection('floorPlans').doc(fileId).update(updateData);
-		} catch (error) {
-			console.error("Error updating file status:", error);
-		}
-	};
+	// const updateFileStatus = async (fileId: string, updateData: { isStarred: boolean }) => {
+	// 	try {
+	// 		// Assuming you have a Firebase function to update the file metadata
+	// 		await firebase.firestore().collection('floorPlans').doc(fileId).update(updateData);
+	// 	} catch (error) {
+	// 		console.error("Error updating file status:", error);
+	// 	}
+	// };
 
-	const starredFiles = floorPlans.filter(file => file.isStarred);
+	// const starredFiles = floorPlans.filter(file => file.isStarred);
 
 	// Share floor plan
 	// To do: bring up pop up component asking for an email input
@@ -298,7 +315,6 @@ export default function Home() {
 		await addContributor(floorPlanID, email)
 	}	
 
-
 	return (
 		<div className={styles.container}>
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
@@ -306,21 +322,21 @@ export default function Home() {
 				<aside className={styles.sidebar}>
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 					<nav className={styles.navigation} id="navSidebar">
-						<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={handleClickHome}>
 							<HomeIcon size={22} /> Home
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={handleClickSharedWithMe}>
 							< Users size={22} /> Shared with me
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
 							<Clock color="black" size={22} /> Recent
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
+						{/* <button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
 							<Star size={22} /> Starred
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
 							<Trash2 size={22} /> Recently Deleted
-						</button>
+						</button> */}
 					</nav>
 					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
 						Logout
@@ -446,9 +462,9 @@ export default function Home() {
 									*/}
 									<div className={styles.fileOptions}>
 										{/* Star Button */}
-										<button className={styles.starButton} onClick={() => toggleStar(file.id)}>
+										{/* <button className={styles.starButton} onClick={() => toggleStar(file.id)}>
 											<Star color={file.isStarred ? "yellow" : "grey"} />
-										</button>
+										</button> */}
 										<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
 											<img
 												className={styles.threeDotLogo}
