@@ -229,7 +229,10 @@ export default function Home() {
 	};
 
 	// Hide three dot pop up menu when you hover away
+
+	//const handleMouseLeave = () => {
 	const handleMouseLeave = () => {
+
 		setShowThreeDotPopup(false);
 	};
 
