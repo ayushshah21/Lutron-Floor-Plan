@@ -1,7 +1,7 @@
 import { fabric } from 'fabric';
 import { useRef, useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
-import { ExtendedGroup } from '../utils/fabricUtil';
+import { ExtendedGroup, ExtendedRect } from '../utils/fabricUtil';
 import { useUploadPdf } from './useUploadPdf';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import socket from "../../socket";
@@ -54,7 +54,29 @@ export const useCanvas = () => {
         };
     }, [socket]);
 
-
+    useEffect(() => {
+        if (socket) {
+            socket.on('deleteObject', (data) => {
+                const fabricCanvas = canvasRef.current;
+                if (fabricCanvas) {
+                    // Find the object with the matching custom ID and remove it
+                    const objectToRemove = fabricCanvas.getObjects().find((o) => 
+                        (o as ExtendedRect | ExtendedGroup).customId === data.customId
+                    );
+    
+                    if (objectToRemove) {
+                        fabricCanvas.remove(objectToRemove);
+                        fabricCanvas.renderAll();
+                    }
+                }
+            });
+        }
+    
+        return () => {
+            if (socket) socket.off('deleteObject');
+        };
+    }, [socket]);
+    
     const addImageToCanvas = (imageUrl: string, x: number, y: number) => {
         fabric.Image.fromURL(imageUrl, function (img) {
             if (img) {
@@ -102,6 +124,7 @@ export const useCanvas = () => {
             canvasRef.current.add(group);
             // Emit the object addition to the server
             const serializedGroup = group.toObject();
+            serializedGroup.customId = group.customId;
             socket.emit('addObject', serializedGroup);
         }
     };
@@ -109,7 +132,7 @@ export const useCanvas = () => {
     const addRectangleToCanvas = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
-            const rect = new fabric.Rect({
+            const rect = new ExtendedRect({
                 left: 900,
                 top: 600,
                 fill: 'pink',
@@ -118,24 +141,30 @@ export const useCanvas = () => {
                 selectable: true,
                 opacity: 0.9,
             });
+    
             fabricCanvas.add(rect);
-             // Emit the object addition to the server
+    
+            // Emit the object addition to the server
             const serializedRect = rect.toObject();
+            serializedRect.customId = rect.customId; // Include customId in the emitted object
             socket.emit('addObject', serializedRect);
         }
     };
-
+    
     const deleteSelectedObject = () => {
         const fabricCanvas = canvasRef.current;
         if (fabricCanvas) {
             const activeObject = fabricCanvas.getActiveObject();
             if (activeObject) {
+                const customId = (activeObject as ExtendedRect | ExtendedGroup).customId; // Access customId
                 fabricCanvas.remove(activeObject);
-
+    
+                // Emit the deleteObject event to the server
+                socket.emit('deleteObject', { customId });
             }
         }
     };
-
+    
     // Zoom into the floor plan
     const zoomIn = () => {
         const newZoom = zoomLevel * 1.1; // Increase zoom by 10%
