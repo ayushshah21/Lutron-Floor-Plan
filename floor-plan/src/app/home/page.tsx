@@ -413,6 +413,7 @@ export default function Home() {
 								{showThreeDotPopup && selectedFileId === file.id && (
 									isRenaming && docToRename === file.id ? (
 										<>
+										
 											<input value={newName} onChange={(e) => setNewName(e.target.value)} />
 											<button onClick={submitNewName}>Save</button>
 											<button onClick={cancelRenaming}>Cancel</button>
