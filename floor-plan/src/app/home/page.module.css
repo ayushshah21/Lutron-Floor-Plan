@@ -54,7 +54,15 @@
 .threeDotLogo {
   width: 24px;
   height: 24px;
+  cursor: pointer;
   margin-left: 40px;
+}
+
+.input {
+  width: 100px;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
 .floorPlanLogo {
@@ -348,6 +356,10 @@
   width: 120px;
   text-align: center;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  position: relative; /* Allow absolute positioning inside the folder item */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .folderItem:hover {

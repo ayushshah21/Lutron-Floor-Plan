@@ -21,6 +21,11 @@ Drag and drop
 Folder buttons
 */
 
+/*
+
+Delete Folder!!!
+*/
+
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
