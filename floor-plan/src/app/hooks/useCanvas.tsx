@@ -116,9 +116,7 @@ export const useCanvas = () => {
             left: x,
             top: y,
             selectable: true,
-            isOriginal: isOriginal,
         });
-        group.isOriginal = true;
 
         if (canvasRef.current) {
             canvasRef.current.add(group);

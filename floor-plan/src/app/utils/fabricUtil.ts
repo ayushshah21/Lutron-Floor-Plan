@@ -1,3 +1,4 @@
+// File for extending fabric.js objects to incorporate ids for deletion 
 import { fabric } from 'fabric';
 
 function generateCustomId() {
@@ -5,33 +6,39 @@ function generateCustomId() {
 }
 
 interface IExtendedRectOptions extends fabric.IRectOptions {
-    isOriginal?: boolean;
     customId?: string; // Add customId to the options interface
 }
 
 export class ExtendedRect extends fabric.Rect {
-    isOriginal?: boolean;
     customId?: string;  // Add customId property
 
     constructor(options?: IExtendedRectOptions) {
         super(options);
-        this.isOriginal = options?.isOriginal;
         this.customId = options?.customId || generateCustomId(); // Generate customId based on current date
     }
 }
 
 interface IExtendedGroupOptions extends fabric.IGroupOptions {
-    isOriginal?: boolean;
-    customId?: string; // Add customId to the options interface
+    customId?: string; 
 }
 
 export class ExtendedGroup extends fabric.Group {
-    isOriginal?: boolean;
-    customId?: string;  // Add customId property
-
+    customId?: string;  
     constructor(items?: fabric.Object[], options?: IExtendedGroupOptions) {
         super(items, options);
-        this.isOriginal = options?.isOriginal;
         this.customId = options?.customId || generateCustomId(); // Generate customId based on current date
+    }
+}
+
+interface IExtendedPathOptions extends fabric.IPathOptions {
+    customId?: string;
+}
+
+export class ExtendedPath extends fabric.Path {
+    customId?: string;
+
+    constructor(path: string | any[], options?: IExtendedPathOptions) {
+        super(path, options);
+        this.customId = options?.customId || generateCustomId();
     }
 }
