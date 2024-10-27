@@ -2,7 +2,7 @@ import { fabric } from "fabric";
 import { useRef, useState, useEffect } from "react";
 import { jsPDF } from "jspdf";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ExtendedGroup, ExtendedRect, ExtendedText } from '../utils/fabricUtil';
+import { ExtendedGroup, ExtendedRect, ExtendedText, ExtendedPath } from '../utils/fabricUtil';
 import { useUploadPdf } from "./useUploadPdf";
 import { app, db, auth } from "../../../firebase";
 import socket from "../../socket";
@@ -62,7 +62,7 @@ export const useCanvas = () => {
                 if (fabricCanvas) {
                     // Find the object with the matching custom ID and remove it
                     const objectToRemove = fabricCanvas.getObjects().find((o) => 
-                        (o as ExtendedRect | ExtendedGroup | ExtendedText).customId === data.customId
+                        (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
                     );
     
                     if (objectToRemove) {
@@ -255,6 +255,14 @@ export const useCanvas = () => {
 			fabricCanvas.freeDrawingBrush.width = 5;
 			setIsDrawing(true);
 			setIsErasing(false);
+
+			// Listen for path creation and emit each new path
+			fabricCanvas.on('path:created', (event: fabric.IEvent & { path?: fabric.Path }) => {
+				const path = event.path as ExtendedPath; 
+				const serializedPath = path.toObject();
+				serializedPath.customId = path.customId; 
+				socket.emit('addObject', serializedPath);
+			});
 		}
 	};
 

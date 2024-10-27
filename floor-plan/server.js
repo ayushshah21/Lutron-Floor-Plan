@@ -20,13 +20,16 @@ app.prepare().then(() => {
 		});
 
 		socket.on('addObject', (data) => {
-			console.log('Received object to add');
 			socket.broadcast.emit('addObject', data);  
 		});
 
 		socket.on('deleteObject', (data) => {
-			console.log('Received delete object event');
 			socket.broadcast.emit('deleteObject', data); 
+		});
+
+		socket.on('moveObject', (data) => {
+			console.log('Object being moved');
+			socket.broadcast.emit('moveObject', data); 
 		});
 	});
 
