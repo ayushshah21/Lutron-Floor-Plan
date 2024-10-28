@@ -236,19 +236,6 @@ export default function Editor() {
 					<User size={18} />
 				</button>
 			</div>
-			<div className="search-bar-container">
-				<form className="search-form" onSubmit={handleSearchSubmit}>
-					<input
-						type="text"
-						className="search-input"
-						placeholder="Search..."
-						onChange={handleSearchInputChange}
-					/>
-					<button className="search-button">
-						<Search size={17} />
-					</button>
-				</form>
-			</div>
 			<EditorToolbar
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
