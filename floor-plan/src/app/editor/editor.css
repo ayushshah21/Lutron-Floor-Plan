@@ -5,7 +5,7 @@
     justify-content: center;
     padding: 6rem;
     min-height: 100vh;
-    background-color: #d6dbe0;
+    background-color: #ffffff;
     color: black;
 }
 
@@ -534,5 +534,38 @@
 
 .editor-toolbar::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+
+.breadcrumbs {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.breadcrumbs a {
+  color: #0057B8;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+  color: #144a75;
+  text-decoration: underline;
+}
+
+.breadcrumbs .separator {
+  color: #666;
+}
+
+.breadcrumbs .current-file {
+  color: #666;
+  font-weight: 500;
 }
 
