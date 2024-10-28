@@ -4,12 +4,14 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { pdfjs } from "react-pdf";
 import { getDocument } from "pdfjs-dist";
+import Link from 'next/link';
 
 import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
 import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
+import React from "react";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -190,8 +192,33 @@ export default function Editor() {
 		}
 	}, [pdfUrl]);
 
+	const folderPath = searchParams.get('folderPath'); // Expect a JSON string of the folder path
+  
+	// Parse the folder path from the URL parameter
+	const pathSegments = folderPath ? JSON.parse(decodeURIComponent(folderPath)) : [{ id: "4", name: "Home" }];
+
+	// Log the folder path to verify what we're getting
+	console.log('Folder Path:', folderPath);
+	console.log('Path Segments:', pathSegments);
+
 	return (
-		<div>
+		<div className="main">
+			{/* Update the breadcrumb navigation to include folder path */}
+			<div className="breadcrumbs">
+				{pathSegments.map((segment: { id: string, name: string }, index: number) => (
+					<React.Fragment key={segment.id}>
+						<Link 
+							href={`/home?folder=${segment.id}&folderPath=${encodeURIComponent(
+								JSON.stringify(pathSegments.slice(0, index + 1))
+							)}`}
+						>
+							{segment.name}
+						</Link>
+						{index < pathSegments.length - 1 && <span className="separator">/</span>}
+					</React.Fragment>
+				))}
+			</div>
+			
 			<div className="toolbar">
 				<button className="toolbar-button" onClick={exportCanvasAsPDF} aria-label="Export as PDF">
 					<FileText size={18} />
@@ -209,12 +236,6 @@ export default function Editor() {
 					<User size={18} />
 				</button>
 			</div>
-			<img
-				className="lutronLogo"
-				onClick={() => router.push('/home')}
-				src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg"
-				alt="Lutron Electronics Logo - click to go back to home page"
-			/>
 			<EditorToolbar
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}

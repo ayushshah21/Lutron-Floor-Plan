@@ -90,3 +90,4 @@ const fetchFolders = async (parentFolderId: string = "4") => { // Default to "4"
 
   return { folders, loading, error, createFolder, deleteFolder, fetchFolders };
 };
+

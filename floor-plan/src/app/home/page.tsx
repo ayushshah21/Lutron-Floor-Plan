@@ -170,7 +170,8 @@ export default function Home() {
 	// Opening existing floor plans
 	const openFloorplan = (pdfURL: string, documentID: string, fileName: string) => {
 		setOpeningSpinner(true);
-		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}`);
+		const encodedFolderPath = encodeURIComponent(JSON.stringify(folderPath));
+		router.push(`/editor?pdf=${encodeURIComponent(pdfURL)}&documentID=${documentID}&fileName=${encodeURIComponent(fileName)}&folderPath=${encodedFolderPath}`);
 	};
 
 	// Function to update the folderID of a file in Firestore
@@ -339,6 +340,26 @@ export default function Home() {
 	// };
 
 	// const starredFiles = floorPlans.filter(file => file.isStarred);
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const folderParam = params.get('folder');
+		const folderPathParam = params.get('folderPath');
+
+		if (folderParam) {
+			setSelectedFolder(folderParam);
+			fetchFolders(folderParam);
+		}
+
+		if (folderPathParam) {
+			try {
+				const pathData = JSON.parse(decodeURIComponent(folderPathParam));
+				setFolderPath(pathData);
+			} catch (error) {
+				console.error('Error parsing folder path:', error);
+			}
+		}
+	}, []);
 
 	return (
 		<div className={styles.container}>
