@@ -16,7 +16,7 @@ import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
-import Modal from "../components/Modal";
+import ShareButton from "../components/ShareButton";
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
@@ -24,7 +24,7 @@ import 'pdfjs-dist/build/pdf.worker.entry';
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
-	const { addContributor } =useShareFile();
+	const { addContributor } = useShareFile();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
@@ -45,11 +45,6 @@ export default function Home() {
 	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
-	// Share floor plan - use states
-	const [showShareModal, setShowShareModal] = useState(false);
-	const [shareEmail, setShareEmail] = useState('');
-	const [selectedFileToShare, setSelectedFileToShare] = useState<string | null>(null);
-
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 
 	// Functions for switching between home and shared with me
@@ -67,32 +62,6 @@ export default function Home() {
 	useEffect(() => {
 		fetchFloorPlans(); // Fetch files when the filter or folder changes
 	}, [filterByContributors, selectedFolder]);
-
-	// Functions for sharing floor plans
-	const handleShareClick = (fileId: string) => { // Display share floor plan pop up
-		setSelectedFileToShare(fileId);
-		setShowShareModal(true);
-	};
-
-	const shareFloorplan = async (floorPlanID: string, email: string) => {
-		await addContributor(floorPlanID, email)
-	}
-
-	const handleConfirmShare = async () => {
-		if (selectedFileToShare && shareEmail) {
-			await shareFloorplan(selectedFileToShare, shareEmail);
-			setShowShareModal(false);
-			setShareEmail('');
-		} else {
-			alert("Please enter a valid email.");
-		}
-	};
-
-	const handleCancelShare = () => {
-		setShowShareModal(false);
-		setShareEmail('');
-	};
-
 
 	// Function to render PDF thumbnail
 	const renderThumbnail = async (pdfUrl: string) => {
@@ -485,22 +454,6 @@ export default function Home() {
 							))
 						)}
 					</div>
-					{/* Share floor plan modal */}
-					<Modal
-						isVisible={showShareModal}
-						onClose={handleCancelShare}
-						onConfirm={handleConfirmShare}
-						title="Share Floor Plan"
-					>
-						<input
-							type="email"
-							placeholder="Enter email"
-							value={shareEmail}
-							onChange={(e) => setShareEmail(e.target.value)}
-							className="input"
-						/>
-					</Modal>
-
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
@@ -547,9 +500,7 @@ export default function Home() {
 										</>
 									) : (
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<button className={styles.threeDotButton} onClick={() => handleShareClick(file.id)}>
-													Share
-											</button>
+											<ShareButton fileId={file.id}/>
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 											<button onClick={() => handleDelete(file.id)}>Delete</button>
 										</div>

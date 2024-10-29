@@ -12,6 +12,7 @@ import { ExtendedRect, ExtendedGroup } from '../utils/fabricUtil';
 import { useCanvas } from "../hooks/useCanvas";
 import { Search, Users, Share, UserRoundPlus, Monitor, Share2, CircleUserRound, User, Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
 import React from "react";
+import ShareButton from "../components/ShareButton";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -228,10 +229,7 @@ export default function Editor() {
 					<Save size={18} />
 					Save Changes
 				</button>
-				<button className="toolbar-button" onClick={handleShare} aria-label="Share">
-					<Share2 size={18} />
-					Share
-				</button>
+				<ShareButton fileId={documentID}/>
 				<button className="toolbar-button" onClick={handleUserMenu} aria-label="User Profile">
 					<User size={18} />
 				</button>
