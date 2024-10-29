@@ -45,43 +45,13 @@ export default function Editor() {
 	const [documentID, setDocumentID] = useState<string>("");
 	const [fileName, setFileName] = useState<string>("");
 	const searchParams = useSearchParams();
-	const router = useRouter();
-	const [isCollaboratorsOpen, setCollaboratorsOpen] = useState(false);
 	const pdfContainerRef = useRef<HTMLDivElement>(null);
-
-	const handleShare = () => {
-		const shareData = {
-			title: 'Editor page',
-			text: 'Check out this floor plan!',
-			url: window.location.href,
-		};
-
-		if (navigator.share) {
-			navigator.share(shareData)
-				.then(() => console.log('Shared sucessfully'))
-				.catch((error) => console.log('Error sharing', error));
-
-		} else {
-			alert('wed share API is not supported in this browser')
-		}
-	};
 
 	const handleUserMenu = () => {
 		console.log("User Profile clicked");
 		// Logic to open user profile or user settings dropdown menu
 	};
-
-	const handleSearchSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		// Handle the search submission here
-		console.log("Search submitted");
-	};
-
-	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// Handle the input change here
-		console.log(e.target.value);
-	};
-
+	
 	const handleFullscreen = () => {
 		const pdfContainer = pdfContainerRef.current;
 		if (!document.fullscreenElement && pdfContainer) {
