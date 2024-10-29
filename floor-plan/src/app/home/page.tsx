@@ -8,7 +8,6 @@ import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
-import { useShareFile } from '../hooks/useShareFile';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
@@ -24,7 +23,6 @@ import 'pdfjs-dist/build/pdf.worker.entry';
 export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
-	const { addContributor } = useShareFile();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
@@ -288,28 +286,6 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
-	// //starred stuff 
-	// const toggleStar = async (fileId: string) => {
-	// 	const updatedFile = floorPlans.find((file) => file.id === fileId);
-	// 	if (updatedFile) {
-	// 		updatedFile.isStarred = !updatedFile.isStarred; // Toggle starred status
-	// 		await updateFileStatus(fileId, { isStarred: updatedFile.isStarred }); // Update the file's status
-	// 		await fetchFloorPlans(); // Re-fetch the floor plans to update the UI
-	// 	}
-	// };
-
-	// Function to update the file's status in Firebase or another database
-	// const updateFileStatus = async (fileId: string, updateData: { isStarred: boolean }) => {
-	// 	try {
-	// 		// Assuming you have a Firebase function to update the file metadata
-	// 		await firebase.firestore().collection('floorPlans').doc(fileId).update(updateData);
-	// 	} catch (error) {
-	// 		console.error("Error updating file status:", error);
-	// 	}
-	// };
-
-	// const starredFiles = floorPlans.filter(file => file.isStarred);
-
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const folderParam = params.get('folder');
@@ -346,12 +322,6 @@ export default function Home() {
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
 							<Clock color="black" size={22} /> Recent
 						</button>
-						{/* <button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
-							<Star size={22} /> Starred
-						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => setViewingStarred(true)}>
-							<Trash2 size={22} /> Recently Deleted
-						</button> */}
 					</nav>
 					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
 						Logout
@@ -457,40 +427,22 @@ export default function Home() {
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
-								<div className={styles.fileItemTopRow}>
+								{/* Three-dot button */}
+								<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
 									<img
-										src={thumbnails[file.id] || 'default-thumbnail.png'} // Display thumbnail or fallback
-										alt="PDF Thumbnail"
-										className={styles.thumbnail} />
-									{/*<div className={styles.fileName}>
-										{truncateFloorPlanName(file.name)}
-										<div className={styles.fileNamePopup}>{file.name}</div>
-									</div>
-									*/}
-									{/** 
-									 * <img
 										className={styles.threeDotLogo}
 										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
 										alt="three-dots-icon"
-										onClick={() => handleThreeDotPopup(file.id)}
 									/>
-									*/}
-									<div className={styles.fileOptions}>
-										{/* Star Button */}
-										{/* <button className={styles.starButton} onClick={() => toggleStar(file.id)}>
-											<Star color={file.isStarred ? "yellow" : "grey"} />
-										</button> */}
-										<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
-											<img
-												className={styles.threeDotLogo}
-												src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-												alt="three-dots-icon"
-												onClick={() => handleThreeDotPopup(file.id)}
-											/>
-										</button>
-									</div>
+								</button>
+								<div className={styles.fileName}>
+									{truncateFloorPlanName(file.name)}
+									<div className={styles.fileNamePopup}>{file.name}</div>
 								</div>
+								<img src={thumbnails[file.id] || 'default-thumbnail.png'} alt="PDF Thumbnail" className={styles.thumbnail} />
+								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
 
+								{/* Popup Menu */}
 								{showThreeDotPopup && selectedFileId === file.id && (
 									isRenaming && docToRename === file.id ? (
 										<>
@@ -500,23 +452,12 @@ export default function Home() {
 										</>
 									) : (
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<ShareButton fileId={file.id}/>
+											<ShareButton fileId={file.id} />
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 											<button onClick={() => handleDelete(file.id)}>Delete</button>
 										</div>
 									)
 								)}
-								<p
-									className={styles.fileInfo}>
-									<span className={styles.fileName}>
-										{file.name}
-									</span>
-									<br />
-									{/* Display creator name in a smaller font */}
-									<span className={styles.creatorInfo}>
-										{file.creatorEmail || 'Unknown Creator'}
-									</span>
-								</p>
 							</div>
 						))}
 					</div>
