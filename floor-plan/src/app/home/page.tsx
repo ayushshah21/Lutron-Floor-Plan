@@ -16,6 +16,9 @@ import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
+import Menu from '../components/menu';
+import { deleteItem, moveItem, renameItem } from '../utils/menuUtils';
+
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
