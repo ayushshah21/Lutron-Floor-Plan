@@ -28,9 +28,8 @@ app.prepare().then(() => {
 		});
 
 		socket.on('moveObject', (data) => {
-			console.log('Object being moved');
-			socket.broadcast.emit('moveObject', data); 
-		});
+			socket.broadcast.emit('moveObject', data);
+		});		
 	});
 
 	server.all('*', (req, res) => {

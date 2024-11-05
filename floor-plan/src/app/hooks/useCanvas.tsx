@@ -6,8 +6,9 @@ import { ExtendedGroup, ExtendedRect, ExtendedText, ExtendedPath } from '../util
 import { useUploadPdf } from "./useUploadPdf";
 import { app, db, auth } from "../../../firebase";
 import socket from "../../socket";
+import { getDocument } from "pdfjs-dist";
 
-export const useCanvas = () => {
+export const useCanvas = (pdfUrl: string) => {
 	const canvasRef = useRef<fabric.Canvas | null>(null);
 	const [zoomLevel, setZoomLevel] = useState(1);
 	const { updatePdfUrl } = useUploadPdf();
@@ -15,68 +16,149 @@ export const useCanvas = () => {
 
 	const [isDrawing, setIsDrawing] = useState(false);
 	const [isErasing, setIsErasing] = useState(false);
-	
-	// Socket.io UseEffects
+
 	useEffect(() => {
-        // Check if WebSocket connection is established
-        socket.on('connect', () => {
-            console.log('Connected to WebSocket server with ID:', socket.id);
-        });
+        let cleanup: (() => void) | undefined;
 
-        // Clean up the connection when the component unmounts
-        return () => {
-            socket.off('connect');
-        };
-    }, []);
-	
-    useEffect(() => {
-        if (!canvasRef.current) {
-            canvasRef.current = new fabric.Canvas('c', {
-                isDrawingMode: false,
-            });
-        }
+        if (pdfUrl && !canvasRef.current) {
+            (async function initializeCanvas() {
+                try {
+                    // Fetch the PDF document
+                    const pdf = await getDocument(pdfUrl).promise;
+                    const page = await pdf.getPage(1);
+                    const viewport = page.getViewport({ scale: 0.6 });
 
-        if (socket) {
-            socket.on('addObject', (data) => {
-                const fabricCanvas = canvasRef.current;
-                if (fabricCanvas) {
-                    fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
-                        objects.forEach((obj) => {
-                            fabricCanvas.add(obj);  // Add the object to the canvas
-                            fabricCanvas.renderAll(); // Re-render the canvas
-                        });
-                    }, '');  // Pass an empty string for now as the reviver
-                }
-            });
-        }
-        
-        return () => {
-            if (socket) socket.off('addObject');
-        };
-    }, [socket]);
+                    // Create a temporary canvas to render the PDF page
+                    const canvasEl = document.createElement("canvas");
+                    const context = canvasEl.getContext("2d");
+                    canvasEl.width = viewport.width;
+                    canvasEl.height = viewport.height;
 
-    useEffect(() => {
-        if (socket) {
-            socket.on('deleteObject', (data) => {
-                const fabricCanvas = canvasRef.current;
-                if (fabricCanvas) {
-                    // Find the object with the matching custom ID and remove it
-                    const objectToRemove = fabricCanvas.getObjects().find((o) => 
-                        (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
-                    );
-    
-                    if (objectToRemove) {
-                        fabricCanvas.remove(objectToRemove);
-                        fabricCanvas.renderAll();
+                    if (!context) {
+                        throw new Error("Could not get 2D context from canvas");
                     }
+
+                    await page.render({ canvasContext: context, viewport }).promise;
+
+                    // Create an image from the rendered canvas
+                    const img = new Image();
+                    img.src = canvasEl.toDataURL();
+
+                    img.onload = function () {
+                        const fabricCanvas = new fabric.Canvas("canvas", {
+                            width: viewport.width,
+                            height: viewport.height,
+                            isDrawingMode: false,
+                            selection: true,
+                        });
+
+                        canvasRef.current = fabricCanvas;
+
+                        // Set image as the background image of Fabric.js canvas
+                        fabricCanvas.setBackgroundImage(
+                            img.src,
+                            fabricCanvas.renderAll.bind(fabricCanvas),
+                            {
+                                originX: 'center',
+                                originY: 'center',
+                                top: (fabricCanvas.height || 600) / 2,
+                                left: (fabricCanvas.width || 800) / 2,
+                                scaleX: 1,
+                                scaleY: 1,
+                            }
+                        );
+
+                        // Attach event listeners and capture the cleanup function
+                        cleanup = attachEventListeners(fabricCanvas);
+                    };
+                } catch (error) {
+                    console.error("Error loading or rendering PDF:", error);
+                }
+            })();
+        }
+
+        // Cleanup function to run when the component unmounts
+        return () => {
+            if (cleanup) cleanup();
+        };
+    }, [pdfUrl]);
+	
+	const attachEventListeners = (fabricCanvas: fabric.Canvas) => {
+        // Event handler for when an object is moved on the canvas
+        const handleObjectMoving = (event: fabric.IEvent) => {
+            console.log("Object is moving");
+            const target = event.target as ExtendedGroup | ExtendedRect | ExtendedText | ExtendedPath;
+            if (target && target.customId) {
+                const { left, top, customId } = target;
+                console.log('Emitting moveObject:', { left, top, customId });
+                socket.emit('moveObject', { left, top, customId });
+            } else {
+                console.log("No valid target or customId for moving object");
+            }
+        };
+
+        // Attach the 'object:moving' event listener to the canvas
+        fabricCanvas.on('object:moving', handleObjectMoving);
+        console.log("object:moving event listener added");
+
+        // Socket.io event listeners for real-time collaboration
+        if (socket) {
+            // Listen for 'addObject' event from the server
+            socket.on('addObject', (data) => {
+                console.log("Object added");
+                console.log(data);
+                fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
+                    objects.forEach((obj) => {
+                        fabricCanvas.add(obj);
+                        fabricCanvas.renderAll();
+                    });
+                }, '');
+            });
+
+            // Listen for 'deleteObject' event from the server
+            socket.on('deleteObject', (data) => {
+                console.log("Object deleted");
+                console.log(data);
+                const objectToRemove = fabricCanvas.getObjects().find((o) =>
+                    (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
+                );
+                if (objectToRemove) {
+                    fabricCanvas.remove(objectToRemove);
+                    fabricCanvas.renderAll();
+                }
+            });
+
+            // Listen for 'moveObject' event from the server
+            socket.on('moveObject', (data) => {
+                console.log('Received moveObject:', data);
+                const objectToMove = fabricCanvas.getObjects().find((o) =>
+                    (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
+                );
+                if (objectToMove) {
+                    objectToMove.set({
+                        left: data.left,
+                        top: data.top,
+                    });
+                    fabricCanvas.renderAll();
                 }
             });
         }
-    
-        return () => {
-            if (socket) socket.off('deleteObject');
+
+        // Clean up function to remove event listeners when the component unmounts
+        const cleanup = () => {
+            fabricCanvas.off('object:moving', handleObjectMoving);
+            console.log("object:moving event listener removed");
+
+            if (socket) {
+                socket.off('addObject');
+                socket.off('deleteObject');
+                socket.off('moveObject');
+            }
         };
-    }, [socket]);
+
+        // Return the cleanup function
+        return cleanup;
+    };
 
 	const addIconToCanvas = (
 		iconPath: string,
@@ -93,12 +175,18 @@ export const useCanvas = () => {
 					originX: "center",
 					originY: "center",
 					selectable: true,
+            		lockMovementX: false,
+            		lockMovementY: false,
+					evented: true, // Ensures the object can trigger events
 				});
 
 				const group = new ExtendedGroup([img], {
 					left: x,
 					top: y,
 					selectable: true,
+					lockMovementX: false,
+					lockMovementY: false,
+					evented: true, // Ensures the object can trigger events
 					isOriginal: isOriginal,
 				});
 
@@ -145,6 +233,9 @@ export const useCanvas = () => {
 				originX: "center",
 				originY: "center",
 				selectable: true,
+				lockMovementX: false,
+            	lockMovementY: false,
+				evented: true, // Ensures the object can trigger events
 				opacity: 0.9,
 			});
 			fabricCanvas.add(rect);
@@ -152,8 +243,8 @@ export const useCanvas = () => {
 			fabricCanvas.renderAll();
 
 			const serializedRect = rect.toObject();
-            serializedRect.customId = rect.customId; // Include customId in the emitted object
-            socket.emit('addObject', serializedRect);
+			serializedRect.customId = rect.customId;
+			socket.emit('addObject', serializedRect);
 		}
 	};
 
@@ -349,7 +440,6 @@ export const useCanvas = () => {
 		}
 	};
 	
-
 	return {
 		canvasRef,
 		addLightIconToCanvas,
