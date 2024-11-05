@@ -1,16 +1,21 @@
+// components/ShareButton.tsx
 import { useState } from "react";
 import Modal from "./Modal";
-import { useShareFile } from '../hooks/useShareFile';
-
+import { useShareFile } from "../hooks/useShareFile";
 
 interface ShareButtonProps {
     fileId: string;
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({ fileId }) => {
-    const [showShareModal, setShowShareModal] = useState(false);
-    const [shareEmail, setShareEmail] = useState("");
+    const [showShareModal, setShowShareModal] = useState<boolean>(false);
+    const [shareEmail, setShareEmail] = useState<string>("");
     const { addContributor } = useShareFile();
+
+    const validateEmail = (email: string): boolean => {
+        const re = /\S+@\S+\.\S+/;
+        return re.test(email);
+    };
 
     const handleShareClick = () => {
         setShowShareModal(true);
@@ -18,11 +23,16 @@ const ShareButton: React.FC<ShareButtonProps> = ({ fileId }) => {
 
     const handleConfirmShare = async () => {
         if (shareEmail) {
+            if (!validateEmail(shareEmail)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
             await addContributor(fileId, shareEmail);
+            alert("Floor plan successfully shared");
             setShowShareModal(false);
             setShareEmail("");
         } else {
-            alert("Please enter a valid email.");
+            alert("Please enter an email.");
         }
     };
 
