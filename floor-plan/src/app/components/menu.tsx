@@ -1,26 +1,34 @@
-// src/components/Menu.tsx
-import React from 'react';
-import { renameItem, deleteItem, moveItem } from '../utils/menuUtils';
+import React, { useState } from "react";
+import { useMenuActions } from "../hooks/useMenuActions";
 
 interface MenuProps {
     itemId: string;
-    onRename: () => void;
-    onDelete: () => void;
-    onMove: () => void;
+    onClose: () => void;
 }
 
-const Menu: React.FC<MenuProps> = ({ itemId, onRename, onDelete, onMove }) => {
+const Menu: React.FC<MenuProps> = ({ itemId, onClose }) => {
+    const { handleDelete, handleRename, handleMove } = useMenuActions();
+    const [newName, setNewName] = useState("");
+    const [newFolderId, setNewFolderId] = useState("");
+
     return (
         <div className="menu">
-            <button onClick={() => { onRename(); renameItem(itemId, 'New Name'); }}>
-                Rename
-            </button>
-            <button onClick={() => { onDelete(); deleteItem(itemId); }}>
-                Delete
-            </button>
-            <button onClick={() => { onMove(); moveItem(itemId, 'New Location'); }}>
-                Move
-            </button>
+            <button onClick={() => handleDelete()}>Delete</button>
+            <input
+                type="text"
+                placeholder="New name"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+            />
+            <button onClick={() => handleRename(newName)}>Rename</button>
+            <input
+                type="text"
+                placeholder="New folder ID"
+                value={newFolderId}
+                onChange={(e) => setNewFolderId(e.target.value)}
+            />
+            <button onClick={() => handleMove(newFolderId)}>Move</button>
+            <button onClick={onClose}>Close</button>
         </div>
     );
 };

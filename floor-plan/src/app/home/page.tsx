@@ -4,7 +4,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase";
 import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
-import { useDeleteDocument } from "../hooks/useDeleteDocument";
+//import { useDeleteDocument } from "../hooks/useDeleteDocument";
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
@@ -13,17 +13,24 @@ import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase";
+//import { doc, updateDoc } from "firebase/firestore";
+//import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
-import Menu from '../components/menu';
-import { deleteItem, moveItem, renameItem } from '../utils/menuUtils';
+//import Menu from '../components/menu';
+//import { deleteItem, moveItem, renameItem } from '../utils/menuUtils';
+
+import { useMenuActions } from "../hooks/useMenuActions"; // Custom hook to handle menu actions
+import Menu from "../components/menu"; // Three-dot menu component
 
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
 
 export default function Home() {
+	const [isMenuVisible, setMenuVisible] = useState(false);
+    const [activeItemId, setActiveItemId] = useState<string | null>(null);
+
+
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
@@ -34,19 +41,25 @@ export default function Home() {
 	const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
-	const [selectedFileId, setSelectedFileId] = useState(String);
+	//const [selectedFileId, setSelectedFileId] = useState(String);
 	const router = useRouter();
 	const [openSpinner, setOpeningSpinner] = useState(false);
 
-	const [isRenaming, setIsRenaming] = useState(false);
-	const [docToRename, setDocToRename] = useState<string | null>(null);
-	const [newName, setNewName] = useState('');
+	//const [isRenaming, setIsRenaming] = useState(false);
+	//const [docToRename, setDocToRename] = useState<string | null>(null);
+	//const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
 	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
 	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+
+    const showMenu = (itemId: string) => {
+        setActiveItemId(itemId);
+        setMenuVisible(true);
+    };
+
 
 	// Functions for switching between home and shared with me
 	const handleClickHome = () => {
@@ -231,19 +244,7 @@ export default function Home() {
 		}
 	};
 
-	// Creates a pop up when user tries to delete a floor plan
-	// Askes if they want to proceed
-	const handleDelete = async (id: string) => {
-		if (window.confirm("Are you sure you want to delete this file?")) {
-			try {
-				await deleteDocument(id);
-				window.location.reload(); // Refreshes the page after successful deletion
-			} catch (error) {
-				console.error("Failed to delete the floor plan:", error);
-				alert("Failed to delete the floor plan.");
-			}
-		}
-	};
+	const { isMenuOpen, openMenu, closeMenu, handleDelete, handleRename, handleMove } = useMenuActions();
 
 	// Display pop up menu when clicking on three dot icon
 	const handleThreeDotPopup = (id: string) => {
@@ -262,27 +263,9 @@ export default function Home() {
 		return name.length > 10 ? `${name.substring(0, 7)}...` : name;
 	};
 
-	const startRenaming = (docId: string, currentName?: string) => {
-		setIsRenaming(true);
-		setDocToRename(docId);
-		setNewName(currentName || ''); // Pre-fill with current name if available
-	};
 
-	const cancelRenaming = () => {
-		setIsRenaming(false);
-		setDocToRename(null);
-	};
 
-	// Changes the new name in firebase and on screen
-	const submitNewName = async () => {
-		if (docToRename && newName) {
-			await updateFileName(docToRename, newName);
-			setIsRenaming(false);
-			setDocToRename(null);
-			// Optionally refresh the list of floor plans to show the updated name
-			await fetchFloorPlans();
-		}
-	};
+
 
 	// Hide three dot pop up menu when you hover away
 	const handleMouseLeave = () => {
@@ -446,20 +429,12 @@ export default function Home() {
 								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
 
 								{/* Popup Menu */}
-								{showThreeDotPopup && selectedFileId === file.id && (
-									isRenaming && docToRename === file.id ? (
-										<>
-											<input value={newName} onChange={(e) => setNewName(e.target.value)} />
-											<button onClick={submitNewName}>Save</button>
-											<button onClick={cancelRenaming}>Cancel</button>
-										</>
-									) : (
-										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<ShareButton fileId={file.id} />
-											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-											<button onClick={() => handleDelete(file.id)}>Delete</button>
-										</div>
-									)
+								<button className={styles.threeDotButton} onClick={() => openMenu(file.id)}>
+									<img className={styles.threeDotLogo} src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png" alt="three-dots-icon" />
+								</button>
+
+								{isMenuOpen && activeItemId === file.id && (
+									<Menu itemId={file.id} onClose={closeMenu} />
 								)}
 							</div>
 						))}
