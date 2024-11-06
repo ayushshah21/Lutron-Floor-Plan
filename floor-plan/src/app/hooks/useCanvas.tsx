@@ -7,6 +7,7 @@ import { useUploadPdf } from "./useUploadPdf";
 import { app, db, auth } from "../../../firebase";
 import socket from "../../socket";
 import { getDocument } from "pdfjs-dist";
+import { doc, updateDoc } from "firebase/firestore";
 
 export const useCanvas = (pdfUrl: string) => {
 	const canvasRef = useRef<fabric.Canvas | null>(null);
@@ -205,7 +206,7 @@ export const useCanvas = (pdfUrl: string) => {
 	};
 
 	const addLightIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/light-1.png", x, y, isOriginal);
+		addIconToCanvas("/light.png", x, y, isOriginal);
 	};
 
 	const addFixtureIconToCanvas = (x: number, y: number, isOriginal = false) => {
@@ -329,6 +330,18 @@ export const useCanvas = (pdfUrl: string) => {
 				const uploadResult = await uploadBytes(storageRef, pdfBlob);
 				const downloadURL = await getDownloadURL(uploadResult.ref);
 				await updatePdfUrl(documentId, downloadURL);
+
+				// Save icon positions to Firestore
+				const iconPositions = canvasRef.current?.getObjects().map((obj) => ({
+					type: obj.type,
+					left: obj.left,
+					top: obj.top,
+					customId: (obj as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId, // Type assertion to access customId
+				}));
+
+				// Save icon positions to Firestore (you need to implement this function)
+				await saveIconPositions(documentId, iconPositions || []);
+
 				alert("Changes successfully saved");
 			} catch (err) {
 				console.error("Error uploading PDF to Firebase Storage:", err);
@@ -336,6 +349,14 @@ export const useCanvas = (pdfUrl: string) => {
 		} else {
 			console.error("Failed to generate PDF");
 		}
+	};
+
+	// Function to save icon positions to Firestore
+	const saveIconPositions = async (documentId: string, iconPositions: any[]) => {
+		const docRef = doc(db, "floorplans", documentId);
+		await updateDoc(docRef, {
+			iconPositions: iconPositions,
+		});
 	};
 
 	const enableFreeDrawing = () => {

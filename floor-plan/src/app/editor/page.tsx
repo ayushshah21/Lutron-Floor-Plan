@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { pdfjs } from "react-pdf";
 import Link from 'next/link';
+import { doc, getDoc } from "firebase/firestore";
 
 import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
@@ -10,6 +11,7 @@ import { useCanvas } from "../hooks/useCanvas";
 import { User, Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
 import React from "react";
 import ShareButton from "../components/ShareButton";
+import { db } from "../../../firebase";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -78,6 +80,9 @@ export default function Editor() {
 			setPdfUrl(searchParamPdf);
 			setDocumentID(searchParamDocId);
 			setFileName(originalFileName);
+
+			// Load icon positions from Firestore
+			loadIconPositions(searchParamDocId);
 		}
 	}, [searchParams]);
 
@@ -85,6 +90,45 @@ export default function Editor() {
   
 	// Parse the folder path from the URL parameter
 	const pathSegments = folderPath ? JSON.parse(decodeURIComponent(folderPath)) : [{ id: "4", name: "Home" }];
+
+	// Function to load icon positions from Firestore
+	const loadIconPositions = async (documentId: string) => {
+		const docRef = doc(db, "floorplans", documentId);
+		const docSnap = await getDoc(docRef);
+		if (docSnap.exists()) {
+			const data = docSnap.data();
+			const iconPositions = data.iconPositions || [];
+			iconPositions.forEach((icon: any) => {
+				switch (icon.type) {
+					case 'light':
+						addLightIconToCanvas(icon.left, icon.top);
+						break;
+					case 'fixture':
+						addFixtureIconToCanvas(icon.left, icon.top);
+						break;
+					case 'device':
+						addDeviceIconToCanvas(icon.left, icon.top);
+						break;
+					case 'sensor':
+						addSensorIconToCanvas(icon.left, icon.top);
+						break;
+					case 'securityCamera':
+						addSecurityCameraIconToCanvas(icon.left, icon.top);
+						break;
+					case 'wall':
+						addWallIconToCanvas(icon.left, icon.top);
+						break;
+					case 'door':
+						addDoorIconToCanvas(icon.left, icon.top);
+						break;
+					default:
+						console.log(`Unsupported icon type: ${icon.type}`);
+				}
+			});
+		} else {
+			console.log("No such document!");
+		}
+	};
 
 	return (
 		<div className="main">
