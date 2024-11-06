@@ -205,7 +205,7 @@ export const useCanvas = (pdfUrl: string) => {
 	};
 
 	const addLightIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/light-1.png", x, y, isOriginal);
+		addIconToCanvas("/light.png", x, y, isOriginal);
 	};
 
 	const addFixtureIconToCanvas = (x: number, y: number, isOriginal = false) => {
