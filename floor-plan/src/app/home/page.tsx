@@ -439,7 +439,7 @@ export default function Home() {
 									{truncateFloorPlanName(file.name)}
 									<div className={styles.fileNamePopup}>{file.name}</div>
 								</div>
-								<img src={thumbnails[file.id] || 'default-thumbnail.png'} alt="PDF Thumbnail" className={styles.thumbnail} />
+								<img src={thumbnails[file.id] || 'loading'} alt="PDF Thumbnail" className={styles.thumbnail} />
 								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
 
 								{/* Popup Menu */}
