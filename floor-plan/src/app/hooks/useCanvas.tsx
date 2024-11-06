@@ -117,7 +117,7 @@ export const useCanvas = () => {
 	};
 
 	const addLightIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/light.png", x, y, isOriginal);
+		addIconToCanvas("/light-1.png", x, y, isOriginal);
 	};
 
 	const addFixtureIconToCanvas = (x: number, y: number, isOriginal = false) => {
@@ -129,7 +129,7 @@ export const useCanvas = () => {
 	};
 
 	const addSensorIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/sensor.jpg", x, y, isOriginal);
+		addIconToCanvas("/sensor.png", x, y, isOriginal);
 	};
 
 	const addRectangleToCanvas = () => {
@@ -308,7 +308,7 @@ export const useCanvas = () => {
 	};
 
 	const addSecurityCameraIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/security-camera.jpg", x, y, isOriginal);
+		addIconToCanvas("/security-camera.png", x, y, isOriginal);
 	};
 
 	const addWallIconToCanvas = (x: number, y: number, isOriginal = false) => {
@@ -316,7 +316,7 @@ export const useCanvas = () => {
 	};
 
 	const addDoorIconToCanvas = (x: number, y: number, isOriginal = false) => {
-		addIconToCanvas("/door.jpg", x, y, isOriginal);
+		addIconToCanvas("/door.png", x, y, isOriginal);
 	};
 
 	const addRightArrowIconToCanvas = (x: number, y: number, isOriginal = false) => {
