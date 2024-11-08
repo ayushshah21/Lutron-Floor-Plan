@@ -17,6 +17,7 @@ export const useCanvas = (pdfUrl: string) => {
 	const [isDrawing, setIsDrawing] = useState(false);
 	const [isErasing, setIsErasing] = useState(false);
 
+	// Canvas initalization
 	useEffect(() => {
         let cleanup: (() => void) | undefined;
 
@@ -83,30 +84,33 @@ export const useCanvas = (pdfUrl: string) => {
         };
     }, [pdfUrl]);
 	
+	// Socket.io
 	const attachEventListeners = (fabricCanvas: fabric.Canvas) => {
-        // Event handler for when an object is moved on the canvas
-        const handleObjectMoving = (event: fabric.IEvent) => {
-            console.log("Object is moving");
-            const target = event.target as ExtendedGroup | ExtendedRect | ExtendedText | ExtendedPath;
-            if (target && target.customId) {
-                const { left, top, customId } = target;
-                console.log('Emitting moveObject:', { left, top, customId });
-                socket.emit('moveObject', { left, top, customId });
-            } else {
-                console.log("No valid target or customId for moving object");
-            }
-        };
+		const handleObjectModified = (event: fabric.IEvent) => {
+			const target = event.target as ExtendedGroup | ExtendedRect | ExtendedText | ExtendedPath;
+			if (target && target.customId) {
+				const center = target.getCenterPoint();
+				const { scaleX, scaleY, angle, customId } = target;
+		
+				const data = {
+					customId,
+					left: center.x,
+					top: center.y,
+					scaleX,
+					scaleY,
+					angle,
+				};
+		
+				socket.emit('updateObject', data);
+			}
+		};
 
-        // Attach the 'object:moving' event listener to the canvas
-        fabricCanvas.on('object:moving', handleObjectMoving);
-        console.log("object:moving event listener added");
+    	fabricCanvas.on('object:modified', handleObjectModified);
 
         // Socket.io event listeners for real-time collaboration
         if (socket) {
             // Listen for 'addObject' event from the server
             socket.on('addObject', (data) => {
-                console.log("Object added");
-                console.log(data);
                 fabric.util.enlivenObjects([data], (objects: fabric.Object[]) => {
                     objects.forEach((obj) => {
                         fabricCanvas.add(obj);
@@ -117,8 +121,6 @@ export const useCanvas = (pdfUrl: string) => {
 
             // Listen for 'deleteObject' event from the server
             socket.on('deleteObject', (data) => {
-                console.log("Object deleted");
-                console.log(data);
                 const objectToRemove = fabricCanvas.getObjects().find((o) =>
                     (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
                 );
@@ -128,35 +130,37 @@ export const useCanvas = (pdfUrl: string) => {
                 }
             });
 
-            // Listen for 'moveObject' event from the server
-            socket.on('moveObject', (data) => {
-                console.log('Received moveObject:', data);
-                const objectToMove = fabricCanvas.getObjects().find((o) =>
-                    (o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
-                );
-                if (objectToMove) {
-                    objectToMove.set({
-                        left: data.left,
-                        top: data.top,
-                    });
-                    fabricCanvas.renderAll();
-                }
-            });
+            socket.on('updateObject', (data) => {
+				const objectToUpdate = fabricCanvas.getObjects().find((o) =>
+					(o as ExtendedRect | ExtendedGroup | ExtendedText | ExtendedPath).customId === data.customId
+				);
+				if (objectToUpdate) {
+					objectToUpdate.set({
+						left: data.left,
+						top: data.top,
+						scaleX: data.scaleX,
+						scaleY: data.scaleY,
+						angle: data.angle,
+						originX: 'center',
+						originY: 'center',
+					});
+					objectToUpdate.setCoords();
+					fabricCanvas.renderAll();
+				}
+			});
         }
 
         // Clean up function to remove event listeners when the component unmounts
         const cleanup = () => {
-            fabricCanvas.off('object:moving', handleObjectMoving);
-            console.log("object:moving event listener removed");
+            fabricCanvas.off('object:modified', handleObjectModified);
 
             if (socket) {
                 socket.off('addObject');
                 socket.off('deleteObject');
-                socket.off('moveObject');
+                socket.off('updateObject');
             }
         };
 
-        // Return the cleanup function
         return cleanup;
     };
 
@@ -183,6 +187,8 @@ export const useCanvas = (pdfUrl: string) => {
 				const group = new ExtendedGroup([img], {
 					left: x,
 					top: y,
+					originX: "center",
+					originY: "center",
 					selectable: true,
 					lockMovementX: false,
 					lockMovementY: false,
