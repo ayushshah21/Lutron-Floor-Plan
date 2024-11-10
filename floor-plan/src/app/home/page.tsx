@@ -61,6 +61,21 @@ export default function Home() {
 		fetchFloorPlans(); // Fetch files when the filter or folder changes
 	}, [filterByContributors, selectedFolder]);
 
+	// Removes the border around the home page
+	useEffect(() => {
+		document.body.style.margin = "0";
+		document.body.style.padding = "0";
+		document.body.style.boxSizing = "border-box";
+		document.body.style.background = "#F9F9F9";
+	
+		return () => {
+		  document.body.style.margin = "";
+		  document.body.style.padding = "";
+		  document.body.style.boxSizing = "";
+		  document.body.style.background = "";
+		};
+	  }, []);
+
 	// Function to render PDF thumbnail
 	const renderThumbnail = async (pdfUrl: string) => {
 		try {
@@ -311,7 +326,7 @@ export default function Home() {
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
 			<>
 				<aside className={styles.sidebar}>
-					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
+					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo"/>
 					<nav className={styles.navigation} id="navSidebar">
 						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={handleClickHome}>
 							<HomeIcon size={22} /> Home
@@ -321,6 +336,9 @@ export default function Home() {
 						</button>
 						<button className={`${styles.navButton} ${styles.iconButton}`}>
 							<Clock color="black" size={22} /> Recent
+						</button>
+						<button className={`${styles.navButton} ${styles.iconButton}`}>
+							<Star size={22} /> Starred
 						</button>
 					</nav>
 					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
@@ -372,12 +390,19 @@ export default function Home() {
 							+ New
 						</button>
 
+
 						{showNewOptions && (
 							<div className={styles.newOptionsDropdown}>
-								<button onClick={() => document.getElementById("fileInput")?.click()}>
+								<button onClick={() => {
+									document.getElementById("fileInput")?.click();
+									setShowNewOptions(false); // Hide the menu after clicking "New File"
+								}}>
 									New File
 								</button>
-								<button onClick={() => setShowNewFolderInput(!showNewFolderInput)}>
+								<button onClick={() => {
+									setShowNewFolderInput(!showNewFolderInput);
+									setShowNewOptions(false); // Hide the menu after clicking "New Folder"
+								}}>
 									New Folder
 								</button>
 								{/* Hidden input field for file selection */}
@@ -402,6 +427,7 @@ export default function Home() {
 								<button onClick={handleCreateFolder} className={styles.button}>
 									Create Folder
 								</button>
+								<button onClick={() => setShowNewFolderInput(false)} className={styles.button}>Cancel</button>
 							</div>
 						)}
 					</div>
@@ -423,6 +449,9 @@ export default function Home() {
 								</div>
 							))
 						)}
+					</div>
+					<div className={styles.prompt}>
+						Use the “New” button to upload a file or folder
 					</div>
 					<div className={styles.fileList}>
 						{floorPlans.map((file: FloorPlanDocument) => (
@@ -455,14 +484,12 @@ export default function Home() {
 											<ShareButton fileId={file.id} />
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 											<button onClick={() => handleDelete(file.id)}>Delete</button>
+											<button>Add to Starred</button>
 										</div>
 									)
 								)}
 							</div>
 						))}
-					</div>
-					<div className={styles.prompt}>
-						Use the “New” button to upload a file
 					</div>
 				</main>
 			</>

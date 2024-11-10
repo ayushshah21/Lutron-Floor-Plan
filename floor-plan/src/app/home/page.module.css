@@ -43,20 +43,12 @@
   margin-top: 8px;
 }
 
-.starButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-bottom: 8px; /* Space between star and three-dot button */
-}
-
 /* The sidebar styles */
 .sidebar {
   background: #FFFFFF;
   padding: 1rem;
   width: 240px;
   height: 100vh;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -89,7 +81,8 @@
 .lutronLogo {
   max-width: 80%;
   /* Adjust the size of the logo */
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
   align-self: center;
   /* Center the logo in the sidebar */
 }
@@ -362,6 +355,8 @@
   display: flex;
   flex-direction: column;
   z-index: 10; /* Ensure dropdown is above other elements */
+  left: 9%; 
+  top: -25%;
 }
 
 /* Style for the new folder input field */
