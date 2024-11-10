@@ -5,6 +5,7 @@ import { auth } from "../../../firebase";
 import styles from "./page.module.css";
 import { useUploadPdf } from "../hooks/useUploadPdf";
 import { useDeleteDocument } from "../hooks/useDeleteDocument";
+import { useStarredFile } from "../hooks/useStarredFiles"
 import { useRouter } from "next/navigation";
 import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
@@ -26,8 +27,9 @@ export default function Home() {
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
 	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
-	const [filterByContributors, setFilterByContributors] = useState(false);
-	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder, filterByContributors);
+	const [filterCondition, setFilterCondition] = useState<string>("Home"); // Default is home
+	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder, filterCondition);
+	const { updateStarredFloorplan } = useStarredFile();
 	const { deleteDocument, isDeleting, error: deleteError } = useDeleteDocument();
 	const { isLoading } = useAuthRedirect();
 	const [showThreeDotPopup, setShowThreeDotPopup] = useState(false);
@@ -45,21 +47,16 @@ export default function Home() {
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 
-	// Functions for switching between home and shared with me
-	const handleClickHome = () => {
-		setFilterByContributors(false); 
-		setSelectedFolder(null); 
-	};
-
-	const handleClickSharedWithMe = () => {
-		setFilterByContributors(true); 
+	// Functions for switching between home, recent, starred, and sharred
+	const handleClickFilterOptions = (filterParameter: string) => {
+		setFilterCondition(filterParameter); 
 		setSelectedFolder(null); 
 	};
 
 	// Ensure `fetchFloorPlans` is called whenever `filterByContributors` or `selectedFolder` changes
 	useEffect(() => {
 		fetchFloorPlans(); // Fetch files when the filter or folder changes
-	}, [filterByContributors, selectedFolder]);
+	}, [filterCondition, selectedFolder]);
 
 	// Removes the border around the home page
 	useEffect(() => {
@@ -301,6 +298,16 @@ export default function Home() {
 		setShowThreeDotPopup(false);
 	};
 
+	// Handle starring floorplans
+	const handleStarredFloorplans = async (documentId: string, isStarred: boolean) => {
+		await updateStarredFloorplan(documentId, isStarred);
+		if (isStarred) {
+			alert("Floorplan successfully starred")
+		} else {
+			alert("Floorplan removed from starred")
+		}
+	}
+
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const folderParam = params.get('folder');
@@ -326,18 +333,18 @@ export default function Home() {
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
 			<>
 				<aside className={styles.sidebar}>
-					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo"/>
+					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 					<nav className={styles.navigation} id="navSidebar">
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={handleClickHome}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Home")}>
 							<HomeIcon size={22} /> Home
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={handleClickSharedWithMe}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Shared")}>
 							< Users size={22} /> Shared with me
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Recent")}>
 							<Clock color="black" size={22} /> Recent
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`}>
+						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Starred")}>
 							<Star size={22} /> Starred
 						</button>
 					</nav>
@@ -395,7 +402,6 @@ export default function Home() {
 							<div className={styles.newOptionsDropdown}>
 								<button onClick={() => {
 									document.getElementById("fileInput")?.click();
-									setShowNewOptions(false); // Hide the menu after clicking "New File"
 								}}>
 									New File
 								</button>
@@ -484,7 +490,8 @@ export default function Home() {
 											<ShareButton fileId={file.id} />
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
 											<button onClick={() => handleDelete(file.id)}>Delete</button>
-											<button>Add to Starred</button>
+											<button onClick={() => handleStarredFloorplans(file.id, true)}>Add to Starred</button>
+											<button onClick={() => handleStarredFloorplans(file.id, false)}>Remove from Starred</button>
 										</div>
 									)
 								)}

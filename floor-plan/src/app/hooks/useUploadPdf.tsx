@@ -59,6 +59,7 @@ export const useUploadPdf = () => {
 				contributors: [userId],
 				createdAt: serverTimestamp(),
 				updatedAt: serverTimestamp(),
+				starred: false,
 				pdfURL,
 				name: floorPlanName, 
 				folderID,

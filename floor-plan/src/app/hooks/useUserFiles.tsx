@@ -1,13 +1,10 @@
 // hooks/useUserFiles.ts
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, onSnapshot, orderBy } from 'firebase/firestore';
 import { auth, db } from '../../../firebase'; // Adjust this path as needed
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 
-// Future: instead of passing booleans for shared with me, recent, etc
-// Pass in a filter string like (recent, shared, home, etc)
-// based on this filter string, filter floor plans as needed
-export const useUserFiles = (selectedFolder: string | null, filterByContributors: boolean) => {
+export const useUserFiles = (selectedFolder: string | null, filterCondition: string) => {
 	const [floorPlans, setFloorPlans] = useState<FloorPlanDocument[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null); // Allow `string` or `null`
@@ -25,20 +22,37 @@ export const useUserFiles = (selectedFolder: string | null, filterByContributors
 			
 			// Store firebase query
 			let q;
-
-			if (filterByContributors) {
-				// Filter floor plans where the user's email is in the contributors array
-				q = query(
-					collection(db, 'FloorPlans'),
-					where('contributors', 'array-contains', user.email)
-				);
-			} else {
-				// Default filter by originalCreator and folderID
-				q = query(
-					collection(db, 'FloorPlans'),
-					where('originalCreator', '==', user.uid),
-					where('folderID', '==', selectedFolder || '4') // Default to folder "4" (Home)
-				);
+			switch (filterCondition) {
+				case "Shared":
+					q = query(
+						collection(db, 'FloorPlans'),
+						where('contributors', 'array-contains', user.email)
+					);
+					break;
+				case "Home":
+					q = query(
+						collection(db, 'FloorPlans'),
+						where('originalCreator', '==', user.uid),
+						where('folderID', '==', selectedFolder || '4')
+					);
+					break;
+				case "Starred":
+					q = query(
+						collection(db, 'FloorPlans'),
+						where('originalCreator', '==', user.uid),
+						where('starred', '==', true)
+					);
+					break;
+				case "Recent":
+					q = query(
+						collection(db, 'FloorPlans'),
+						where('originalCreator', '==', user.uid),
+						where('folderID', '==', selectedFolder || '4'),
+						orderBy('updatedAt', 'desc') // Server-side sorting by `updatedAt`
+					);
+					break;
+				default:
+					throw new Error('Invalid filter condition');
 			}
 
 			const querySnapshot = await getDocs(q);
