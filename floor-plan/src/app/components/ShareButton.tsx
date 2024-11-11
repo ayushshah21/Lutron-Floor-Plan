@@ -2,6 +2,8 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import { useShareFile } from "../hooks/useShareFile";
+import { Share2 } from "lucide-react";
+import "./ShareButton.css";
 
 interface ShareButtonProps {
     fileId: string;
@@ -43,7 +45,10 @@ const ShareButton: React.FC<ShareButtonProps> = ({ fileId }) => {
 
     return (
         <>
-            <button onClick={handleShareClick}>Share</button>
+            <button className="share-button" onClick={handleShareClick}>
+                <Share2 size={18} />
+                Share
+            </button>
             <Modal
                 isVisible={showShareModal}
                 onClose={handleCancelShare}
