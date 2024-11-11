@@ -7,9 +7,11 @@ import Link from 'next/link';
 import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { useCanvas } from "../hooks/useCanvas";
-import { User, Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
+import { Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
+import { auth } from "../../../firebase";
 import React from "react";
 import ShareButton from "../components/ShareButton";
+import socket from "../../socket";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -43,12 +45,10 @@ export default function Editor() {
 	const [fileName, setFileName] = useState<string>("");
 	const searchParams = useSearchParams();
 	const pdfContainerRef = useRef<HTMLDivElement>(null);
-
-	const handleUserMenu = () => {
-		console.log("User Profile clicked");
-		// Logic to open user profile or user settings dropdown menu
-	};
 	
+	const currentUser = auth.currentUser?.email;
+	const [currentUsers, setCurrentUsers] = useState<string[]>([]); // State to hold current users
+
 	const handleFullscreen = () => {
 		const pdfContainer = pdfContainerRef.current;
 		if (!document.fullscreenElement && pdfContainer) {
@@ -86,6 +86,23 @@ export default function Editor() {
 	// Parse the folder path from the URL parameter
 	const pathSegments = folderPath ? JSON.parse(decodeURIComponent(folderPath)) : [{ id: "4", name: "Home" }];
 
+	// Handle Socket.IO connections and events
+	useEffect(() => {
+		// Join the room with documentID and username
+		socket.emit('joinRoom', { room_id: documentID, username: currentUser });
+
+		// Listen for user list updates
+		socket.on('userList', (users: string[]) => {
+			setCurrentUsers(users);
+		});
+
+		// Cleanup on unmount
+		return () => {
+			socket.emit('leaveRoom', { room_id: documentID });
+			socket.off('userList');
+		};
+	}, [documentID, currentUser]);
+
 	return (
 		<div className="main">
 			{/* Update the breadcrumb navigation to include folder path */}
@@ -114,9 +131,6 @@ export default function Editor() {
 					Save Changes
 				</button>
 				<ShareButton fileId={documentID}/>
-				<button className="toolbar-button" onClick={handleUserMenu} aria-label="User Profile">
-					<User size={18} />
-				</button>
 			</div>
 			<EditorToolbar
 				addRectangleToCanvas={addRectangleToCanvas}
@@ -143,6 +157,17 @@ export default function Editor() {
 					<canvas id="canvas"></canvas>
 				</div>
 			</div>
+
+			{/* Display the list of current users */}
+			<div className="current-users">
+				<p><strong>Current users:</strong></p>
+				<ul>
+					{currentUsers.map((user, index) => (
+						<li key={index}>{user}</li>
+					))}
+				</ul>
+			</div>
+
 			<div className="bottom-right-controls">
 				<button onClick={zoomIn} className="control-button" aria-label="Zoom In">
 					<ZoomIn size={24}/>
