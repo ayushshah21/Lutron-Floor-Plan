@@ -70,19 +70,22 @@
 
 
 .toolbar-button {
-    background: none;
-    border: none;
-    padding: 8px;
+    background-color: #ffffff;
+    border: 2px solid #0057B8;
+    color: #0057B8;
+    padding: 8px 16px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    border-radius: 50%;
-    font-weight: bold; 
-    color: #0057B8; 
-    font-size: 1.1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
 }
 
 .toolbar-button:hover {
-    background-color: #144a75;
+    background-color: #0057B8;
+    color: #ffffff;
 }
 
 .toolbar-button svg {
@@ -634,4 +637,80 @@
 
 .current-users::-webkit-scrollbar-thumb:hover {
   background: #b3b3b3;
+}
+
+/* Revert most changes but enhance specific elements */
+
+/* Enhance the top action buttons */
+.toolbar-button {
+    background-color: #ffffff;
+    border: 2px solid #0057B8;
+    color: #0057B8;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.toolbar-button:hover {
+    background-color: #0057B8;
+    color: #ffffff;
+}
+
+/* Fix the breadcrumb overlap */
+.breadcrumbs {
+    margin-top: 60px; /* Add space below the header */
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Ensure canvas renders properly */
+.canvas-container {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin: 20px;
+    position: relative;
+}
+
+/* Adjust the side toolbar spacing */
+.sideToolBar {
+    margin-top: 60px; /* Match breadcrumb spacing */
+}
+
+/* Clean up the bottom controls */
+.bottom-right-controls {
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+/* Fix the breadcrumb/home button positioning */
+.breadcrumbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 1rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0; /* Remove the previous margin */
+}
+
+.breadcrumbs a {
+    color: #0057B8;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.breadcrumbs a:hover {
+    color: #144a75;
+    text-decoration: underline;
 }
