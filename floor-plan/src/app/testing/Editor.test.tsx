@@ -1,17 +1,87 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import Editor from '../editor/page'
-import mockRouter from 'next-router-mock';
+/**
+ * @jest-environment jsdom
+ */
+import React from "react";
+import { render, screen } from "@testing-library/react";
 
-jest.mock('next/router', () => require('next-router-mock'));
+// Mock the components and hooks instead of their dependencies
+jest.mock("../hooks/useCanvas", () => ({
+  useCanvas: () => ({
+    canvasRef: { current: null },
+    zoomIn: jest.fn(),
+    zoomOut: jest.fn(),
+    exportCanvasAsPDF: jest.fn(),
+    saveFloorPlanChanges: jest.fn(),
+  })
+}));
 
-describe('Editor Page Tests', () => {
-    beforeEach(() => {
-        mockRouter.setCurrentUrl('/editor'); // Setup the initial URL
-    });
+// Mock the components
+jest.mock("../components/ShareButton", () => {
+  return function DummyShareButton() {
+    return <div>Share Button</div>;
+  };
+});
 
-    test('Render editor page', () => {
-        render(<Editor/>);
-    });
+jest.mock("../components/EditorToolbar", () => {
+  return function DummyEditorToolbar() {
+    return <div>Editor Toolbar</div>;
+  };
+});
+
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+  useSearchParams: () => ({
+    get: jest.fn().mockReturnValue(null),
+  }),
+}));
+
+// Import the Editor component after the mocks
+import Editor from "../editor/page";
+
+describe("Editor Basic UI Tests", () => {
+  test("renders toolbar buttons with correct labels", () => {
+    render(<Editor />);
+    
+    expect(screen.getByLabelText("Export as PDF")).toBeTruthy();
+    expect(screen.getByLabelText("Save Changes")).toBeTruthy();
+    expect(screen.getByLabelText("User Profile")).toBeTruthy();
+  });
+
+  test("renders control buttons in bottom-right corner", () => {
+    render(<Editor />);
+    
+    expect(screen.getByLabelText("Zoom In")).toBeTruthy();
+    expect(screen.getByLabelText("Zoom Out")).toBeTruthy();
+    expect(screen.getByLabelText("Toggle Fullscreen")).toBeTruthy();
+  });
+
+  test("renders EditorToolbar component", () => {
+    render(<Editor />);
+    expect(screen.getByText("Editor Toolbar")).toBeTruthy();
+  });
+
+  test("renders ShareButton component", () => {
+    render(<Editor />);
+    expect(screen.getByText("Share Button")).toBeTruthy();
+  });
+
+  test("renders breadcrumb with Home by default", () => {
+    render(<Editor />);
+    expect(screen.getByText("Home")).toBeTruthy();
+  });
+
+  test("renders main UI containers", () => {
+    const { container } = render(<Editor />);
+    
+    // Use type assertion to handle querySelector return type
+    const main = container.querySelector(".main");
+    const toolbar = container.querySelector(".toolbar");
+    const canvasContainer = container.querySelector(".canvas-container");
+    const controls = container.querySelector(".bottom-right-controls");
+
+    expect(main).not.toBeNull();
+    expect(toolbar).not.toBeNull();
+    expect(canvasContainer).not.toBeNull();
+    expect(controls).not.toBeNull();
+  });
 });
