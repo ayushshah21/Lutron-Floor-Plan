@@ -27,9 +27,9 @@ app.prepare().then(() => {
 			socket.broadcast.emit('deleteObject', data); 
 		});
 
-		socket.on('moveObject', (data) => {
-			socket.broadcast.emit('moveObject', data);
-		});		
+		socket.on('updateObject', (data) => {
+			socket.broadcast.emit('updateObject', data);
+		});
 	});
 
 	server.all('*', (req, res) => {
