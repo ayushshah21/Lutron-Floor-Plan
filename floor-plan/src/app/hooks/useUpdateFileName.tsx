@@ -1,32 +1,51 @@
-import { useState } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../firebase';
 
+// hooks/useUpdateFileName.tsx
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 /**
- * Hook to handle the renaming of documents in Firestore.
+ * Hook to manage renaming files.
  */
 export const useUpdateFileName = () => {
-    const [isUpdating, setIsUpdating] = useState(false); // State to track whether update file name is in progress
-    const [error, setError] = useState<Error | null>(null); // State to store any errors that occur
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [docToRename, setDocToRename] = useState<string | null>(null);
+  const [newName, setNewName] = useState<string>("");
 
-    /**
-     * Function to update the name of a document in the 'FloorPlans' collection.
-     * @param {string} docId - The ID of the document to update.
-     * @param {string} newName - The new name for the document.
-     */
-    const updateFileName = async (docId: string, newName: string) => {
-        setIsUpdating(true);
-        try {
-            const docRef = doc(db, 'FloorPlans', docId);
-            await updateDoc(docRef, { name: newName });
-        } catch (err) {
-            console.error("Error updating document name:", err);
-            setError(err as Error);
-        }
-        setIsUpdating(false);
-    };
+  const startRenaming = (docId: string, currentName: string) => {
+    setDocToRename(docId);
+    setNewName(currentName);
+    setIsRenaming(true);
+  };
 
+  const cancelRenaming = () => {
+    setDocToRename(null);
+    setNewName("");
+    setIsRenaming(false);
+  };
 
-    return { updateFileName, isUpdating, error };
+  const submitNewName = async () => {
+    if (!docToRename) return;
+    try {
+      const docRef = doc(db, "floorPlans", docToRename);
+      await updateDoc(docRef, { name: newName });
+      console.log("Document renamed successfully");
+    } catch (error) {
+      console.error("Error renaming document: ", error);
+    } finally {
+      cancelRenaming();
+    }
+  };
+
+  return {
+    isRenaming,
+    docToRename,
+    newName,
+    setNewName,
+    startRenaming,
+    cancelRenaming,
+    submitNewName,
+  };
 };
+
+export default useUpdateFileName;

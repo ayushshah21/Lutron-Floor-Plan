@@ -1,32 +1,33 @@
+// hooks/useStarredFiles.tsx
 import { useState } from "react";
-import { getFirestore, doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
-const firestore = getFirestore();
+/**
+ * Hook to manage starring and unstarring files.
+ */
+export const useStarredFiles = () => {
+  const [updating, setUpdating] = useState(false);
 
-export const useStarredFile = () => {
-	const [updating, setUpdating] = useState(false);
-	const [error, setError] = useState("");
+  const handleStarred = async (documentId: string, isStarred: boolean) => {
+    setUpdating(true);
+    try {
+      const docRef = doc(db, "floorPlans", documentId);
+      await updateDoc(docRef, {
+        isStarred: isStarred,
+      });
+      console.log(`File ${isStarred ? "starred" : "unstarred"} successfully`);
+    } catch (error) {
+      console.error("Error updating starred status: ", error);
+    } finally {
+      setUpdating(false);
+    }
+  };
 
-	// Set starred attribute to false or true given a documentID, and a boolean
-	const updateStarredFloorplan = async (documentId: string, isStarred: boolean) => {
-		setUpdating(true);
-		setError(""); // Reset the error state
-
-		try {
-			// Reference to the specific document in Firestore
-			const docRef = doc(firestore, "FloorPlans", documentId);
-
-			// Update the starred field 
-			await updateDoc(docRef, {
-				starred: isStarred,
-			});
-		} catch (err) {
-			console.error("Error updating starred floorplan:", err);
-			setError("Error updating starred floorplan");
-		} finally {
-			setUpdating(false);
-		}
-	};
-
-	return { updateStarredFloorplan, updating, error };
+  return {
+    handleStarred,
+    updating,
+  };
 };
+
+export default useStarredFiles;

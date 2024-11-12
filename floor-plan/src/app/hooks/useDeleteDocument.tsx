@@ -1,31 +1,32 @@
-import { useState } from 'react';
-import { doc, deleteDoc } from 'firebase/firestore';
-import { db } from '../../../firebase'; 
+// hooks/useDeleteDocument.tsx
+import { useState } from "react";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase";
 
 /**
- * Custom hook to handle the deletion of documents from Firestore.
- * Provides the function to delete a document, a flag indicating if a deletion is in progress,
- * and any errors that might have occurred during the deletion process.
+ * Hook to manage document deletion from Firebase Firestore.
  */
-export const useDeleteDocument = () => {
-    const [isDeleting, setIsDeleting] = useState(false); // State to track whether deletion is in progress
-    const [error, setError] = useState<Error | null>(null); // State to store any errors that occur
+const useDeleteDocument = () => {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<null | Error>(null);
 
-    /**
-     * Function to delete a document from the 'FloorPlans' collection in Firestore.
-     * @param {string} docId - The ID of the document to delete.
-     */
-    const deleteDocument = async (docId: string) => {
-        setIsDeleting(true); // Set deleting state to true to indicate the process has started
-        try {
-            const docRef = doc(db, 'FloorPlans', docId); // Get a reference to the specific document
-            await deleteDoc(docRef); // Attempt to delete the document
-        } catch (err) {
-            console.error("Error deleting document:", err); // Log and store any errors that occur
-            setError(err as Error);
-        }
-        setIsDeleting(false); // Reset deleting state once the deletion process is complete
-    };
+  /**
+   * Function to delete a document by ID.
+   * @param documentId - The ID of the document to delete.
+   */
+  const deleteDocument = async (documentId: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteDoc(doc(db, "floorPlans", documentId));
+      setDeleteError(null);
+    } catch (error) {
+      setDeleteError(error as Error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-    return { deleteDocument, isDeleting, error }; // Return the delete function, deletion state, and error state
+  return { deleteDocument, isDeleting, deleteError };
 };
+
+export default useDeleteDocument;
