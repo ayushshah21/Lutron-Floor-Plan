@@ -1,32 +1,25 @@
 // hooks/useDeleteDocument.tsx
-import { useState } from "react";
-import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { useState } from 'react';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../../firebase'; // Adjust this path as needed
 
-/**
- * Hook to manage document deletion from Firebase Firestore.
- */
-const useDeleteDocument = () => {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<null | Error>(null);
+export const useDeleteDocument = () => {
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Function to delete a document by ID.
-   * @param documentId - The ID of the document to delete.
-   */
   const deleteDocument = async (documentId: string) => {
     setIsDeleting(true);
+    setError(null);
+
     try {
-      await deleteDoc(doc(db, "floorPlans", documentId));
-      setDeleteError(null);
-    } catch (error) {
-      setDeleteError(error as Error);
+      const docRef = doc(db, 'FloorPlans', documentId);
+      await deleteDoc(docRef);
+    } catch (err) {
+      setError(`Error deleting document: ${(err as Error).message}`);
     } finally {
       setIsDeleting(false);
     }
   };
 
-  return { deleteDocument, isDeleting, deleteError };
+  return { deleteDocument, isDeleting, error };
 };
-
-export default useDeleteDocument;

@@ -1,4 +1,3 @@
-
 export interface FloorPlanDocument {
     id: string;
     contributors: string[];
@@ -7,7 +6,6 @@ export interface FloorPlanDocument {
     originalCreator: string;
     pdfURL: string;
     updatedAt: Date;
-    name?: string;
-    folderID?: string;
-  }
-  
+    name?: string; // Make name optional to allow undefined but always provide a fallback in the UI
+    folderID?: string; 
+}
