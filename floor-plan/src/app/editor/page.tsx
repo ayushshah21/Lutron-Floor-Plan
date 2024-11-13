@@ -48,6 +48,11 @@ export default function Editor() {
 	
 	const currentUser = auth.currentUser?.email;
 	const [currentUsers, setCurrentUsers] = useState<string[]>([]); // State to hold current users
+	const [minimized, setMinimized] = useState(false); // Track if current users box is minimized
+
+	const toggleMinimize = () => {
+		setMinimized(!minimized);
+	}
 
 	const handleFullscreen = () => {
 		const pdfContainer = pdfContainerRef.current;
@@ -159,13 +164,20 @@ export default function Editor() {
 			</div>
 
 			{/* Display the list of current users */}
-			<div className="current-users">
-				<p><strong>Current users:</strong></p>
-				<ul>
-					{currentUsers.map((user, index) => (
-						<li key={index}>{user}</li>
-					))}
-				</ul>
+			<div className={`current-users ${minimized ? 'minimized' : ''}`}>
+				<button onClick={toggleMinimize} className="minimize-button">
+					{minimized ? '+' : '-'}
+				</button>
+				{!minimized && (
+					<>
+						<p><strong>Current users:</strong></p>
+						<ul>
+							{currentUsers.map((user, index) => (
+								<li key={index}>{user}</li>
+							))}
+						</ul>
+					</>
+				)}
 			</div>
 
 			<div className="bottom-right-controls">
