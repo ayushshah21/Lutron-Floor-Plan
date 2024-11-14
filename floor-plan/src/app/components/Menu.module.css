@@ -1,0 +1,36 @@
+.menuContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.menuOptions {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    padding: 0.5rem;
+}
+
+.menuOptions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.menuOptions button:hover {
+    background-color: #f0f0f0;
+}

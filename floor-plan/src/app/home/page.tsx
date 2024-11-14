@@ -17,6 +17,8 @@ import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
+import Menu from "../components/Menu";
+
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
 import 'pdfjs-dist/build/pdf.worker.entry';
@@ -308,6 +310,24 @@ export default function Home() {
 		}
 	}
 
+	const handleRenameFolder = (folderId: string) => {
+		// Placeholder function to handle renaming folders
+		console.log(`Rename folder with ID: ${folderId}`);
+		// Add your renaming logic here (e.g., prompt for new folder name, update in database)
+	};
+	const handleMoveFolder = (folderId: string) => {
+    // Placeholder function to handle moving folders
+    console.log(`Move folder with ID: ${folderId}`);
+    // Add your moving logic here (e.g., select target folder, update in database)
+	};
+
+	const handleDeleteFolder = (folderId: string) => {
+		// Placeholder function to delete  folders
+		console.log(`Delete folder with ID: ${folderId}`);
+		// Add your delete logic here (e.g., select target folder, update in database)
+		};
+
+
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		const folderParam = params.get('folder');
@@ -438,7 +458,6 @@ export default function Home() {
 						)}
 					</div>
 
-
 					<div className={styles.folderList}>
 						{loadingFolders ? (
 							<div>Loading folders...</div>
@@ -451,11 +470,17 @@ export default function Home() {
 									onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
 									onDragOver={(e) => e.preventDefault()} // Allow drag over
 								>
-									{folder.name}
+									<span>{folder.name}</span>
+									<Menu
+										onDelete={() => handleDeleteFolder(folder.id)}
+										onRename={() => handleRenameFolder(folder.id)}
+										onMove={() => handleMoveFolder(folder.id)}
+									/>
 								</div>
 							))
 						)}
 					</div>
+
 					<div className={styles.prompt}>
 						Use the “New” button to upload a file or folder
 					</div>
