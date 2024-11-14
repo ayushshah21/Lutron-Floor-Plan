@@ -20,7 +20,7 @@ import ShareButton from "../components/ShareButton";
 import { truncateName } from "../utils/stringUtils";
 import { signOutWithGoogle } from "../utils/auth";
 import { useDeleteDocument } from "../hooks/useDeleteDocument";
-import { Home as HomeIcon, Users, Clock, Star, Search } from "react-feather";
+import { Home as HomeIcon, Users, Clock, Star, Search, MoreVertical } from "react-feather";
 
 export default function HomePage() {
   const router = useRouter();
@@ -99,7 +99,10 @@ export default function HomePage() {
                 {index < folderPath.length - 1 ? (
                   <button
                     className={styles.breadcrumbButton}
-                    onClick={() => handleBreadcrumbClick(folder.id, index)}
+                    onClick={() => {
+                      setSelectedFolder(folder.id);
+                      handleBreadcrumbClick(folder.id, index);
+                    }}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleDropOnBreadcrumb(e, folder.id)}
                   >
@@ -178,15 +181,24 @@ export default function HomePage() {
             {loadingFolders ? (
               <div>Loading folders...</div>
             ) : (
-              folders.map((folder, index) => (
+              folders.map((folder) => (
                 <div
                   key={folder.id}
                   className={styles.folderItem}
-                  onClick={() => handleBreadcrumbClick(folder.id, index)}
+                  onClick={() => {
+                    setSelectedFolder(folder.id);
+                    setFolderPath((prev) => [...prev, { id: folder.id, name: folder.name }]);
+                  }}
                   onDrop={(e) => handleDrop(e, folder.id)}
                   onDragOver={(e) => e.preventDefault()}
                 >
                   {folder.name}
+                  <button
+                    className={styles.threeDotButton}
+                    onClick={() => handleThreeDotPopup(folder.id)}
+                  >
+                    <MoreVertical size={20} />
+                  </button>
                 </div>
               ))
             )}
@@ -201,24 +213,23 @@ export default function HomePage() {
               <div
                 key={file.id}
                 className={styles.fileItem}
-                onDoubleClick={() => openFloorplan(file.id)}
+                onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || "Untitled")}
                 onMouseLeave={() => setShowThreeDotPopup(false)}
               >
                 <Thumbnail
                   thumbnail={thumbnails[file.id] || "loading"}
-                  onOpen={() => openFloorplan(file.id)}
+                  onOpen={() => openFloorplan(file.pdfURL, file.id, file.name || "Untitled")}
                 />
                 <button
                   className={styles.threeDotButton}
                   onClick={() => handleThreeDotPopup(file.id)}
                 >
-                  <img
-                    className={styles.threeDotLogo}
-                    src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-                    alt="three-dots-icon"
-                  />
+                  <MoreVertical size={20} />
                 </button>
-                <div className={styles.fileName}>{truncateName(file.name || "Untitled")}</div>
+                <div className={styles.fileName}>
+                  {truncateName(file.name)}
+                  <div className={styles.fileNamePopup}>{file.name}</div>
+                </div>
                 <div className={styles.creatorInfo}>{file.creatorEmail || "Unknown Creator"}</div>
 
                 {/* Popup Menu */}
