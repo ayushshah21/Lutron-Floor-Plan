@@ -11,6 +11,7 @@ import { Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
 import { auth } from "../../../firebase";
 import React from "react";
 import ShareButton from "../components/ShareButton";
+import ExportPDFButton from "../components/ExportPDFButton";
 import socket from "../../socket";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -127,10 +128,7 @@ export default function Editor() {
 			</div>
 			
 			<div className="toolbar">
-				<button className="toolbar-button" onClick={exportCanvasAsPDF} aria-label="Export as PDF">
-					<FileText size={18} />
-					Export PDF
-				</button>
+				<ExportPDFButton exportCanvasAsPDF={(fileName) => exportCanvasAsPDF(fileName)} />
 				<button className="toolbar-button" onClick={() => saveFloorPlanChanges(documentID, fileName)} aria-label="Save Changes">
 					<Save size={18} />
 					Save Changes

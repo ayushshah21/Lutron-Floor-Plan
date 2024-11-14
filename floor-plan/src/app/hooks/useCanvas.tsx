@@ -308,15 +308,10 @@ export const useCanvas = (pdfUrl: string) => {
 		return pdf;
 	};
 
-	const exportCanvasAsPDF = () => {
+	const exportCanvasAsPDF = (fileName: string) => {
 		const pdf = generatePdf();
 		if (!pdf) return;
-
-		const fileName = prompt(
-			"Enter the file name for the exported PDF:",
-			"annotated-floorplan"
-		);
-		pdf.save(`${fileName || "annotated-floorplan"}.pdf`);
+		pdf.save(fileName);
 	};
 
 	const saveFloorPlanChanges = async (
