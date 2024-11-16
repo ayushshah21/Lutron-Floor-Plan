@@ -56,9 +56,9 @@ export default function Editor() {
 	}
 
 	const handleFullscreen = () => {
-		const pdfContainer = pdfContainerRef.current;
-		if (!document.fullscreenElement && pdfContainer) {
-			pdfContainer.requestFullscreen().catch((err) => {
+		const container = document.querySelector('.main') as HTMLElement;
+		if (!document.fullscreenElement && container) {
+			container.requestFullscreen().catch((err) => {
 				console.log(`Error attempting to enable fullscreen mode: ${err.message}`);
 			});
 		} else {
@@ -68,11 +68,24 @@ export default function Editor() {
 		}
 	};
 
-	// Function to add icons at a default position
+	// Keep track of the last icon position
+	const [lastIconPosition, setLastIconPosition] = useState({ x: 100, y: 100 });
+	const GRID_SPACING = 50; // Space between icons
+
+	// Updated function to add icons at incremental positions
 	const addIconAtDefaultPosition = (addIconFunction: (x: number, y: number) => void) => {
-		const defaultX = 450;
-		const defaultY = 300;
-		addIconFunction(defaultX, defaultY);
+		// Add the icon at the current position
+		addIconFunction(lastIconPosition.x, lastIconPosition.y);
+		
+		// Update the position for the next icon
+		// Move right by GRID_SPACING, and if too far right, move down and reset x
+		const newX = lastIconPosition.x + GRID_SPACING;
+		const newY = newX > 800 ? lastIconPosition.y + GRID_SPACING : lastIconPosition.y;
+		
+		setLastIconPosition({
+			x: newX > 800 ? 100 : newX, // Reset to left side if too far right
+			y: newY
+		});
 	};
 
 	// Extract pdf url from search params

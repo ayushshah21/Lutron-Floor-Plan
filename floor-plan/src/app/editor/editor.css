@@ -740,3 +740,106 @@
     color: #144a75;
     text-decoration: underline;
 }
+
+.container:-webkit-full-screen,
+.container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    padding-left: 300px; /* Make space for the toolbar */
+}
+
+/* Ensure the editor toolbar stays visible in fullscreen */
+.editor-toolbar {
+    position: fixed;
+    top: 120px;
+    left: 20px;
+    width: 280px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    z-index: 9999; /* Increased z-index to ensure visibility */
+}
+
+/* Add specific styles for fullscreen mode */
+:-webkit-full-screen .editor-toolbar {
+    position: fixed !important;
+    display: block !important;
+    z-index: 9999;
+    left: 20px !important;
+}
+
+:fullscreen .editor-toolbar {
+    position: fixed !important;
+    display: block !important;
+    z-index: 9999;
+    left: 20px !important;
+}
+
+/* Ensure the toolbar menu stays visible */
+:-webkit-full-screen .toolbar-menu,
+:fullscreen .toolbar-menu {
+    display: block !important;
+}
+
+/* Ensure submenu items remain visible */
+:-webkit-full-screen .submenu-items,
+:fullscreen .submenu-items {
+    position: fixed !important;
+    display: block !important;
+    z-index: 9999;
+    left: 20px !important;
+}
+
+/* Remove the previous fullscreen submenu styles and replace with these */
+:-webkit-full-screen .editor-toolbar,
+:fullscreen .editor-toolbar {
+    position: fixed !important;
+    display: block !important;
+    z-index: 9999;
+    left: 20px !important;
+    top: 20px !important; 
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+.submenu-items {
+    position: relative !important; 
+    left: 0 !important;
+    background-color: white;
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+
+.submenu {
+    position: relative;
+    width: 100%;
+}
+
+
+:-webkit-full-screen .submenu-items,
+:fullscreen .submenu-items {
+    position: relative !important;
+    left: 0 !important;
+    display: block !important;
+    z-index: 9999;
+}
+
+.submenu-toggle {
+    position: relative;
+    z-index: 1;
+}
+
+
+.submenu-items {
+    transition: all 0.3s ease;
+}
