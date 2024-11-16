@@ -269,15 +269,39 @@ export const useCanvas = (pdfUrl: string) => {
     };
 
 	const zoomIn = () => {
-		const newZoom = zoomLevel * 1.1;
-		canvasRef.current?.setZoom(newZoom);
-		setZoomLevel(newZoom);
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		// Get the center point of the canvas viewport
+		const centerPoint = new fabric.Point(
+			canvas.getWidth() / 2,
+			canvas.getHeight() / 2
+		);
+
+		// Calculate new zoom level
+		const newZoom = canvas.getZoom() * 1.1;
+
+		// Zoom to point (center)
+		canvas.zoomToPoint(centerPoint, newZoom);
+		canvas.requestRenderAll();
 	};
 
 	const zoomOut = () => {
-		const newZoom = zoomLevel * 0.9;
-		canvasRef.current?.setZoom(newZoom);
-		setZoomLevel(newZoom);
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+
+		// Get the center point of the canvas viewport
+		const centerPoint = new fabric.Point(
+			canvas.getWidth() / 2,
+			canvas.getHeight() / 2
+		);
+
+		// Calculate new zoom level
+		const newZoom = canvas.getZoom() / 1.1;
+
+		// Zoom to point (center)
+		canvas.zoomToPoint(centerPoint, newZoom);
+		canvas.requestRenderAll();
 	};
 
 	const generatePdf = () => {
