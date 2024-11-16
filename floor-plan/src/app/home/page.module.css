@@ -236,6 +236,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.19);
   transform: scale(1.05);
   border-color: rgba(0, 87, 184, 0.3); 
+  z-index: 1;
 }
 
 .fileIcon {
@@ -287,7 +288,7 @@
   background: white;
   border: 1px solid #ccc;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  z-index: 100;
+  z-index: 1000;
 }
 
 .popupMenu button {

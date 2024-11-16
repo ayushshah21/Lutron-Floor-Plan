@@ -11,6 +11,7 @@ import { Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
 import { auth } from "../../../firebase";
 import React from "react";
 import ShareButton from "../components/ShareButton";
+import ExportPDFButton from "../components/ExportPDFButton";
 import socket from "../../socket";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -48,6 +49,11 @@ export default function Editor() {
 	
 	const currentUser = auth.currentUser?.email;
 	const [currentUsers, setCurrentUsers] = useState<string[]>([]); // State to hold current users
+	const [minimized, setMinimized] = useState(false); // Track if current users box is minimized
+
+	const toggleMinimize = () => {
+		setMinimized(!minimized);
+	}
 
 	const handleFullscreen = () => {
 		const pdfContainer = pdfContainerRef.current;
@@ -122,10 +128,7 @@ export default function Editor() {
 			</div>
 			
 			<div className="toolbar">
-				<button className="toolbar-button" onClick={exportCanvasAsPDF} aria-label="Export as PDF">
-					<FileText size={18} />
-					Export PDF
-				</button>
+				<ExportPDFButton exportCanvasAsPDF={(fileName) => exportCanvasAsPDF(fileName)} />
 				<button className="toolbar-button" onClick={() => saveFloorPlanChanges(documentID, fileName)} aria-label="Save Changes">
 					<Save size={18} />
 					Save Changes
@@ -159,13 +162,20 @@ export default function Editor() {
 			</div>
 
 			{/* Display the list of current users */}
-			<div className="current-users">
-				<p><strong>Current users:</strong></p>
-				<ul>
-					{currentUsers.map((user, index) => (
-						<li key={index}>{user}</li>
-					))}
-				</ul>
+			<div className={`current-users ${minimized ? 'minimized' : ''}`}>
+				<button onClick={toggleMinimize} className="minimize-button">
+					{minimized ? '+' : '-'}
+				</button>
+				{!minimized && (
+					<>
+						<p><strong>Current users:</strong></p>
+						<ul>
+							{currentUsers.map((user, index) => (
+								<li key={index}>{user}</li>
+							))}
+						</ul>
+					</>
+				)}
 			</div>
 
 			<div className="bottom-right-controls">

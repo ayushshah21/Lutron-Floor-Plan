@@ -48,6 +48,8 @@ export default function Home() {
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
+	const [searchTerm, setSearchTerm] = useState(''); // Store search terms for the search bar
+
 
 	// Functions for switching between home, recent, starred, and sharred
 	const handleClickFilterOptions = (filterParameter: string) => {
@@ -348,6 +350,11 @@ export default function Home() {
 		}
 	}, []);
 
+	const filteredFloorPlans = floorPlans.filter((file) => 
+		file.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+		file.creatorEmail?.toLowerCase().includes(searchTerm.toLowerCase())
+	);
+	
 	return (
 		<div className={styles.container}>
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
@@ -407,8 +414,11 @@ export default function Home() {
 							type="text"
 							placeholder="Search floor plans"
 							className={styles.searchInput}
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 					</div>
+
 					<div className={styles.newOptionsSection}>
 						<button
 							className={styles.button}
@@ -485,7 +495,7 @@ export default function Home() {
 						Use the “New” button to upload a file or folder
 					</div>
 					<div className={styles.fileList}>
-						{floorPlans.map((file: FloorPlanDocument) => (
+						{filteredFloorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
 								{/* Three-dot button */}
 								<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
