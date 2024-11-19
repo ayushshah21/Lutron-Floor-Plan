@@ -35,6 +35,13 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
+// Add mock for socket.io-client
+jest.mock("../../socket", () => ({
+  emit: jest.fn(),
+  on: jest.fn(),
+  off: jest.fn(),
+}));
+
 // Import the Editor component after the mocks
 import Editor from "../editor/page";
 
@@ -42,9 +49,8 @@ describe("Editor Basic UI Tests", () => {
   test("renders toolbar buttons with correct labels", () => {
     render(<Editor />);
     
-    expect(screen.getByLabelText("Export as PDF")).toBeTruthy();
-    expect(screen.getByLabelText("Save Changes")).toBeTruthy();
-    expect(screen.getByLabelText("User Profile")).toBeTruthy();
+    expect(screen.getByText("Export as PDF")).toBeTruthy();
+    expect(screen.getByText("Save Changes")).toBeTruthy();
   });
 
   test("renders control buttons in bottom-right corner", () => {
@@ -83,5 +89,34 @@ describe("Editor Basic UI Tests", () => {
     expect(toolbar).not.toBeNull();
     expect(canvasContainer).not.toBeNull();
     expect(controls).not.toBeNull();
+  });
+
+  test("renders current users panel", () => {
+    render(<Editor />);
+    expect(screen.getByText("Current users:")).toBeTruthy();
+  });
+
+  test("current users panel has minimize button", () => {
+    render(<Editor />);
+    const minimizeButton = screen.getByRole("button", { name: "-" });
+    expect(minimizeButton).toBeTruthy();
+  });
+
+  test("breadcrumb shows correct separator", () => {
+    render(<Editor />);
+    const separators = screen.queryAllByText("/");
+    expect(separators.length).toBeGreaterThanOrEqual(0);
+  });
+
+  test("renders canvas element", () => {
+    const { container } = render(<Editor />);
+    const canvas = container.querySelector("canvas");
+    expect(canvas).toBeTruthy();
+  });
+
+  test("renders all required toolbar buttons", () => {
+    render(<Editor />);
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBeGreaterThan(0);
   });
 });

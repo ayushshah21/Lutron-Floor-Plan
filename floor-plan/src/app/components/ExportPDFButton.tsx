@@ -28,9 +28,13 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({ exportCanvasAsPDF }) 
 
     return (
         <>
-            <button className="export-button" onClick={handleExportClick}>
+            <button 
+                className="toolbar-button" 
+                onClick={() => exportCanvasAsPDF(fileName)}
+                aria-label="Export as PDF"
+            >
                 <FileText size={18} />
-                Export PDF
+                Export as PDF
             </button>
             <Modal
                 isVisible={showExportModal}
