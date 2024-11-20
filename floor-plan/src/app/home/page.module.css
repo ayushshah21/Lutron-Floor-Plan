@@ -58,6 +58,12 @@
   /* Spacing at the top inside the sidebar */
 }
 
+.navButton.active {
+  background-color: #1E75BB; 
+  color: #FFFFFF; 
+  font-weight: bold; 
+}
+
 .sidebar h4 {
   text-align: center; 
   font-size: 1.5rem; 

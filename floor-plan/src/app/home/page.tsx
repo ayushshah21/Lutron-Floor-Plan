@@ -363,16 +363,22 @@ export default function Home() {
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
 					<h4>Floor Plan Application</h4>
 					<nav className={styles.navigation} id="navSidebar">
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Home")}>
+						<button
+							className={`${styles.navButton} ${filterCondition === "Home" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Home")}
+						>
 							<HomeIcon size={22} /> Home
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Shared")}>
-							< Users size={22} /> Shared with me
+						<button
+							className={`${styles.navButton} ${filterCondition === "Shared" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Shared")}
+						>
+							<Users size={22} /> Shared with me
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Recent")}>
-							<Clock color="black" size={22} /> Recent
-						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Starred")}>
+						<button
+							className={`${styles.navButton} ${filterCondition === "Starred" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Starred")}
+						>
 							<Star size={22} /> Starred
 						</button>
 					</nav>

@@ -43,14 +43,6 @@ export const useUserFiles = (selectedFolder: string | null, filterCondition: str
 						where('starred', '==', true)
 					);
 					break;
-				case "Recent":
-					q = query(
-						collection(db, 'FloorPlans'),
-						where('originalCreator', '==', user.uid),
-						where('folderID', '==', selectedFolder || '4'),
-						orderBy('updatedAt', 'desc') // Server-side sorting by `updatedAt`
-					);
-					break;
 				default:
 					throw new Error('Invalid filter condition');
 			}
