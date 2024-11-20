@@ -44,6 +44,7 @@ export default function Login() {
 					height={25}
 					className={styles.lutronLogo}
 				/>
+				<h2>Floor Plan Application</h2>
 				<h3>Sign In</h3>
 				<p>with your Gmail account</p>
 				<button className={styles.button} onClick={signInWithGoogle} id="loginButton">

@@ -361,6 +361,7 @@ export default function Home() {
 			<>
 				<aside className={styles.sidebar}>
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
+					<h4>Floor Plan Application</h4>
 					<nav className={styles.navigation} id="navSidebar">
 						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Home")}>
 							<HomeIcon size={22} /> Home
@@ -492,7 +493,7 @@ export default function Home() {
 					</div>
 
 					<div className={styles.prompt}>
-						Use the “New” button to upload a file or folder
+						Use the “New” button to upload a floor plan (PDF format) or folder
 					</div>
 					<div className={styles.fileList}>
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (

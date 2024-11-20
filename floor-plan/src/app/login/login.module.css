@@ -29,7 +29,8 @@
 }
 
 .lutronLogo {
-	margin-bottom: 20px;
+	width: 250px; 
+    height: auto; 
 }
 
 .button {
