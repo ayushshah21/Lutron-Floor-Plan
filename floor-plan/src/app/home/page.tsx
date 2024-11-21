@@ -11,7 +11,7 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
+import { Search, Star, Users, HomeIcon } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
@@ -49,6 +49,10 @@ export default function Home() {
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 	const [searchTerm, setSearchTerm] = useState(''); // Store search terms for the search bar
+	const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+	// Call this function whenever a floor plan field changes
+	const refreshFloorPlans = () => setRefreshTrigger(prev => !prev);
 
 
 	// Functions for switching between home, recent, starred, and sharred
@@ -60,7 +64,7 @@ export default function Home() {
 	// Ensure `fetchFloorPlans` is called whenever `filterByContributors` or `selectedFolder` changes
 	useEffect(() => {
 		fetchFloorPlans(); // Fetch files when the filter or folder changes
-	}, [filterCondition, selectedFolder]);
+	}, [filterCondition, selectedFolder, refreshTrigger]);
 
 	// Removes the border around the home page
 	useEffect(() => {
@@ -246,11 +250,11 @@ export default function Home() {
 
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
-	const handleDelete = async (id: string) => {
+	const handleDeleteFloorPlan = async (id: string) => {
 		if (window.confirm("Are you sure you want to delete this file?")) {
 			try {
 				await deleteDocument(id);
-				window.location.reload(); // Refreshes the page after successful deletion
+				refreshFloorPlans() // Refreshes floorplans after successful deletion
 			} catch (error) {
 				console.error("Failed to delete the floor plan:", error);
 				alert("Failed to delete the floor plan.");
@@ -303,14 +307,12 @@ export default function Home() {
 	};
 
 	// Handle starring floorplans
-	const handleStarredFloorplans = async (documentId: string, isStarred: boolean) => {
-		await updateStarredFloorplan(documentId, isStarred);
-		if (isStarred) {
-			alert("Floorplan successfully starred")
-		} else {
-			alert("Floorplan removed from starred")
-		}
-	}
+	const handleStarredFloorplans = async (documentId: string, isCurrentlyStarred: boolean) => {
+		let newStarredState = !isCurrentlyStarred;
+		await updateStarredFloorplan(documentId, newStarredState);
+		// Trigger a refresh to re-fetch updated floor plans from the server
+		refreshFloorPlans();
+	};
 
 	const handleRenameFolder = (folderId: string) => {
 		// Placeholder function to handle renaming folders
@@ -512,10 +514,17 @@ export default function Home() {
 										alt="three-dots-icon"
 									/>
 								</button>
+								
 								<div className={styles.fileName}>
 									{truncateFloorPlanName(file.name)}
 									<div className={styles.fileNamePopup}>{file.name}</div>
 								</div>
+								<button
+									className={styles.starButton}
+									onClick={() => handleStarredFloorplans(file.id, file.starred)}
+								>
+									<Star fill={file.starred ? "yellow" : "white"} color="black" />
+								</button>
 								<img src={thumbnails[file.id] || 'loading'} alt="PDF Thumbnail" className={styles.thumbnail} />
 								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
 
@@ -531,9 +540,7 @@ export default function Home() {
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
 											<ShareButton fileId={file.id} />
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-											<button onClick={() => handleDelete(file.id)}>Delete</button>
-											<button onClick={() => handleStarredFloorplans(file.id, true)}>Add to Starred</button>
-											<button onClick={() => handleStarredFloorplans(file.id, false)}>Remove from Starred</button>
+											<button onClick={() => handleDeleteFloorPlan(file.id)}>Delete</button>
 										</div>
 									)
 								)}

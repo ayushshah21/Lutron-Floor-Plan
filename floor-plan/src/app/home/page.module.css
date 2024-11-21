@@ -325,6 +325,17 @@
   background-color: #f0f0f0;
 }
 
+.starButton {
+  margin-left: 140px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.starButton:hover {
+  transform: scale(1.1); /* Slight zoom effect on hover */
+}
+
 .folderSection {
   display: flex;
   align-items: center;
