@@ -426,6 +426,15 @@ export default function Home() {
 						>
 							+ New
 						</button>
+						<br></br>
+						<br></br>
+
+
+						<div className={styles.prompt}>
+						Use the “New” button to upload a file or folder
+						<br></br>
+						</div>
+						
 
 
 						{showNewOptions && (
@@ -491,9 +500,7 @@ export default function Home() {
 						)}
 					</div>
 
-					<div className={styles.prompt}>
-						Use the “New” button to upload a file or folder
-					</div>
+
 					<div className={styles.fileList}>
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
