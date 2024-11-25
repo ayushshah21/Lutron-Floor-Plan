@@ -440,23 +440,11 @@ export default function Home() {
 						{showNewOptions && (
 							<div className={styles.newOptionsDropdown}>
 								<button onClick={() => {
-									document.getElementById("fileInput")?.click();
-								}}>
-									New File
-								</button>
-								<button onClick={() => {
 									setShowNewFolderInput(!showNewFolderInput);
 									setShowNewOptions(false); // Hide the menu after clicking "New Folder"
 								}}>
 									New Folder
 								</button>
-								{/* Hidden input field for file selection */}
-								<input
-									type="file"
-									id="fileInput"
-									style={{ display: 'none' }}  // Hide the default input
-									onChange={handleFileChange}  // Trigger file change logic
-								/>
 							</div>
 						)}
 
@@ -504,6 +492,20 @@ export default function Home() {
 						Use the “New” button to upload a floor plan (PDF format) or folder
 					</div>
 					<div className={styles.fileList}>
+						<div className={styles.fileItem}>
+							<button
+								className={styles.importButton}
+								onClick={() => document.getElementById("fileInput")?.click()}
+							>
+								Click to import a floor plan (PDF Format)
+							</button>
+							<input
+								type="file"
+								id="fileInput"
+								style={{ display: 'none' }}
+								onChange={handleFileChange}
+							/>
+						</div>
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
 								{/* Three-dot button */}
@@ -514,7 +516,7 @@ export default function Home() {
 										alt="three-dots-icon"
 									/>
 								</button>
-								
+
 								<div className={styles.fileName}>
 									{truncateFloorPlanName(file.name)}
 									<div className={styles.fileNamePopup}>{file.name}</div>
