@@ -18,6 +18,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
 import Menu from "../components/Menu";
+import AddFolderButton from "../components/AddFolderButton";
 
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
@@ -27,7 +28,6 @@ export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
 	const [filterCondition, setFilterCondition] = useState<string>("Home"); // Default is home
 	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder, filterCondition);
@@ -43,8 +43,6 @@ export default function Home() {
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
-	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
-	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
@@ -237,16 +235,11 @@ export default function Home() {
 		}
 	};
 
-	const handleCreateFolder = async () => {
-		if (folderName.trim()) {
-			const parentFolderId = selectedFolder || "4";
-			await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
-			setFolderName('');
-			setShowNewFolderInput(false);  // Hide the new folder input after creation
-		} else {
-			alert("Please enter a folder name.");
-		}
-	};
+	const handleCreateFolder = async (folderName: string) => {
+        const parentFolderId = selectedFolder || "4"; // Default folder ID if none selected
+        await createFolder(folderName, parentFolderId);
+        fetchFolders(parentFolderId); // Refresh the folder list
+    };
 
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
@@ -427,45 +420,11 @@ export default function Home() {
 							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 					</div>
-
-					<div className={styles.newOptionsSection}>
-						<button
-							className={styles.button}
-							onClick={() => setShowNewOptions(!showNewOptions)}
-						>
-							+ New
-						</button>
-
-
-						{showNewOptions && (
-							<div className={styles.newOptionsDropdown}>
-								<button onClick={() => {
-									setShowNewFolderInput(!showNewFolderInput);
-									setShowNewOptions(false); // Hide the menu after clicking "New Folder"
-								}}>
-									New Folder
-								</button>
-							</div>
-						)}
-
-						{showNewFolderInput && (
-							<div className={styles.newFolderInput}>
-								<input
-									type="text"
-									placeholder="Enter folder name"
-									value={folderName}
-									onChange={(e) => setFolderName(e.target.value)}
-									className={styles.input}
-								/>
-								<button onClick={handleCreateFolder} className={styles.button}>
-									Create Folder
-								</button>
-								<button onClick={() => setShowNewFolderInput(false)} className={styles.button}>Cancel</button>
-							</div>
-						)}
-					</div>
-
+		
 					<div className={styles.folderList}>
+						<div className={styles.newOptionsSection}>
+							<AddFolderButton onCreateFolder={handleCreateFolder} />
+						</div>
 						{loadingFolders ? (
 							<div>Loading folders...</div>
 						) : (
@@ -489,7 +448,7 @@ export default function Home() {
 					</div>
 
 					<div className={styles.prompt}>
-						Use the “New” button to upload a floor plan (PDF format) or folder
+						Double click on a floor plan to open them in the editor page
 					</div>
 					<div className={styles.fileList}>
 						<div className={styles.fileItem}>
