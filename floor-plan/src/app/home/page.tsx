@@ -11,7 +11,7 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Search, Star, Users, HomeIcon } from "lucide-react";
+import { Search, Star, Users, HomeIcon, User } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
@@ -48,6 +48,8 @@ export default function Home() {
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 	const [searchTerm, setSearchTerm] = useState(''); // Store search terms for the search bar
 	const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+	const [currentUser, setCurrentUser] = useState<string | null>(null);
 
 	// Call this function whenever a floor plan field changes
 	const refreshFloorPlans = () => setRefreshTrigger(prev => !prev);
@@ -345,6 +347,11 @@ export default function Home() {
 		}
 	}, []);
 
+	useEffect(() => {
+		const user = auth.currentUser;
+		setCurrentUser(user?.email || 'Guest User');
+	}, []);
+
 	const filteredFloorPlans = floorPlans.filter((file) => 
 		file.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
 		file.creatorEmail?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -352,6 +359,10 @@ export default function Home() {
 	
 	return (
 		<div className={styles.container}>
+			<div className={styles.userProfile}>
+				<User size={18} />
+				<span>{currentUser}</span>
+			</div>
 			{(uploading || loading || isDeleting || openSpinner) && <Spinner />}
 			<>
 				<aside className={styles.sidebar}>

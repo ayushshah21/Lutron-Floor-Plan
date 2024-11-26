@@ -58,14 +58,14 @@
 }
 
 .toolbar {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 15px;
-    /* Adds space between the buttons */
-    z-index: 1000;
-    /* Ensures it stays on top of other elements */
+    position: fixed !important;
+    top: 10px !important;
+    right: 300px !important;
+    display: flex !important;
+    gap: 15px !important;
+    align-items: center !important;
+    z-index: 1000 !important;
+    background-color: transparent !important;
 }
 
 
@@ -852,4 +852,40 @@
 
 .submenu-items {
     transition: all 0.3s ease;
+}
+
+.user-profile {
+  position: fixed !important;
+  top: 10px !important;
+  right: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 8px 16px !important;
+  background-color: #ffffff !important;
+  border: 2px solid #0057B8 !important;
+  border-radius: 4px !important;
+  color: #0057B8 !important;
+  font-weight: 500 !important;
+  z-index: 1001 !important;
+  width: fit-content !important;
+}
+
+.user-profile svg {
+  color: #0057B8 !important;
+}
+
+/* Adjust toolbar position to make room for profile */
+.toolbar {
+  right: 300px;
+}
+
+/* Ensure icons within user profile maintain color */
+.user-profile svg {
+  color: #0057B8 !important;
+}
+
+/* Adjust any share button specific positioning if needed */
+.toolbar button:last-child {
+  margin-right: 0 !important;
 }
