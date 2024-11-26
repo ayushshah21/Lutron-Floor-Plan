@@ -553,27 +553,18 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1.1rem;
-  font-weight: bold; 
-  color: #0057B8; 
-}
-
-.breadcrumbs a {
-  color: #0057B8;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.breadcrumbs a:hover {
-  color: #144a75;
-  text-decoration: underline;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eee;
+  width: 100%;
 }
 
 .breadcrumbs .separator {
   color: #666;
+  margin: 0 0.5rem;
 }
 
 .breadcrumbs .current-file {
-  color: #666;
+  color: #0057B8;
   font-weight: 500;
 }
 

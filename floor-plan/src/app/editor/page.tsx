@@ -124,7 +124,6 @@ export default function Editor() {
 
 	return (
 		<div className="main">
-			{/* Update the breadcrumb navigation to include folder path */}
 			<div className="breadcrumbs">
 				{pathSegments.map((segment: { id: string, name: string }, index: number) => (
 					<React.Fragment key={segment.id}>
@@ -135,9 +134,12 @@ export default function Editor() {
 						>
 							{segment.name}
 						</Link>
-						{index < pathSegments.length - 1 && <span className="separator">/</span>}
+						<span className="separator">/</span>
 					</React.Fragment>
 				))}
+				<span className="current-file">
+					{fileName || 'Untitled'}
+				</span>
 			</div>
 			
 			<div className="toolbar">
