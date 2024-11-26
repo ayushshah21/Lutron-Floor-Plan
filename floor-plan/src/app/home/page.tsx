@@ -11,13 +11,14 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Clock, Search, Star, Users, HomeIcon, Trash2, CircleUser } from "lucide-react";
+import { Search, Star, Users, HomeIcon } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
 import Menu from "../components/Menu";
+import AddFolderButton from "../components/AddFolderButton";
 
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
@@ -27,7 +28,6 @@ export default function Home() {
 	const [pdfFile, setPdfFile] = useState<File | null>(null);
 	const { uploadPdf, uploading, error } = useUploadPdf();
 	const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-	const [folderName, setFolderName] = useState('');
 	const { folders, loading: loadingFolders, createFolder, deleteFolder, fetchFolders } = useFolders();
 	const [filterCondition, setFilterCondition] = useState<string>("Home"); // Default is home
 	const { floorPlans, loading, fetchFloorPlans } = useUserFiles(selectedFolder, filterCondition);
@@ -43,12 +43,14 @@ export default function Home() {
 	const [docToRename, setDocToRename] = useState<string | null>(null);
 	const [newName, setNewName] = useState('');
 	const { updateFileName } = useUpdateFileName();
-	const [showNewOptions, setShowNewOptions] = useState(false); // State to handle showing new options
-	const [showNewFolderInput, setShowNewFolderInput] = useState(false); // For showing the new folder input field
 	const [folderPath, setFolderPath] = useState<{ id: string; name: string }[]>([{ id: "4", name: "Home" },]); // Keeps track of the folder path
 
 	const [thumbnails, setThumbnails] = useState<{ [key: string]: string }>({}); // Store thumbnails
 	const [searchTerm, setSearchTerm] = useState(''); // Store search terms for the search bar
+	const [refreshTrigger, setRefreshTrigger] = useState(false);
+
+	// Call this function whenever a floor plan field changes
+	const refreshFloorPlans = () => setRefreshTrigger(prev => !prev);
 
 
 	// Functions for switching between home, recent, starred, and sharred
@@ -60,7 +62,7 @@ export default function Home() {
 	// Ensure `fetchFloorPlans` is called whenever `filterByContributors` or `selectedFolder` changes
 	useEffect(() => {
 		fetchFloorPlans(); // Fetch files when the filter or folder changes
-	}, [filterCondition, selectedFolder]);
+	}, [filterCondition, selectedFolder, refreshTrigger]);
 
 	// Removes the border around the home page
 	useEffect(() => {
@@ -233,24 +235,19 @@ export default function Home() {
 		}
 	};
 
-	const handleCreateFolder = async () => {
-		if (folderName.trim()) {
-			const parentFolderId = selectedFolder || "4";
-			await createFolder(folderName, parentFolderId);  // Pass the parent folder ID
-			setFolderName('');
-			setShowNewFolderInput(false);  // Hide the new folder input after creation
-		} else {
-			alert("Please enter a folder name.");
-		}
-	};
+	const handleCreateFolder = async (folderName: string) => {
+        const parentFolderId = selectedFolder || "4"; // Default folder ID if none selected
+        await createFolder(folderName, parentFolderId);
+        fetchFolders(parentFolderId); // Refresh the folder list
+    };
 
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
-	const handleDelete = async (id: string) => {
+	const handleDeleteFloorPlan = async (id: string) => {
 		if (window.confirm("Are you sure you want to delete this file?")) {
 			try {
 				await deleteDocument(id);
-				window.location.reload(); // Refreshes the page after successful deletion
+				refreshFloorPlans() // Refreshes floorplans after successful deletion
 			} catch (error) {
 				console.error("Failed to delete the floor plan:", error);
 				alert("Failed to delete the floor plan.");
@@ -303,14 +300,12 @@ export default function Home() {
 	};
 
 	// Handle starring floorplans
-	const handleStarredFloorplans = async (documentId: string, isStarred: boolean) => {
-		await updateStarredFloorplan(documentId, isStarred);
-		if (isStarred) {
-			alert("Floorplan successfully starred")
-		} else {
-			alert("Floorplan removed from starred")
-		}
-	}
+	const handleStarredFloorplans = async (documentId: string, isCurrentlyStarred: boolean) => {
+		let newStarredState = !isCurrentlyStarred;
+		await updateStarredFloorplan(documentId, newStarredState);
+		// Trigger a refresh to re-fetch updated floor plans from the server
+		refreshFloorPlans();
+	};
 
 	const handleRenameFolder = (folderId: string) => {
 		// Placeholder function to handle renaming folders
@@ -361,17 +356,24 @@ export default function Home() {
 			<>
 				<aside className={styles.sidebar}>
 					<img className={styles.lutronLogo} src="https://umslogin.lutron.com/Content/Dynamic/Default/Images/logo-lutron-blue.svg" alt="Lutron Logo" />
+					<h4>Floor Plan Application</h4>
 					<nav className={styles.navigation} id="navSidebar">
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Home")}>
+						<button
+							className={`${styles.navButton} ${filterCondition === "Home" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Home")}
+						>
 							<HomeIcon size={22} /> Home
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Shared")}>
-							< Users size={22} /> Shared with me
+						<button
+							className={`${styles.navButton} ${filterCondition === "Shared" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Shared")}
+						>
+							<Users size={22} /> Shared with me
 						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Recent")}>
-							<Clock color="black" size={22} /> Recent
-						</button>
-						<button className={`${styles.navButton} ${styles.iconButton}`} onClick={() => handleClickFilterOptions("Starred")}>
+						<button
+							className={`${styles.navButton} ${filterCondition === "Starred" ? styles.active : ""}`}
+							onClick={() => handleClickFilterOptions("Starred")}
+						>
 							<Star size={22} /> Starred
 						</button>
 					</nav>
@@ -418,57 +420,11 @@ export default function Home() {
 							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
 					</div>
-
-					<div className={styles.newOptionsSection}>
-						<button
-							className={styles.button}
-							onClick={() => setShowNewOptions(!showNewOptions)}
-						>
-							+ New
-						</button>
-
-
-						{showNewOptions && (
-							<div className={styles.newOptionsDropdown}>
-								<button onClick={() => {
-									document.getElementById("fileInput")?.click();
-								}}>
-									New File
-								</button>
-								<button onClick={() => {
-									setShowNewFolderInput(!showNewFolderInput);
-									setShowNewOptions(false); // Hide the menu after clicking "New Folder"
-								}}>
-									New Folder
-								</button>
-								{/* Hidden input field for file selection */}
-								<input
-									type="file"
-									id="fileInput"
-									style={{ display: 'none' }}  // Hide the default input
-									onChange={handleFileChange}  // Trigger file change logic
-								/>
-							</div>
-						)}
-
-						{showNewFolderInput && (
-							<div className={styles.newFolderInput}>
-								<input
-									type="text"
-									placeholder="Enter folder name"
-									value={folderName}
-									onChange={(e) => setFolderName(e.target.value)}
-									className={styles.input}
-								/>
-								<button onClick={handleCreateFolder} className={styles.button}>
-									Create Folder
-								</button>
-								<button onClick={() => setShowNewFolderInput(false)} className={styles.button}>Cancel</button>
-							</div>
-						)}
-					</div>
-
+		
 					<div className={styles.folderList}>
+						<div className={styles.newOptionsSection}>
+							<AddFolderButton onCreateFolder={handleCreateFolder} />
+						</div>
 						{loadingFolders ? (
 							<div>Loading folders...</div>
 						) : (
@@ -492,9 +448,23 @@ export default function Home() {
 					</div>
 
 					<div className={styles.prompt}>
-						Use the “New” button to upload a file or folder
+						Double click on a floor plan to open them in the editor page
 					</div>
 					<div className={styles.fileList}>
+						<div className={styles.fileItem}>
+							<button
+								className={styles.importButton}
+								onClick={() => document.getElementById("fileInput")?.click()}
+							>
+								Click to import a floor plan (PDF Format)
+							</button>
+							<input
+								type="file"
+								id="fileInput"
+								style={{ display: 'none' }}
+								onChange={handleFileChange}
+							/>
+						</div>
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (
 							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
 								{/* Three-dot button */}
@@ -505,10 +475,17 @@ export default function Home() {
 										alt="three-dots-icon"
 									/>
 								</button>
+
 								<div className={styles.fileName}>
 									{truncateFloorPlanName(file.name)}
 									<div className={styles.fileNamePopup}>{file.name}</div>
 								</div>
+								<button
+									className={styles.starButton}
+									onClick={() => handleStarredFloorplans(file.id, file.starred)}
+								>
+									<Star fill={file.starred ? "yellow" : "white"} color="black" />
+								</button>
 								<img src={thumbnails[file.id] || 'loading'} alt="PDF Thumbnail" className={styles.thumbnail} />
 								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
 
@@ -524,9 +501,7 @@ export default function Home() {
 										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
 											<ShareButton fileId={file.id} />
 											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-											<button onClick={() => handleDelete(file.id)}>Delete</button>
-											<button onClick={() => handleStarredFloorplans(file.id, true)}>Add to Starred</button>
-											<button onClick={() => handleStarredFloorplans(file.id, false)}>Remove from Starred</button>
+											<button onClick={() => handleDeleteFloorPlan(file.id)}>Delete</button>
 										</div>
 									)
 								)}
