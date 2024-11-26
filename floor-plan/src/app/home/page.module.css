@@ -491,3 +491,24 @@
   text-decoration: underline;
   color: #2378B5; /* Darker blue on hover, same as button hover */
 }
+
+/* Add these styles at the end of the file */
+.userProfile {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  border: 2px solid #0057B8;
+  border-radius: 4px;
+  color: #0057B8;
+  font-weight: 500;
+  z-index: 1000;
+}
+
+.userProfile svg {
+  color: #0057B8;
+}

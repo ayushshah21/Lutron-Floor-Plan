@@ -7,7 +7,7 @@ import Link from 'next/link';
 import "./editor.css";
 import EditorToolbar from "../components/EditorToolbar";
 import { useCanvas } from "../hooks/useCanvas";
-import { Fullscreen, ZoomIn, ZoomOut, FileText, Save } from "lucide-react";
+import { Fullscreen, ZoomIn, ZoomOut, FileText, Save, User } from "lucide-react";
 import { auth } from "../../../firebase";
 import React from "react";
 import ShareButton from "../components/ShareButton";
@@ -47,7 +47,13 @@ export default function Editor() {
 	const searchParams = useSearchParams();
 	const pdfContainerRef = useRef<HTMLDivElement>(null);
 	
-	const currentUser = auth.currentUser?.email;
+	const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+	useEffect(() => {
+		const user = auth.currentUser;
+		setCurrentUser(user?.email || 'Guest User');
+	}, []);
+
 	const [currentUsers, setCurrentUsers] = useState<string[]>([]); // State to hold current users
 	const [minimized, setMinimized] = useState(false); // Track if current users box is minimized
 
@@ -124,7 +130,6 @@ export default function Editor() {
 
 	return (
 		<div className="main">
-			{/* Update the breadcrumb navigation to include folder path */}
 			<div className="breadcrumbs">
 				{pathSegments.map((segment: { id: string, name: string }, index: number) => (
 					<React.Fragment key={segment.id}>
@@ -135,9 +140,12 @@ export default function Editor() {
 						>
 							{segment.name}
 						</Link>
-						{index < pathSegments.length - 1 && <span className="separator">/</span>}
+						<span className="separator">/</span>
 					</React.Fragment>
 				))}
+				<span className="current-file">
+					{fileName || 'Untitled'}
+				</span>
 			</div>
 			
 			<div className="toolbar">
@@ -148,6 +156,12 @@ export default function Editor() {
 				</button>
 				<ShareButton fileId={documentID}/>
 			</div>
+
+			<div className="user-profile">
+				<User size={18} />
+				<span>{currentUser}</span>
+			</div>
+
 			<EditorToolbar
 				addRectangleToCanvas={addRectangleToCanvas}
 				addLightIcon={() => addIconAtDefaultPosition(addLightIconToCanvas)}
