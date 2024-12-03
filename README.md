@@ -25,10 +25,10 @@ A Miro-like multi-user application where users can upload floor plans (ceiling p
 - [X] The app must allow users to upload a new floorplan in the web app.
 - [X] The app must allow users to view a floorplan in the web app.
 - [X] The app must allow users to use drawing tools to annotate a floorplan with devices and controls to create a system layout.
-- [ ] The app must allow for a multi-user experience wherein any updates made to the floorplan should instantly be visible on all users’ floorplans (i.e., the state of the floorplan is synchronized across all users currently looking at it).
+- [X] The app must allow for a multi-user experience wherein any updates made to the floorplan should instantly be visible on all users’ floorplans (i.e., the state of the floorplan is synchronized across all users currently looking at it).
 - [X] The app must allow users to export an annotated floorplan for use in other common non-Lutron design tools (e.g., CAD).
 - [X] The app must be unit & integration tested using modern web project best practices (e.g., Jest, Cypress, etc.)
-- [ ] Nice to have: the app should be able to intake an existing Lutron floorplan.
+- [X] Nice to have: the app should be able to intake an existing Lutron floorplan (Must be in PDF format)
 
 ## How to run application
 - Run npm install to get dependencies

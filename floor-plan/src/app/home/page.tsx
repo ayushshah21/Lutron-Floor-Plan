@@ -11,7 +11,7 @@ import useAuthRedirect from "../hooks/useAuthRedirect";
 import { useUserFiles } from '../hooks/useUserFiles';
 import { FloorPlanDocument } from '../interfaces/FloorPlanDocument';
 import { useUpdateFileName } from '../hooks/useUpdateFileName';
-import { Search, Star, Users, HomeIcon, User } from "lucide-react";
+import { Search, Star, Users, HomeIcon, User, LogOut, Book } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
 import { doc, updateDoc } from "firebase/firestore";
@@ -388,8 +388,14 @@ export default function Home() {
 							<Star size={22} /> Starred
 						</button>
 					</nav>
-					<button className={styles.logoutButton} onClick={signOutWithGoogle}>
-						Logout
+					<button
+						className={styles.navButton}
+						onClick={() => window.open('/user-guide.pdf', '_blank')}
+					>
+						<Book size={22} /> User Manual
+					</button>
+					<button className={styles.navButton} onClick={signOutWithGoogle}>
+						<LogOut size={22} /> Logout
 					</button>
 				</aside>
 
