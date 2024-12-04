@@ -3,8 +3,9 @@
  */
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { useSearchParams } from "next/navigation";
 
-// Mock the components and hooks instead of their dependencies
+// Mock the components and hooks
 jest.mock("../hooks/useCanvas", () => ({
   useCanvas: () => ({
     canvasRef: { current: null },
@@ -15,7 +16,6 @@ jest.mock("../hooks/useCanvas", () => ({
   })
 }));
 
-// Mock the components
 jest.mock("../components/ShareButton", () => {
   return function DummyShareButton() {
     return <div>Share Button</div>;
@@ -35,27 +35,41 @@ jest.mock("next/navigation", () => ({
   }),
 }));
 
-// Add mock for socket.io-client
+// Mock socket.io-client
 jest.mock("../../socket", () => ({
   emit: jest.fn(),
-  on: jest.fn(),
+  on: jest.fn((event, callback) => {
+    if (event === 'userList') {
+      callback(["test@example.com"]);
+    }
+  }),
   off: jest.fn(),
 }));
 
-// Import the Editor component after the mocks
+// Mock firebase
+jest.mock("../../../firebase", () => ({
+  auth: {
+    currentUser: {
+      email: "test@example.com"
+    }
+  }
+}));
+
 import Editor from "../editor/page";
 
 describe("Editor Basic UI Tests", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   test("renders toolbar buttons with correct labels", () => {
     render(<Editor />);
-    
     expect(screen.getByText("Export as PDF")).toBeTruthy();
     expect(screen.getByText("Save Changes")).toBeTruthy();
   });
 
   test("renders control buttons in bottom-right corner", () => {
     render(<Editor />);
-    
     expect(screen.getByLabelText("Zoom In")).toBeTruthy();
     expect(screen.getByLabelText("Zoom Out")).toBeTruthy();
     expect(screen.getByLabelText("Toggle Fullscreen")).toBeTruthy();
@@ -78,17 +92,10 @@ describe("Editor Basic UI Tests", () => {
 
   test("renders main UI containers", () => {
     const { container } = render(<Editor />);
-    
-    // Use type assertion to handle querySelector return type
-    const main = container.querySelector(".main");
-    const toolbar = container.querySelector(".toolbar");
-    const canvasContainer = container.querySelector(".canvas-container");
-    const controls = container.querySelector(".bottom-right-controls");
-
-    expect(main).not.toBeNull();
-    expect(toolbar).not.toBeNull();
-    expect(canvasContainer).not.toBeNull();
-    expect(controls).not.toBeNull();
+    expect(container.querySelector(".main")).toBeTruthy();
+    expect(container.querySelector(".toolbar")).toBeTruthy();
+    expect(container.querySelector(".canvas-container")).toBeTruthy();
+    expect(container.querySelector(".bottom-right-controls")).toBeTruthy();
   });
 
   test("renders current users panel", () => {
@@ -96,27 +103,45 @@ describe("Editor Basic UI Tests", () => {
     expect(screen.getByText("Current users:")).toBeTruthy();
   });
 
-  test("current users panel has minimize button", () => {
+  test("renders minimize button in current users panel", () => {
     render(<Editor />);
     const minimizeButton = screen.getByRole("button", { name: "-" });
     expect(minimizeButton).toBeTruthy();
   });
 
-  test("breadcrumb shows correct separator", () => {
-    render(<Editor />);
-    const separators = screen.queryAllByText("/");
-    expect(separators.length).toBeGreaterThanOrEqual(0);
-  });
-
   test("renders canvas element", () => {
     const { container } = render(<Editor />);
-    const canvas = container.querySelector("canvas");
-    expect(canvas).toBeTruthy();
+    expect(container.querySelector("canvas")).toBeTruthy();
   });
 
-  test("renders all required toolbar buttons", () => {
+  // User Profile Tests
+  test("renders user profile", () => {
+    const { container } = render(<Editor />);
+    const userProfile = container.querySelector('.user-profile');
+    expect(userProfile).toBeTruthy();
+  });
+
+  test("user profile contains user icon", () => {
+    const { container } = render(<Editor />);
+    const userProfile = container.querySelector('.user-profile');
+    const svg = userProfile?.querySelector('svg');
+    expect(svg).toBeTruthy();
+  });
+
+  // Socket Connection Tests
+  test("emits joinRoom event with correct data", () => {
+    const socketMock = jest.requireMock("../../socket");
     render(<Editor />);
-    const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThan(0);
+    
+    expect(socketMock.emit).toHaveBeenCalledWith('joinRoom', {
+      room_id: expect.any(String),
+      username: expect.any(String)
+    });
+  });
+
+  test("handles socket userList event", () => {
+    render(<Editor />);
+    const currentUsersPanel = screen.getByText("Current users:");
+    expect(currentUsersPanel).toBeTruthy();
   });
 });
