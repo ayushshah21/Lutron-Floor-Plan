@@ -14,11 +14,13 @@ import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Search, Star, Users, HomeIcon, User, LogOut, Book } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
-import { doc, updateDoc } from "firebase/firestore";
+//import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
 import Menu from "../components/Menu";
 import AddFolderButton from "../components/AddFolderButton";
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc, writeBatch } from "firebase/firestore";
+
 
 
 import * as pdfjsLib from 'pdfjs-dist/build/pdf'; // Import the PDF.js library
@@ -324,11 +326,30 @@ export default function Home() {
     // Add your moving logic here (e.g., select target folder, update in database)
 	};
 
-	const handleDeleteFolder = (folderId: string) => {
-		// Placeholder function to delete  folders
-		console.log(`Delete folder with ID: ${folderId}`);
-		// Add your delete logic here (e.g., select target folder, update in database)
-		};
+	const handleDeleteFolder = async (folderId: string, parentFolderId: string | null) => {
+		try {
+		  // Query Firestore for files in the folder
+		  const filesQuery = query(
+			collection(db, "files"), // Ensure "files" is the correct collection name
+			where("parentFolderId", "==", folderId)
+		  );
+		  const filesSnapshot = await getDocs(filesQuery);
+	  
+		  // Batch update files' parentFolderId
+		  const batch = writeBatch(db);
+		  filesSnapshot.forEach((fileDoc) => {
+			batch.update(fileDoc.ref, { parentFolderId: parentFolderId || "root" });
+		  });
+		  await batch.commit();
+	  
+		  // Delete the folder itself
+		  await deleteDoc(doc(db, "folders", folderId));
+		  fetchFolders(); // Refresh UI
+		} catch (error) {
+		  console.error("Error deleting folder:", error);
+		}
+	};
+	  
 
 
 	useEffect(() => {
