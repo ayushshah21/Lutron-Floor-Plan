@@ -447,30 +447,34 @@ export default function Home() {
 					</div>
 		
 					<div className={styles.folderList}>
-						<div className={styles.newOptionsSection}>
-							<AddFolderButton onCreateFolder={handleCreateFolder} />
-						</div>
-						{loadingFolders ? (
-							<div>Loading folders...</div>
-						) : (
-							folders.map((folder) => (
+						{filterCondition === "Home" && (
+							<>
+							<div className={styles.newOptionsSection}>
+								<AddFolderButton onCreateFolder={handleCreateFolder} />
+							</div>
+							{loadingFolders ? (
+								<div>Loading folders...</div>
+							) : (
+								folders.map((folder) => (
 								<div
-								  key={folder.id}
-								  className={styles.folderItem}
-								  onDragOver={(e) => e.preventDefault()} // Allow dragging over the folder
-								  onDrop={(e) => handleDrop(e, folder.id)} // Handle drop
+									key={folder.id}
+									className={styles.folderItem}
+									onDragOver={(e) => e.preventDefault()} // Allow dragging over the folder
+									onDrop={(e) => handleDrop(e, folder.id)} // Handle drop
 								>
-								  <span onClick={() => handleFolderClick(folder.id, folder.name)}>{folder.name}</span>
-								  {/* Add the three-dot menu */}
-								  <Menu
+									<span onClick={() => handleFolderClick(folder.id, folder.name)}>{folder.name}</span>
+									<Menu
 									onRename={() => console.log(`Rename folder: ${folder.name}`)}
 									onDelete={() => console.log(`Delete folder: ${folder.name}`)}
 									onMove={() => console.log(`Move folder: ${folder.name}`)}
-								  />
+									/>
 								</div>
-							  ))
+								))
+							)}
+							</>
 						)}
 					</div>
+
 
 					<div className={styles.prompt}>
 						Double click on a floor plan to open them in the editor page
