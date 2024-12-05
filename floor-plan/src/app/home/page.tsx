@@ -164,35 +164,43 @@ export default function Home() {
 	// Function to update the folderID of a file in Firestore
 	const updateFileFolder = async (fileId: string, folderID: string) => {
 		try {
-			const fileRef = doc(db, "FloorPlans", fileId); // Reference to the specific file document
-			await updateDoc(fileRef, { folderID }); // Update the folderID field in Firestore
-			console.log(`File ${fileId} moved to folder ${folderID}`);
+		  const fileRef = doc(db, "FloorPlans", fileId);
+		  await updateDoc(fileRef, { folderID });
+		  console.log(`File ${fileId} moved to folder ${folderID}`);
+		  console.log('moved!');
 		} catch (error) {
-			console.error("Failed to update file folder:", error);
-			throw new Error("Failed to update file folder.");
+		  console.error("Failed to update file folder:", error);
+		  throw new Error("Failed to update file folder.");
 		}
 	};
+	
 
-	const handleDrop = async (event: React.DragEvent<HTMLDivElement>, folderId: string) => {
+	const handleDrop = async (event: React.DragEvent<HTMLDivElement>, folderID: string) => {
 		event.preventDefault();
-		const fileId = event.dataTransfer.getData("fileId"); // Get the dragged file ID
+		const fileId = event.dataTransfer.getData('fileId'); // Get the dragged file ID
+	  
+		console.log(`Moving file ${fileId} to folder ${folderID}`);
+	  
 		if (fileId) {
-			try {
-				// Call the updateFileFolder function to change the folderID in Firestore
-				await updateFileFolder(fileId, folderId);
-				fetchFloorPlans(); // Refresh the file list after moving the file
-			} catch (err) {
-				console.error("Failed to move file:", err);
-				alert("Failed to move file.");
-			}
+		  try {
+			// Update Firestore
+			await updateFileFolder(fileId, folderID);
+	  
+			// Explicitly refresh floor plans
+			fetchFloorPlans();
+		  } catch (err) {
+			console.error("Failed to move file:", err);
+			alert("Failed to move file.");
+		  }
 		}
 	};
+	  
 
-	const handleFolderClick = (folderId: string, folderName: string) => {
-		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
-		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+	const handleFolderClick = (folderID: string, folderName: string) => {
+		setSelectedFolder(folderID);  // Set the selected folder ID to display its contents
+		fetchFolders(folderID);  // Fetch subfolders inside the selected folder
 		fetchFloorPlans(); // Fetch files inside the selected folder
-		setFolderPath((prevPath) => [...prevPath, { id: folderId, name: folderName }]); // Add the new folder to the path
+		setFolderPath((prevPath) => [...prevPath, { id: folderID, name: folderName }]); // Add the new folder to the path
 	};
 
 	const handleBackClick = () => {
@@ -205,30 +213,30 @@ export default function Home() {
 	};
 
 	const handleDragStart = (event: React.DragEvent<HTMLDivElement>, fileId: string) => {
-		event.dataTransfer.setData('fileId', fileId); // Set the dragged file ID
+		event.dataTransfer.setData('fileId', fileId); // Save the dragged file ID
 	};
 
-	const handleBreadcrumbClick = (folderId: string) => {
+	const handleBreadcrumbClick = (folderID: string) => {
 		// Find the folder's index in the folderPath array
-		const clickedFolderIndex = folderPath.findIndex(folder => folder.id === folderId);
+		const clickedFolderIndex = folderPath.findIndex(folder => folder.id === folderID);
 
 		// Remove all folders after the clicked folder
 		const newFolderPath = folderPath.slice(0, clickedFolderIndex + 1);
 
-		setSelectedFolder(folderId);  // Set the selected folder ID to display its contents
-		fetchFolders(folderId);  // Fetch subfolders inside the selected folder
+		setSelectedFolder(folderID);  // Set the selected folder ID to display its contents
+		fetchFolders(folderID);  // Fetch subfolders inside the selected folder
 		fetchFloorPlans(); // Fetch files inside the selected folder
 		setFolderPath(newFolderPath);  // Update the folder path to only include folders up to this one
 	};
 
-	const handleDropOnBreadcrumb = async (event: React.DragEvent, targetFolderId: string) => {
+	const handleDropOnBreadcrumb = async (event: React.DragEvent, targetfolderID: string) => {
 		event.preventDefault();
 		const fileId = event.dataTransfer.getData("fileId");  // Get the file ID from the drag event
 
 		if (fileId) {
 			try {
 				// Update the file's folderID to the target folder in Firestore
-				await updateFileFolder(fileId, targetFolderId);
+				await updateFileFolder(fileId, targetfolderID);
 				fetchFloorPlans();  // Refresh the file list after moving the file
 			} catch (err) {
 				console.error("Failed to move file:", err);
@@ -238,9 +246,9 @@ export default function Home() {
 	};
 
 	const handleCreateFolder = async (folderName: string) => {
-        const parentFolderId = selectedFolder || "4"; // Default folder ID if none selected
-        await createFolder(folderName, parentFolderId);
-        fetchFolders(parentFolderId); // Refresh the folder list
+        const parentfolderId = selectedFolder || "4"; // Default folder ID if none selected
+        await createFolder(folderName, parentfolderId);
+        fetchFolders(parentfolderId); // Refresh the folder list
     };
 
 	// Creates a pop up when user tries to delete a floor plan
@@ -449,8 +457,8 @@ export default function Home() {
 								<div
 								  key={folder.id}
 								  className={styles.folderItem}
-								  onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
-								  onDragOver={(e) => e.preventDefault()} // Allow drag over
+								  onDragOver={(e) => e.preventDefault()} // Allow dragging over the folder
+								  onDrop={(e) => handleDrop(e, folder.id)} // Handle drop
 								>
 								  <span onClick={() => handleFolderClick(folder.id, folder.name)}>{folder.name}</span>
 								  {/* Add the three-dot menu */}
@@ -483,46 +491,53 @@ export default function Home() {
 							/>
 						</div>
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (
-							<div key={file.id} className={styles.fileItem} onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')} onMouseLeave={handleMouseLeave}>
-								{/* Three-dot button */}
-								<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
-									<img
-										className={styles.threeDotLogo}
-										src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
-										alt="three-dots-icon"
-									/>
-								</button>
+						<div
+							key={file.id}
+							className={styles.fileItem}
+							draggable // Make the file draggable
+							onDragStart={(event) => handleDragStart(event, file.id)} // Handle drag start
+							onDoubleClick={() => openFloorplan(file.pdfURL, file.id, file.name || 'Untitled')}
+							onMouseLeave={handleMouseLeave}
+						>
+							{/* Three-dot button */}
+							<button className={styles.threeDotButton} onClick={() => handleThreeDotPopup(file.id)}>
+							<img
+								className={styles.threeDotLogo}
+								src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+								alt="three-dots-icon"
+							/>
+							</button>
 
-								<div className={styles.fileName}>
-									{truncateFloorPlanName(file.name)}
-									<div className={styles.fileNamePopup}>{file.name}</div>
-								</div>
-								<button
-									className={styles.starButton}
-									onClick={() => handleStarredFloorplans(file.id, file.starred)}
-								>
-									<Star fill={file.starred ? "yellow" : "white"} color="black" />
-								</button>
-								<img src={thumbnails[file.id] || 'loading'} alt="PDF Thumbnail" className={styles.thumbnail} />
-								<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
-
-								{/* Popup Menu */}
-								{showThreeDotPopup && selectedFileId === file.id && (
-									isRenaming && docToRename === file.id ? (
-										<>
-											<input value={newName} onChange={(e) => setNewName(e.target.value)} />
-											<button onClick={submitNewName}>Save</button>
-											<button onClick={cancelRenaming}>Cancel</button>
-										</>
-									) : (
-										<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
-											<ShareButton fileId={file.id} />
-											<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
-											<button onClick={() => handleDeleteFloorPlan(file.id)}>Delete</button>
-										</div>
-									)
-								)}
+							<div className={styles.fileName}>
+							{truncateFloorPlanName(file.name)}
+							<div className={styles.fileNamePopup}>{file.name}</div>
 							</div>
+							<button
+							className={styles.starButton}
+							onClick={() => handleStarredFloorplans(file.id, file.starred)}
+							>
+							<Star fill={file.starred ? "yellow" : "white"} color="black" />
+							</button>
+							<img src={thumbnails[file.id] || 'loading'} alt="PDF Thumbnail" className={styles.thumbnail} />
+							<div className={styles.creatorInfo}>{file.creatorEmail || 'Unknown Creator'}</div>
+
+							{/* Popup Menu */}
+							{showThreeDotPopup && selectedFileId === file.id && (
+							isRenaming && docToRename === file.id ? (
+								<>
+								<input value={newName} onChange={(e) => setNewName(e.target.value)} />
+								<button onClick={submitNewName}>Save</button>
+								<button onClick={cancelRenaming}>Cancel</button>
+								</>
+							) : (
+								<div className={styles.popupMenu} onMouseLeave={handleMouseLeave}>
+								<ShareButton fileId={file.id} />
+								<button onClick={() => startRenaming(file.id!, file.name)}>Rename</button>
+								<button onClick={() => handleDeleteFloorPlan(file.id)}>Delete</button>
+								</div>
+							)
+							)}
+						</div>
 						))}
 					</div>
 				</main>

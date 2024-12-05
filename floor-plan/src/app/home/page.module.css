@@ -531,3 +531,11 @@
   border: none;
   cursor: pointer;
 }
+
+.folderItem:hover {
+  background-color: #f0f0f0; /* Highlight the folder */
+}
+
+.folderItem.drag-over {
+  background-color: #d0f0d0; /* Different color when dragging over */
+}

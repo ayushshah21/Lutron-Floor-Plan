@@ -12,6 +12,9 @@ export const useUserFiles = (selectedFolder: string | null, filterCondition: str
 	const fetchFloorPlans = async () => {
 		setLoading(true);
 		setError(null);
+		
+		console.log("Fetching floor plans for:", selectedFolder, filterCondition);
+
 
 		try {
 			// Check and retrieve user authentication
@@ -48,11 +51,13 @@ export const useUserFiles = (selectedFolder: string | null, filterCondition: str
 			}
 
 			const querySnapshot = await getDocs(q);
+			console.log("Fetched files:", querySnapshot.docs.map(doc => doc.data()));
 			setFloorPlans(querySnapshot.docs.map(doc => ({
 				id: doc.id,
 				...doc.data() as Omit<FloorPlanDocument, 'id'>
 			})));
 		} catch (error) {
+			console.error("Error fetching files:", error);
 			setError("Error fetching files");
 		}
 		setLoading(false);
