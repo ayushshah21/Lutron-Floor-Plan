@@ -476,10 +476,14 @@ export default function Home() {
 					</div>
 
 
-					<div className={styles.prompt}>
-						Double click on a floor plan to open them in the editor page
-					</div>
+					{filteredFloorPlans.length > 0 && (
+						<div className={styles.prompt}>
+							Double click on a floor plan to open them in the editor page
+						</div>
+					)}
+
 					<div className={styles.fileList}>
+					{filterCondition === "Home" && (
 						<div className={styles.fileItem}>
 							<button
 								className={styles.importButton}
@@ -494,6 +498,7 @@ export default function Home() {
 								onChange={handleFileChange}
 							/>
 						</div>
+					)}
 						{filteredFloorPlans.map((file: FloorPlanDocument) => (
 						<div
 							key={file.id}
