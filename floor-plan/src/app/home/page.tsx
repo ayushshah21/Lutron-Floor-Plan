@@ -447,20 +447,20 @@ export default function Home() {
 						) : (
 							folders.map((folder) => (
 								<div
-									key={folder.id}
-									className={styles.folderItem}
-									onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both folder ID and Name
-									onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
-									onDragOver={(e) => e.preventDefault()} // Allow drag over
+								  key={folder.id}
+								  className={styles.folderItem}
+								  onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
+								  onDragOver={(e) => e.preventDefault()} // Allow drag over
 								>
-									<span>{folder.name}</span>
-									<Menu
-										onDelete={() => handleDeleteFolder(folder.id)}
-										onRename={() => handleRenameFolder(folder.id)}
-										onMove={() => handleMoveFolder(folder.id)}
-									/>
+								  <span onClick={() => handleFolderClick(folder.id, folder.name)}>{folder.name}</span>
+								  {/* Add the three-dot menu */}
+								  <Menu
+									onRename={() => console.log(`Rename folder: ${folder.name}`)}
+									onDelete={() => console.log(`Delete folder: ${folder.name}`)}
+									onMove={() => console.log(`Move folder: ${folder.name}`)}
+								  />
 								</div>
-							))
+							  ))
 						)}
 					</div>
 

@@ -512,3 +512,22 @@
 .userProfile svg {
   color: #0057B8;
 }
+
+
+.folderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc; /* Optional for visual separation */
+}
+
+.folderItem span {
+  cursor: pointer; /* Make the folder name clickable */
+}
+
+.folderItem button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
