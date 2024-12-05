@@ -512,3 +512,30 @@
 .userProfile svg {
   color: #0057B8;
 }
+
+
+.folderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc; /* Optional for visual separation */
+}
+
+.folderItem span {
+  cursor: pointer; /* Make the folder name clickable */
+}
+
+.folderItem button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.folderItem:hover {
+  background-color: #f0f0f0; /* Highlight the folder */
+}
+
+.folderItem.drag-over {
+  background-color: #d0f0d0; /* Different color when dragging over */
+}
