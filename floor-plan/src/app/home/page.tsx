@@ -328,27 +328,33 @@ export default function Home() {
 
 	const handleDeleteFolder = async (folderId: string, parentFolderId: string | null) => {
 		try {
-		  // Query Firestore for files in the folder
+		  // Step 1: Query Firestore for files in the folder
 		  const filesQuery = query(
-			collection(db, "files"), // Ensure "files" is the correct collection name
+			collection(db, "files"),
 			where("parentFolderId", "==", folderId)
 		  );
 		  const filesSnapshot = await getDocs(filesQuery);
 	  
-		  // Batch update files' parentFolderId
+		  // Step 2: Batch move files to the parent folder
 		  const batch = writeBatch(db);
 		  filesSnapshot.forEach((fileDoc) => {
-			batch.update(fileDoc.ref, { parentFolderId: parentFolderId || "root" });
+			const fileRef = fileDoc.ref;
+			batch.update(fileRef, { parentFolderId: parentFolderId || "root" }); // Move to parent or root
+			console.log(`Moving file ${fileDoc.id} to parent folder ${parentFolderId || "root"}`);
 		  });
 		  await batch.commit();
 	  
-		  // Delete the folder itself
+		  // Step 3: Delete the folder itself
 		  await deleteDoc(doc(db, "folders", folderId));
-		  fetchFolders(); // Refresh UI
+		  console.log(`Deleted folder with ID ${folderId}`);
+	  
+		  // Step 4: Refresh the folders
+		  fetchFolders(parentFolderId || "root");
 		} catch (error) {
 		  console.error("Error deleting folder:", error);
 		}
-	};
+	  };
+	  
 	  
 
 
