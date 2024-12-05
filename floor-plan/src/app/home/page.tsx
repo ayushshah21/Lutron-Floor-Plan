@@ -486,10 +486,16 @@ export default function Home() {
 								>
 									<span>{folder.name}</span>
 									<Menu
-										onDelete={() => handleDeleteFolder(folder.id)}
-										onRename={() => handleRenameFolder(folder.id)}
+										onDelete={() => handleDeleteFolder(folder.id, folder.parentFolderId || null)}
+										onRename={() => {
+											const newName = prompt("Enter new folder name:", folder.name);
+											if (newName) {
+											renameFolder(folder.id, newName);
+											}
+										}}
 										onMove={() => handleMoveFolder(folder.id)}
-									/>
+										/>
+
 								</div>
 							))
 						)}
