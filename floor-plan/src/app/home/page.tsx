@@ -309,11 +309,15 @@ export default function Home() {
 		refreshFloorPlans();
 	};
 
-	const handleRenameFolder = (folderId: string) => {
-		// Placeholder function to handle renaming folders
-		console.log(`Rename folder with ID: ${folderId}`);
-		// Add your renaming logic here (e.g., prompt for new folder name, update in database)
+	const renameFolder = async (folderId: string, newName: string) => {
+		try {
+		  await updateDoc(doc(db, "folders", folderId), { name: newName });
+		  fetchFolders(); // Refresh the folders
+		} catch (error) {
+		  console.error("Error renaming folder:", error);
+		}
 	};
+	
 	const handleMoveFolder = (folderId: string) => {
     // Placeholder function to handle moving folders
     console.log(`Move folder with ID: ${folderId}`);
