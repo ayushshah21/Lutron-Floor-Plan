@@ -1,37 +1,46 @@
-// src/app/components/Menu.tsx
-import { useState, FC } from "react";
+import { useState } from "react";
 import styles from "./Menu.module.css";
 
+type MenuType = "file" | "folder";
+
 interface MenuProps {
-  onDelete: () => void;
   onRename: () => void;
-  onMove: () => void;
+  onDelete: () => void;
+  onMove?: () => void;
+  type: MenuType; // New prop to specify whether it’s for a file or folder
 }
 
-// The Menu component is a new file that will be used to handle options for both files and folders.
-// It includes options like Rename, Move, and Delete, and can be attached to any item using a button with three dots.
-const Menu: FC<MenuProps> = ({ onDelete, onRename, onMove }) => {
+const Menu: React.FC<MenuProps> = ({ onRename, onDelete, onMove, type }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => {
+  const toggleMenu = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent parent clicks from triggering
     setIsOpen(!isOpen);
   };
 
-  const handleMenuClick = (action: () => void) => {
+  const handleMenuAction = (action: () => void) => {
     action();
-    setIsOpen(false); // Close the menu after an action is selected
+    setIsOpen(false); // Close the menu after an action
   };
 
   return (
     <div className={styles.menuContainer}>
-      <button className={styles.menuButton} onClick={toggleMenu}>
-        ⋮ {/* Three dots icon */}
+      <button className={styles.threeDotButton} onClick={toggleMenu}>
+        ⋮ {/* Three dots */}
       </button>
       {isOpen && (
-        <div className={styles.menuOptions}>
-          <button onClick={() => handleMenuClick(onRename)}>Rename</button>
-          <button onClick={() => handleMenuClick(onMove)}>Move</button>
-          <button onClick={() => handleMenuClick(onDelete)}>Delete</button>
+        <div className={styles.popupMenu}>
+          <button onClick={() => handleMenuAction(onRename)}>
+            Rename {type === "folder" ? "Folder" : "File"}
+          </button>
+          <button onClick={() => handleMenuAction(onDelete)}>
+            Delete {type === "folder" ? "Folder" : "File"}
+          </button>
+          {onMove && (
+            <button onClick={() => handleMenuAction(onMove)}>
+              Move {type === "folder" ? "Folder" : "File"}
+            </button>
+          )}
         </div>
       )}
     </div>

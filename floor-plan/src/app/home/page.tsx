@@ -259,17 +259,16 @@ export default function Home() {
 		}
 	};
 
-	// Display pop up menu when clicking on three dot icon
 	const handleThreeDotPopup = (id: string) => {
-		// Check if the currently selected file ID is the same as the clicked one and if the popup is shown
 		if (selectedFileId === id && showThreeDotPopup) {
-			setShowThreeDotPopup(false); // Hide the popup if it's already shown for the same file ID
+		  setShowThreeDotPopup(false); // Hide the popup if already shown
 		} else {
-			setSelectedFileId(id); // Set the new file ID
-			setShowThreeDotPopup(true); // Show the popup
+		  setSelectedFileId(id); // Set the new selected ID (file or folder)
+		  setShowThreeDotPopup(true); // Show the popup
 		}
 	};
-
+	  
+	  
 	// Truncate a floor plan name
 	const truncateFloorPlanName = (name: string | undefined) => {
 		if (!name) return 'Unnamed File'; // Handle undefined or empty names
@@ -478,26 +477,46 @@ export default function Home() {
 						) : (
 							folders.map((folder) => (
 								<div
-									key={folder.id}
-									className={styles.folderItem}
-									onClick={() => handleFolderClick(folder.id, folder.name)} // Pass both folder ID and Name
-									onDrop={(e) => handleDrop(e, folder.id)} // Enable dropping files into the folder
-									onDragOver={(e) => e.preventDefault()} // Allow drag over
+								  key={folder.id}
+								  className={styles.folderItem}
+								  onClick={() => handleFolderClick(folder.id, folder.name)} // Handle folder clicks
+								  onMouseLeave={handleMouseLeave} // Close popup menu when the mouse leaves
 								>
-									<span>{folder.name}</span>
+								  {/* Folder Name */}
+								  <div className={styles.folderName}>{folder.name}</div>
+								  
+								  {/* Three-dot button */}
+								  <button
+									className={styles.threeDotButton}
+									onClick={(e) => {
+									  e.stopPropagation(); // Prevent triggering folder click
+									  handleThreeDotPopup(folder.id); // Show the menu
+									}}
+								  >
+									<img
+									  className={styles.threeDotLogo}
+									  src="https://cdn.icon-icons.com/icons2/2645/PNG/512/three_dots_vertical_icon_159806.png"
+									  alt="three-dots-icon"
+									/>
+								  </button>
+								  
+								  {/* Menu Component */}
+								  {showThreeDotPopup && selectedFileId === folder.id && (
 									<Menu
-										onDelete={() => handleDeleteFolder(folder.id, folder.parentFolderId || null)}
-										onRename={() => {
-											const newName = prompt("Enter new folder name:", folder.name);
-											if (newName) {
-											renameFolder(folder.id, newName);
-											}
-										}}
-										onMove={() => handleMoveFolder(folder.id)}
-										/>
-
+									  id={folder.id}
+									  name={folder.name}
+									  type="folder"
+									  onRename={(id, newName) => renameFolder(id, newName)}
+									  onDelete={(id) => handleDeleteFolder(id, folder.parentFolderId || null)}
+									  onMove={(id) => handleMoveFolder(id)}
+									/>
+								  )}
 								</div>
-							))
+							  ))
+							  
+							   
+							  
+							  
 						)}
 					</div>
 
