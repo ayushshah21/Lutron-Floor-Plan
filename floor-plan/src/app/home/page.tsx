@@ -14,7 +14,7 @@ import { useUpdateFileName } from '../hooks/useUpdateFileName';
 import { Search, Star, Users, HomeIcon, User, LogOut, Book } from "lucide-react";
 import Spinner from "../components/Spinner";
 import { useFolders } from '../hooks/useFolders';
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import ShareButton from "../components/ShareButton";
 import Menu from "../components/Menu";
@@ -142,8 +142,8 @@ export default function Home() {
 		if (file && file.type === "application/pdf") {
 			setPdfFile(file);
 
-			const folderId = selectedFolder || "4"; // Default to "4" (Home folder) if no folder is selected
-			const result = await uploadPdf(file, folderId); // Upload the PDF and get both pdfURL and documentId
+			const folderID = selectedFolder || "4"; // Default to "4" (Home folder) if no folder is selected
+			const result = await uploadPdf(file, folderID); // Upload the PDF and get both pdfURL and documentId
 			if (result) {
 				const { pdfURL, documentId } = result;
 				// Redirect to the editor page, passing the PDF URL and documentId
@@ -245,11 +245,50 @@ export default function Home() {
 		}
 	};
 
+	const updateFolderName = async (folderID: string, newName: string) => {
+		try {
+			const folderRef = doc(db, "folders", folderID);
+			await updateDoc(folderRef, { name: newName }); // Only updates the "name" field
+			console.log(`Folder name updated to: ${newName}`);
+		} catch (error) {
+			console.error("Failed to update folder name:", error);
+			throw new Error("Failed to update folder name.");
+		}
+	};
+	
+	
+
+	const verifyFolderExists = async (folderID: string) => {
+		try {
+			const folderRef = doc(db, "folders", folderID); // Ensure "folders" matches the collection in Firestore
+			const folderDoc = await getDoc(folderRef);
+	
+			if (!folderDoc.exists()) {
+				console.error("Folder does not exist:", folderID);
+				return false;
+			}
+	
+			console.log("Folder exists. Data:", folderDoc.data());
+			return true;
+		} catch (error) {
+			console.error("Error verifying folder existence:", error);
+			return false;
+		}
+	};
+	
+	
+	
 	const handleCreateFolder = async (folderName: string) => {
-        const parentfolderId = selectedFolder || "4"; // Default folder ID if none selected
-        await createFolder(folderName, parentfolderId);
-        fetchFolders(parentfolderId); // Refresh the folder list
-    };
+		const parentfolderID = selectedFolder || "4"; // Default folder ID if none selected
+		try {
+			const folderID = await createFolder(folderName, parentfolderID);
+			console.log("Created folder with ID:", folderID); // Log folder ID
+			fetchFolders(parentfolderID); // Refresh the folder list
+		} catch (error) {
+			console.error("Failed to create folder:", error);
+		}
+	};
+	
 
 	// Creates a pop up when user tries to delete a floor plan
 	// Askes if they want to proceed
@@ -317,20 +356,35 @@ export default function Home() {
 		refreshFloorPlans();
 	};
 
-	const handleRenameFolder = (folderId: string) => {
-		// Placeholder function to handle renaming folders
-		console.log(`Rename folder with ID: ${folderId}`);
-		// Add your renaming logic here (e.g., prompt for new folder name, update in database)
+	const handleRenameFolder = async (folderID: string, newName: string) => {
+		console.log(`Attempting to rename folder: ${folderID} to: ${newName}`);
+	
+		const folderExists = await verifyFolderExists(folderID);
+		if (!folderExists) {
+			console.error("Cannot rename folder. Folder does not exist:", folderID);
+			return;
+		}
+	
+		try {
+			await updateFolderName(folderID, newName);
+			console.log(`Successfully renamed folder to: ${newName}`);
+			fetchFolders(selectedFolder || "4"); // Refresh folder list
+		} catch (error) {
+			console.error("Failed to rename folder:", error);
+		}
 	};
-	const handleMoveFolder = (folderId: string) => {
+	
+	
+	
+	const handleMoveFolder = (folderID: string) => {
     // Placeholder function to handle moving folders
-    console.log(`Move folder with ID: ${folderId}`);
+    console.log(`Move folder with ID: ${folderID}`);
     // Add your moving logic here (e.g., select target folder, update in database)
 	};
 
-	const handleDeleteFolder = (folderId: string) => {
+	const handleDeleteFolder = (folderID: string) => {
 		// Placeholder function to delete  folders
-		console.log(`Delete folder with ID: ${folderId}`);
+		console.log(`Delete folder with ID: ${folderID}`);
 		// Add your delete logic here (e.g., select target folder, update in database)
 		};
 
@@ -464,7 +518,7 @@ export default function Home() {
 								>
 									<span onClick={() => handleFolderClick(folder.id, folder.name)}>{folder.name}</span>
 									<Menu
-									onRename={() => console.log(`Rename folder: ${folder.name}`)}
+    								onRename={() => handleRenameFolder(folder.id, folder.name)}
 									onDelete={() => console.log(`Delete folder: ${folder.name}`)}
 									onMove={() => console.log(`Move folder: ${folder.name}`)}
 									/>
